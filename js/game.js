@@ -1,5 +1,6 @@
 const handEl = document.getElementById("hand");
 const trickEl = document.getElementById("trick");
+const msgEl = document.getElementById("msg");
 const resetBtn = document.getElementById("resetBtn");
 
 let hand = ["AS","KH","QD","JC","10S","9H","8D"];
@@ -9,14 +10,14 @@ function render() {
   handEl.innerHTML = "";
   hand.forEach((c, idx) => {
     const b = document.createElement("button");
-    b.className = "btn btn-secondary";
-    b.style.margin = "6px";
+    b.className = "pill";
     b.textContent = c;
     b.onclick = () => play(idx);
     handEl.appendChild(b);
   });
 
   trickEl.textContent = trick.length ? trick.join("  |  ") : "(empty)";
+  msgEl.textContent = hand.length ? "Click a card to play it to the trick." : "Hand is empty. Hit Reset.";
 }
 
 function play(index) {
@@ -26,6 +27,12 @@ function play(index) {
 }
 
 resetBtn.onclick = () => {
+  hand = ["AS","KH","QD","JC","10S","9H","8D"];
+  trick = [];
+  render();
+};
+
+render();
   hand = ["AS","KH","QD","JC","10S","9H","8D"];
   trick = [];
   render();
