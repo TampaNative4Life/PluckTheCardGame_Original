@@ -1,31 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pluck: The Card Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pluck: The Card Game</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #111;
-    color: #fff;
-    text-align: center;
-}
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
+      <span>PLUCK</span>
+    </a>
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a href="rules.html">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-.hero {
-    padding: 60px 20px;
-}
+  <main class="container">
+    <section class="hero">
+      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck: The Card Game">
+      <div class="h1">PLUCK: THE CARD GAME</div>
+      <div class="tagline">GET READY FOR SOME FOWL PLAY WITH PLUCK!</div>
 
-.logo {
-    max-width: 400px;
-    width: 90%;
-}
+      <div class="buttons">
+        <button class="btn btn-primary" onclick="window.location.href='game.html'">PLAY DEMO</button>
+        <button class="btn btn-secondary" onclick="window.location.href='rules.html'">READ RULES</button>
+      </div>
+    </section>
 
-h1 {
-    font-size: 3rem;
-    margin: 30px 0 10px 0;
+    <section class="grid">
+      <div class="card">
+        <h3>3-Player Strategy</h3>
+        <p>Pluck is built for three—fast turns, sharp reads, and real decision-making. No filler.</p>
+      </div>
+      <div class="card">
+        <h3>Built for Online Play</h3>
+        <p>We’re prototyping on the web so anybody can play. Desktop and mobile come later.</p>
+      </div>
+      <div class="card">
+        <h3>Stats + Progress</h3>
+        <p>Wins, plucks, and player growth will be tracked. Everything you earn sticks with you.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    © 2026 Pluck The Card Game • TampaNative4Life
+  </footer>
+
+</body>
+</html>
 }
 
 .tagline {
@@ -96,5 +124,6 @@ footer {
 </body>
 
 </html>
+
 
 
