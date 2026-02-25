@@ -1,41 +1,40 @@
-const handEl = document.getElementById("hand");
-const trickEl = document.getElementById("trick");
-const msgEl = document.getElementById("msg");
-const resetBtn = document.getElementById("resetBtn");
+const handContainer = document.querySelector(".hand");
+const trickContainer = document.querySelector(".trick");
 
-let hand = ["AS","KH","QD","JC","10S","9H","8D"];
-let trick = [];
+const demoHand = [
+  "A♠",
+  "K♦",
+  "10♣",
+  "7♥",
+  "3♠"
+];
 
-function render() {
-  handEl.innerHTML = "";
-  hand.forEach((c, idx) => {
-    const b = document.createElement("button");
-    b.className = "pill";
-    b.textContent = c;
-    b.onclick = () => play(idx);
-    handEl.appendChild(b);
+function renderHand() {
+  handContainer.innerHTML = "";
+
+  demoHand.forEach(card => {
+    const cardEl = document.createElement("div");
+    cardEl.className = "card";
+    cardEl.textContent = card;
+
+    cardEl.addEventListener("click", () => {
+      playCard(card, cardEl);
+    });
+
+    handContainer.appendChild(cardEl);
   });
-
-  trickEl.textContent = trick.length ? trick.join("  |  ") : "(empty)";
-  msgEl.textContent = hand.length ? "Click a card to play it to the trick." : "Hand is empty. Hit Reset.";
 }
 
-function play(index) {
-  const card = hand.splice(index, 1)[0];
-  trick.push(card);
-  render();
+function playCard(card, element) {
+  trickContainer.innerHTML = "";
+
+  const played = document.createElement("div");
+  played.className = "card";
+  played.textContent = card;
+
+  trickContainer.appendChild(played);
+
+  element.remove();
 }
 
-resetBtn.onclick = () => {
-  hand = ["AS","KH","QD","JC","10S","9H","8D"];
-  trick = [];
-  render();
-};
-
-render();
-  hand = ["AS","KH","QD","JC","10S","9H","8D"];
-  trick = [];
-  render();
-};
-
-render();
+document.addEventListener("DOMContentLoaded", renderHand);
