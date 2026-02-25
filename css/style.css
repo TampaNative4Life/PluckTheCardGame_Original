@@ -1,0 +1,152 @@
+:root{
+  --bg:#0b0b0b;
+  --panel:#121212;
+  --text:#ffffff;
+  --muted:#cfcfcf;
+  --gold:#cfa52d;
+  --gold2:#e3b93c;
+  --border:#2a2a2a;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px;
+}
+
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 24px;
+  background:#070707;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  color:var(--text);
+}
+
+.brand img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+}
+
+.brand span{
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+.navlinks{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.navlinks a{
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:700;
+  padding:8px 10px;
+  border-radius:8px;
+}
+
+.navlinks a:hover{
+  background:#141414;
+  color:var(--text);
+}
+
+.hero{
+  padding:50px 0 10px;
+  text-align:center;
+}
+
+.hero img{
+  max-width:520px;
+  width:92%;
+  height:auto;
+}
+
+.h1{
+  font-size:48px;
+  margin:20px 0 10px;
+  letter-spacing:2px;
+  font-weight:900;
+}
+
+.tagline{
+  color:var(--muted);
+  letter-spacing:3px;
+  margin:0 0 26px;
+  font-size:14px;
+}
+
+.buttons{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:18px 0 30px;
+}
+
+.btn{
+  border:none;
+  cursor:pointer;
+  padding:14px 22px;
+  border-radius:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  font-size:16px;
+}
+
+.btn-primary{
+  background:var(--gold);
+  color:#000;
+}
+.btn-primary:hover{ background:var(--gold2); }
+
+.btn-secondary{
+  background:#1f1f1f;
+  color:var(--text);
+  border:1px solid var(--border);
+}
+.btn-secondary:hover{ background:#2a2a2a; }
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  text-align:left;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:14px;
+}
+
+.footer{
+  color:#8a8a8a;
+  text-align:center;
+  padding:30px 18px;
+  border-top:1px solid var(--border);
+  margin-top:50px;
+  font-size:13px;
+}
