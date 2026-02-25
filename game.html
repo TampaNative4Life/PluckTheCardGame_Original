@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pluck Demo</title>
+
+<style>
+body {
+    background:#0f0f0f;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.table {
+    margin-top:40px;
+}
+
+.hand {
+    margin:20px;
+}
+
+.card {
+    display:inline-block;
+    padding:10px 14px;
+    margin:5px;
+    background:#fff;
+    color:#000;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.card:hover {
+    background:#f2d36b;
+}
+
+.trick {
+    margin-top:40px;
+    padding:20px;
+    border:2px solid #cfa52d;
+    min-height:60px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Pluck Demo Table</h2>
+
+<div class="table">
+
+    <div class="hand" id="playerHand"></div>
+
+    <div class="trick" id="trickArea">
+        Trick Area
+    </div>
+
+</div>
+
+<script>
+
+let playerHand = ["AS","KH","QD","JC","10S","9H","8D"];
+let trick = [];
+
+function renderHand() {
+    const handDiv = document.getElementById("playerHand");
+    handDiv.innerHTML = "";
+    playerHand.forEach((card, index) => {
+        let div = document.createElement("div");
+        div.className = "card";
+        div.innerText = card;
+        div.onclick = () => playCard(index);
+        handDiv.appendChild(div);
+    });
+}
+
+function playCard(index) {
+    let card = playerHand.splice(index,1)[0];
+    trick.push(card);
+    renderHand();
+    renderTrick();
+}
+
+function renderTrick() {
+    const trickDiv = document.getElementById("trickArea");
+    trickDiv.innerHTML = trick.join(" | ");
+}
+
+renderHand();
+
+</script>
+
+</body>
+</html>
