@@ -16,15 +16,161 @@ body{
   color:var(--text);
 }
 
-.container{
-  max-width:1100px;
-  margin:0 auto;
-  padding:24px;
-}
-
 .nav{
   display:flex;
   align-items:center;
+  justify-content:space-between;
+  padding:14px 20px;
+  background:#070707;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--text);
+}
+
+.brand img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+}
+
+.brand span{
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.navlinks{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.navlinks a{
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:800;
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+.navlinks a:hover{
+  background:#141414;
+  color:var(--text);
+}
+
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:22px;
+}
+
+.hero{
+  padding:48px 0 14px;
+  text-align:center;
+}
+
+.hero img{
+  max-width:520px;
+  width:92%;
+  height:auto;
+}
+
+.h1{
+  font-size:44px;
+  margin:20px 0 10px;
+  letter-spacing:2px;
+  font-weight:900;
+}
+
+.tagline{
+  color:var(--muted);
+  letter-spacing:3px;
+  margin:0 0 26px;
+  font-size:14px;
+}
+
+.buttons{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:18px 0 30px;
+}
+
+.btn{
+  border:none;
+  cursor:pointer;
+  padding:14px 22px;
+  border-radius:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  font-size:16px;
+}
+
+.btn-primary{
+  background:var(--gold);
+  color:#000;
+}
+.btn-primary:hover{ background:var(--gold2); }
+
+.btn-secondary{
+  background:#1f1f1f;
+  color:var(--text);
+  border:1px solid var(--border);
+}
+.btn-secondary:hover{ background:#2a2a2a; }
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:14px;
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  text-align:left;
+}
+
+.footer{
+  color:#8a8a8a;
+  text-align:center;
+  padding:30px 18px;
+  border-top:1px solid var(--border);
+  margin-top:50px;
+  font-size:13px;
+}
+
+/* Demo bits */
+.pill{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#0f0f0f;
+  color:var(--muted);
+  font-weight:800;
+  margin:6px 6px 0 0;
+}
+
+.trickBox{
+  min-height:52px;
+  padding:14px;
+  border-radius:12px;
+  border:1px dashed #5b4a1b;
+  background:#0f0f0f;
+  color:var(--muted);
+}
   justify-content:space-between;
   padding:14px 24px;
   background:#070707;
