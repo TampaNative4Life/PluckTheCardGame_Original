@@ -1,95 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Pluck Demo</title>
-
-<style>
-body {
-    background:#0f0f0f;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-}
-
-.table {
-    margin-top:40px;
-}
-
-.hand {
-    margin:20px;
-}
-
-.card {
-    display:inline-block;
-    padding:10px 14px;
-    margin:5px;
-    background:#fff;
-    color:#000;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.card:hover {
-    background:#f2d36b;
-}
-
-.trick {
-    margin-top:40px;
-    padding:20px;
-    border:2px solid #cfa52d;
-    min-height:60px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pluck Demo</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
 
-<h2>Pluck Demo Table</h2>
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
+      <span>PLUCK</span>
+    </a>
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-<div class="table">
+  <main class="container">
+    <h1>Playable Demo (Step 1)</h1>
 
-    <div class="hand" id="playerHand"></div>
+    <div class="grid">
+      <div class="card">
+        <h3>Your Hand</h3>
+        <div id="hand"></div>
+        <p id="msg" style="color:#cfcfcf;margin-top:12px;"></p>
+      </div>
 
-    <div class="trick" id="trickArea">
-        Trick Area
+      <div class="card">
+        <h3>Trick</h3>
+        <div class="trickBox" id="trick">(empty)</div>
+        <div class="buttons" style="justify-content:flex-start;margin-top:14px;">
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+        <p style="color:#8a8a8a;margin:0;">Click a card → it moves into the trick. This confirms UI + interaction are working.</p>
+      </div>
     </div>
+  </main>
 
-</div>
+  <footer class="footer">
+    © 2026 Pluck The Card Game
+  </footer>
 
-<script>
-
-let playerHand = ["AS","KH","QD","JC","10S","9H","8D"];
-let trick = [];
-
-function renderHand() {
-    const handDiv = document.getElementById("playerHand");
-    handDiv.innerHTML = "";
-    playerHand.forEach((card, index) => {
-        let div = document.createElement("div");
-        div.className = "card";
-        div.innerText = card;
-        div.onclick = () => playCard(index);
-        handDiv.appendChild(div);
-    });
-}
-
-function playCard(index) {
-    let card = playerHand.splice(index,1)[0];
-    trick.push(card);
-    renderHand();
-    renderTrick();
-}
-
-function renderTrick() {
-    const trickDiv = document.getElementById("trickArea");
-    trickDiv.innerHTML = trick.join(" | ");
-}
-
-renderHand();
-
-</script>
-
+  <script src="js/game.js"></script>
 </body>
 </html>
