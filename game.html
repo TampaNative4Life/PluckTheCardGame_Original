@@ -20,28 +20,33 @@
   </header>
 
   <main class="container">
-    <h1>Playable Demo (Step 1)</h1>
 
-    <div class="grid">
-      <div class="card">
-        <h3>Your Hand</h3>
-        <div id="hand"></div>
-        <p id="msg" style="color:#cfcfcf;margin-top:12px;"></p>
-      </div>
+  <h1>Playable Demo (Step 2)</h1>
 
-      <div class="card">
+  <div class="table">
+
+    <div class="player top">
+      <h3>Player 2 (AI)</h3>
+      <div class="ai-hand">🂠 🂠 🂠 🂠 🂠 🂠 🂠</div>
+    </div>
+
+    <div class="center-area">
+      <div class="trick-box">
         <h3>Trick</h3>
-        <div class="trickBox" id="trick">(empty)</div>
-
-        <div class="buttons" style="justify-content:flex-start;margin-top:14px;">
-          <button class="btn btn-secondary" id="resetBtn">Reset</button>
-        </div>
-
-        <p style="color:#8a8a8a;margin:0;">
-          Click a card → it moves into the trick. This confirms UI + interaction are working.
-        </p>
+        <div id="trick">(empty)</div>
       </div>
     </div>
+
+    <div class="player bottom">
+      <h3>You</h3>
+      <div id="hand"></div>
+      <p id="msg" style="color:#cfcfcf;margin-top:12px;"></p>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+  </div>
+
+</main>
   </main>
 
   <footer class="footer">
@@ -51,3 +56,4 @@
   <script src="js/game.js"></script>
 </body>
 </html>
+
