@@ -352,4 +352,46 @@ body{
   font-size: 28px;
   opacity: 0.6;
 }
+  .table3{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:34px;
+  margin-top:30px;
+}
+
+.middle-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:34px;
+  width:100%;
+}
+
+.player{
+  text-align:center;
+}
+
+.player.left{
+  min-width:240px;
+}
+
+.center-area{
+  display:flex;
+  justify-content:center;
+}
+
+.trick-box{
+  border:1px dashed gold;
+  padding:22px;
+  min-width:280px;
+  text-align:center;
+  border-radius:14px;
+  background:#0f0f0f;
+}
+
+.ai-hand{
+  font-size:28px;
+  opacity:0.6;
+}
 }
