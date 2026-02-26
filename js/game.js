@@ -1,4 +1,10 @@
-// ===== Pluck Web Demo: Step 3 (3 players, turn-based, simple trick logic) =====
+// Pluck Demo Step 4: 3 players + turn order + follow suit + trick counters + round end
+function showError(msg) {
+  const el = document.getElementById("msg");
+  if (el) el.textContent = "ERROR: " + msg;
+  console.error(msg);
+}
+window.addEventListener("error", (e) => showError(e.message || "Unknown script error"));
 
 const handEl = document.getElementById("hand");
 const trickEl = document.getElementById("trick");
@@ -8,16 +14,36 @@ const ai2HandEl = document.getElementById("ai2Hand");
 const ai3HandEl = document.getElementById("ai3Hand");
 const turnBannerEl = document.getElementById("turnBanner");
 
-// --- Basic card model ---
-const SUITS = ["S", "H", "D", "C"]; // Spades, Hearts, Diamonds, Clubs
+// Scoreboard
+const ai2TricksEl = document.getElementById("ai2Tricks");
+const ai3TricksEl = document.getElementById("ai3Tricks");
+const youTricksEl = document.getElementById("youTricks");
+const trickNumEl = document.getElementById("trickNum");
+const trickMaxEl = document.getElementById("trickMax");
+
+const required = [
+  ["hand", handEl],
+  ["trick", trickEl],
+  ["msg", msgEl],
+  ["resetBtn", resetBtn],
+  ["ai2Hand", ai2HandEl],
+  ["ai3Hand", ai3HandEl],
+  ["turnBanner", turnBannerEl],
+  ["ai2Tricks", ai2TricksEl],
+  ["ai3Tricks", ai3TricksEl],
+  ["youTricks", youTricksEl],
+  ["trickNum", trickNumEl],
+  ["trickMax", trickMaxEl],
+];
+for (const [id, el] of required) if (!el) showError(`Missing element id="${id}" in game.html`);
+
+const SUITS = ["S", "H", "D", "C"];
 const RANKS = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
 const RANK_VALUE = Object.fromEntries(RANKS.map((r,i)=>[r,i+2]));
 
 function makeDeck() {
   const deck = [];
-  for (const s of SUITS) {
-    for (const r of RANKS) deck.push(r + s);
-  }
+  for (const s of SUITS) for (const r of RANKS) deck.push(r + s);
   return deck;
 }
 function shuffle(a) {
@@ -28,94 +54,85 @@ function shuffle(a) {
   return a;
 }
 function parseCard(cs) {
-  // "10S" => {rank:"10", suit:"S"} ; "AS" => {rank:"A", suit:"S"}
   const suit = cs.slice(-1);
   const rank = cs.slice(0, cs.length-1);
   return { rank, suit, value: RANK_VALUE[rank] };
 }
 
-// --- Game state ---
 const players = [
-  { id: "AI2", name: "Player 2 (AI)", hand: [] },
-  { id: "AI3", name: "Player 3 (AI)", hand: [] },
-  { id: "YOU", name: "You",            hand: [] }
+  { id: "AI2", name: "Player 2 (AI)", hand: [], tricks: 0 },
+  { id: "AI3", name: "Player 3 (AI)", hand: [], tricks: 0 },
+  { id: "YOU", name: "You",            hand: [], tricks: 0 }
 ];
 
-// Turn order indexes: 0=AI2, 1=AI3, 2=YOU
-let leaderIndex = 0;     // who leads the trick
-let turnIndex = 0;       // whose turn right now
-let leadSuit = null;     // suit that must be followed (simple rule)
-let trick = [];          // [{playerIndex, cardStr}]
-let lockInput = false;   // prevents clicking while AI is moving
+let leaderIndex = 0;
+let turnIndex = 0;
+let leadSuit = null;
+let trick = [];
+let lockInput = false;
 
-// --- Helpers ---
-function seatLabel(i) { return players[i].id; }
+let trickNumber = 1;
+let trickMax = 7;
 
 function render() {
-  // Render your hand as clickable pills
+  if (!handEl || !trickEl || !msgEl) return;
+
+  // Your hand
   handEl.innerHTML = "";
   players[2].hand.forEach((c, idx) => {
     const b = document.createElement("button");
     b.className = "pill";
     b.textContent = c;
-
     b.onclick = () => {
       if (lockInput) return;
-      if (turnIndex !== 2) return; // not your turn
+      if (turnIndex !== 2) return;
       playCard(2, idx);
     };
-
     handEl.appendChild(b);
   });
 
-  // Render trick
-  if (trick.length === 0) {
-    trickEl.textContent = "(empty)";
-  } else {
-    const view = trick.map(t => `${seatLabel(t.playerIndex)}: ${t.cardStr}`).join("  |  ");
-    trickEl.textContent = view;
-  }
+  // Trick
+  trickEl.textContent = trick.length
+    ? trick.map(t => `${players[t.playerIndex].id}: ${t.cardStr}`).join(" | ")
+    : "(empty)";
 
-  // Render AI hands as facedown count
+  // AI hands facedown
   ai2HandEl.textContent = players[0].hand.map(()=> "🂠").join(" ");
   ai3HandEl.textContent = players[1].hand.map(()=> "🂠").join(" ");
 
-  // Banner + msg
-  turnBannerEl.textContent = `Turn: ${players[turnIndex].name}  •  Lead: ${players[leaderIndex].name}`;
+  // Turn banner + message
+  turnBannerEl.textContent = `Turn: ${players[turnIndex].name} • Lead: ${players[leaderIndex].name}`;
   msgEl.textContent = (turnIndex === 2)
     ? (leadSuit ? `Your turn. Follow suit: ${leadSuit}` : "Your turn. Lead any card.")
     : "Waiting on AI...";
+
+  // Scoreboard
+  ai2TricksEl.textContent = String(players[0].tricks);
+  ai3TricksEl.textContent = String(players[1].tricks);
+  youTricksEl.textContent = String(players[2].tricks);
+  trickNumEl.textContent = String(trickNumber);
+  trickMaxEl.textContent = String(trickMax);
 }
 
 function legalIndexesFor(playerIndex) {
   const hand = players[playerIndex].hand;
   if (!leadSuit) return hand.map((_,i)=>i);
-  const suited = hand
-    .map((c,i)=>({c,i}))
-    .filter(x => parseCard(x.c).suit === leadSuit)
-    .map(x=>x.i);
+  const suited = hand.map((c,i)=>({c,i})).filter(x => parseCard(x.c).suit === leadSuit).map(x=>x.i);
   return suited.length ? suited : hand.map((_,i)=>i);
 }
 
 function chooseAiIndex(playerIndex) {
   const legal = legalIndexesFor(playerIndex);
-  // Dumb AI: pick random legal card
-  const pick = legal[Math.floor(Math.random()*legal.length)];
-  return pick;
+  return legal[Math.floor(Math.random()*legal.length)];
 }
 
 function playCard(playerIndex, handIdx) {
-  const hand = players[playerIndex].hand;
-  const cardStr = hand.splice(handIdx, 1)[0];
+  const cardStr = players[playerIndex].hand.splice(handIdx, 1)[0];
+  if (!cardStr) { showError("Tried to play an empty card."); return; }
 
-  // set lead suit if first card of trick
-  if (trick.length === 0) {
-    leadSuit = parseCard(cardStr).suit;
-  }
+  if (trick.length === 0) leadSuit = parseCard(cardStr).suit;
 
   trick.push({ playerIndex, cardStr });
-
-  // advance turn
   turnIndex = (turnIndex + 1) % 3;
 
   render();
@@ -123,11 +140,9 @@ function playCard(playerIndex, handIdx) {
 }
 
 function evaluateTrickWinner() {
-  // Simple trick: must follow lead suit. Highest value among lead suit wins.
-  const lead = leadSuit;
   const candidates = trick
     .map(t => ({...t, card: parseCard(t.cardStr)}))
-    .filter(t => t.card.suit === lead);
+    .filter(t => t.card.suit === leadSuit);
 
   candidates.sort((a,b)=> b.card.value - a.card.value);
   return candidates[0].playerIndex;
@@ -140,30 +155,52 @@ function clearTrickForNext(winnerIndex) {
   turnIndex = winnerIndex;
 }
 
+function roundIsOver() {
+  return players.every(p => p.hand.length === 0) && trick.length === 0;
+}
+
+function announceRoundWinner() {
+  const maxTricks = Math.max(...players.map(p => p.tricks));
+  const winners = players.filter(p => p.tricks === maxTricks);
+
+  if (winners.length === 1) {
+    msgEl.textContent = `Round over. Winner: ${winners[0].name} with ${maxTricks} tricks.`;
+  } else {
+    msgEl.textContent = `Round over. Tie: ${winners.map(w=>w.name).join(" & ")} with ${maxTricks} tricks.`;
+  }
+}
+
 function maybeContinue() {
-  // If trick complete, resolve after a short pause
+  // Resolve trick
   if (trick.length === 3) {
     lockInput = true;
-    render();
 
     setTimeout(() => {
       const winner = evaluateTrickWinner();
+      players[winner].tricks += 1;
       msgEl.textContent = `${players[winner].name} wins the trick.`;
       render();
 
       setTimeout(() => {
         clearTrickForNext(winner);
+        trickNumber += 1;
         lockInput = false;
         render();
-        maybeContinue(); // if AI leads next
-      }, 800);
 
-    }, 700);
+        if (roundIsOver()) {
+          announceRoundWinner();
+          return;
+        }
+
+        maybeContinue(); // if AI leads next
+      }, 700);
+
+    }, 600);
 
     return;
   }
 
-  // If it's AI's turn, let them play automatically
+  // AI turn
   if (turnIndex !== 2) {
     lockInput = true;
     setTimeout(() => {
@@ -171,20 +208,23 @@ function maybeContinue() {
       playCard(turnIndex, aiIdx);
       lockInput = false;
       render();
-    }, 700);
+    }, 600);
   }
 }
 
-// --- Deal / Reset ---
 function dealNewHands() {
   const deck = shuffle(makeDeck());
-  // 7 cards each for demo; adjust later
-  players.forEach(p => p.hand = []);
+  players.forEach(p => { p.hand = []; p.tricks = 0; });
+
+  trickMax = 7;
+  trickNumber = 1;
+
   for (let i=0;i<7;i++) {
     players[0].hand.push(deck.pop());
     players[1].hand.push(deck.pop());
     players[2].hand.push(deck.pop());
   }
+
   trick = [];
   leadSuit = null;
   leaderIndex = 0;
@@ -195,10 +235,11 @@ function dealNewHands() {
 resetBtn.addEventListener("click", () => {
   dealNewHands();
   render();
-  maybeContinue(); // AI may lead immediately
+  maybeContinue();
 });
 
 // Start
 dealNewHands();
 render();
 maybeContinue();
+console.log("Pluck Step 4 loaded OK");
