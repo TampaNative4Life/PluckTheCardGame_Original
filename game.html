@@ -21,7 +21,7 @@
   </header>
 
   <main class="container">
-    <h1>Pluck Demo (Trump + Jokers + 17 Tricks)</h1>
+    <h1>Pluck Demo (Quotas + Pluck Phase)</h1>
 
     <div class="controlbar">
       <div class="controlitem">
@@ -42,12 +42,25 @@
       </div>
     </div>
 
+    <div class="controlbar">
+      <div class="controlitem">
+        <strong>Quotas (AI2 / AI3 / You):</strong>
+        <input id="qAI2" type="number" min="0" max="17" value="8" style="width:70px;">
+        <input id="qAI3" type="number" min="0" max="17" value="5" style="width:70px;">
+        <input id="qYOU" type="number" min="0" max="17" value="4" style="width:70px;">
+        <button class="btn btn-secondary" id="applyQuotaBtn" type="button">Apply Quotas</button>
+      </div>
+      <div class="controlitem">
+        <strong>Phase:</strong> <span id="phaseLabel">PLAY</span>
+      </div>
+    </div>
+
     <p id="turnBanner" style="color:#cfcfcf; text-align:center; margin:0 0 16px 0;"></p>
 
     <div class="scorebar">
-      <div class="scoreitem"><strong>AI2</strong> Tricks: <span id="ai2Tricks">0</span></div>
-      <div class="scoreitem"><strong>AI3</strong> Tricks: <span id="ai3Tricks">0</span></div>
-      <div class="scoreitem"><strong>You</strong> Tricks: <span id="youTricks">0</span></div>
+      <div class="scoreitem"><strong>AI2</strong> Tricks: <span id="ai2Tricks">0</span> / Q <span id="ai2Quota">8</span></div>
+      <div class="scoreitem"><strong>AI3</strong> Tricks: <span id="ai3Tricks">0</span> / Q <span id="ai3Quota">5</span></div>
+      <div class="scoreitem"><strong>You</strong> Tricks: <span id="youTricks">0</span> / Q <span id="youQuota">4</span></div>
       <div class="scoreitem">Trick #: <span id="trickNum">1</span> / <span id="trickMax">17</span></div>
     </div>
 
@@ -68,6 +81,11 @@
           <div class="trick-box">
             <h3>Trick</h3>
             <div id="trick">(empty)</div>
+            <div id="pluckPanel" style="margin-top:14px; padding-top:10px; border-top:1px solid #2a2a2a; display:none;">
+              <h3 style="margin-top:0;">Pluck Phase</h3>
+              <div id="pluckStatus" style="color:#cfcfcf;"></div>
+              <button class="btn btn-secondary" id="pluckNextBtn" type="button" style="margin-top:10px;">Run Next Pluck</button>
+            </div>
           </div>
         </div>
       </div>
@@ -86,6 +104,6 @@
     © 2026 Pluck The Card Game
   </footer>
 
-  <script src="js/game.js?v=5"></script>
+  <script src="js/game.js?v=6"></script>
 </body>
 </html>
