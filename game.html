@@ -21,19 +21,26 @@
 
   <main class="container">
 
-  <h1>Playable Demo (Step 2)</h1>
+  <h1>Playable Demo (Step 3)</h1>
 
-  <div class="table">
+  <div class="table3">
 
     <div class="player top">
       <h3>Player 2 (AI)</h3>
-      <div class="ai-hand">🂠 🂠 🂠 🂠 🂠 🂠 🂠</div>
+      <div class="ai-hand" id="ai2Hand">🂠 🂠 🂠 🂠 🂠 🂠 🂠</div>
     </div>
 
-    <div class="center-area">
-      <div class="trick-box">
-        <h3>Trick</h3>
-        <div id="trick">(empty)</div>
+    <div class="middle-row">
+      <div class="player left">
+        <h3>Player 3 (AI)</h3>
+        <div class="ai-hand" id="ai3Hand">🂠 🂠 🂠 🂠 🂠 🂠 🂠</div>
+      </div>
+
+      <div class="center-area">
+        <div class="trick-box">
+          <h3>Trick</h3>
+          <div id="trick">(empty)</div>
+        </div>
       </div>
     </div>
 
@@ -41,7 +48,7 @@
       <h3>You</h3>
       <div id="hand"></div>
       <p id="msg" style="color:#cfcfcf;margin-top:12px;"></p>
-      <button id="resetBtn">Reset</button>
+      <button class="btn btn-secondary" id="resetBtn">Reset</button>
     </div>
 
   </div>
@@ -56,4 +63,5 @@
   <script src="js/game.js"></script>
 </body>
 </html>
+
 
