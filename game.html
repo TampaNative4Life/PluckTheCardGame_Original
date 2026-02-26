@@ -15,12 +15,32 @@
     </a>
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
+      <a href="rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
   <main class="container">
-    <h1>Playable Demo (Step 4)</h1>
+    <h1>Pluck Demo (Trump + Jokers + 17 Tricks)</h1>
+
+    <div class="controlbar">
+      <div class="controlitem">
+        <label for="trumpSelect"><strong>Dealer selects trump:</strong></label>
+        <select id="trumpSelect">
+          <option value="S">Spades</option>
+          <option value="H" selected>Hearts</option>
+          <option value="D">Diamonds</option>
+          <option value="C">Clubs</option>
+        </select>
+        <button class="btn btn-secondary" id="applyTrumpBtn" type="button">Apply Trump + Deal</button>
+      </div>
+
+      <div class="controlitem">
+        <strong>Trump:</strong> <span id="trumpLabel">H</span>
+        &nbsp; • &nbsp;
+        <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
+      </div>
+    </div>
 
     <p id="turnBanner" style="color:#cfcfcf; text-align:center; margin:0 0 16px 0;"></p>
 
@@ -28,20 +48,20 @@
       <div class="scoreitem"><strong>AI2</strong> Tricks: <span id="ai2Tricks">0</span></div>
       <div class="scoreitem"><strong>AI3</strong> Tricks: <span id="ai3Tricks">0</span></div>
       <div class="scoreitem"><strong>You</strong> Tricks: <span id="youTricks">0</span></div>
-      <div class="scoreitem">Trick #: <span id="trickNum">1</span> / <span id="trickMax">7</span></div>
+      <div class="scoreitem">Trick #: <span id="trickNum">1</span> / <span id="trickMax">17</span></div>
     </div>
 
     <div class="table3">
 
       <div class="player top">
         <h3>Player 2 (AI)</h3>
-        <div class="ai-hand" id="ai2Hand">🂠 🂠 🂠 🂠 🂠 🂠 🂠</div>
+        <div class="ai-hand" id="ai2Hand">🂠</div>
       </div>
 
       <div class="middle-row">
         <div class="player left">
           <h3>Player 3 (AI)</h3>
-          <div class="ai-hand" id="ai3Hand">🂠 🂠 🂠 🂠 🂠 🂠 🂠</div>
+          <div class="ai-hand" id="ai3Hand">🂠</div>
         </div>
 
         <div class="center-area">
@@ -56,7 +76,7 @@
         <h3>You</h3>
         <div id="hand"></div>
         <p id="msg" style="color:#cfcfcf;margin-top:12px;"></p>
-        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
       </div>
 
     </div>
@@ -66,6 +86,6 @@
     © 2026 Pluck The Card Game
   </footer>
 
-  <script src="js/game.js?v=4"></script>
+  <script src="js/game.js?v=5"></script>
 </body>
 </html>
