@@ -324,4 +324,32 @@ body{
   font-size: 28px;
   opacity: 0.6;
 }
+  .table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  margin-top: 40px;
+}
+
+.player {
+  text-align: center;
+}
+
+.center-area {
+  display: flex;
+  justify-content: center;
+}
+
+.trick-box {
+  border: 1px dashed gold;
+  padding: 25px;
+  min-width: 220px;
+  text-align: center;
+}
+
+.ai-hand {
+  font-size: 28px;
+  opacity: 0.6;
+}
 }
