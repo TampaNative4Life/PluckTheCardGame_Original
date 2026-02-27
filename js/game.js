@@ -216,44 +216,108 @@ function legalIndexesFor(playerIndex) {
 }
 
 function chooseAiIndex(playerIndex) {
-
   const legal = legalIndexesFor(playerIndex);
   const hand = players[playerIndex].hand;
 
-  const needed = players[playerIndex].quota - players[playerIndex].tricks;
-  const tricksPlayed = trickNumber - 1;
-  const tricksLeft = TOTAL_TRICKS - tricksPlayed;
+  const neededSelf = players[playerIndex].quota - players[playerIndex].tricks;
+
+  // Opponent pressure: who still needs tricks?
+  const oppIdx = [0, 1, 2].filter(i => i !== playerIndex);
+  const oppNeed = oppIdx.map(i => ({ i, need: players[i].quota - players[i].tricks }));
+
+  // Helper: would this card likely win this trick (rough but effective)?
+  function wouldWinIfPlayed(cardStr) {
+    const tempTrick = trick.concat([{ playerIndex, cardStr }]);
+
+    // if trick not complete, assume remaining players may play something legal;
+    // still estimate winner among cards already present (good enough for "block" behavior).
+    const anyTrump = tempTrick.some(t => isTrumpCard(t.cardStr));
+
+    let best = null;
+    let bestP = -1;
+
+    for (const t of tempTrick) {
+      // must follow trick winner rules
+      if (anyTrump) {
+        if (!isTrumpCard(t.cardStr)) continue;
+        const p = cardPower(t.cardStr);
+        if (p > bestP) { bestP = p; best = t; }
+      } else {
+        if (cardSuitForFollow(t.cardStr) !== leadSuit) continue;
+        const p = parseCard(t.cardStr, trumpSuit).value;
+        if (p > bestP) { bestP = p; best = t; }
+      }
+    }
+    // if no best found (weird edge), assume not winning
+    return best ? (best.playerIndex === playerIndex) : false;
+  }
+
+  function cardVal(cardStr) {
+    if (cardStr === CARD_BIG_JOKER) return 1000;
+    if (cardStr === CARD_LITTLE_JOKER) return 900;
+    const p = parseCard(cardStr, trumpSuit);
+    return p.value;
+  }
 
   let bestIdx = legal[0];
   let bestScore = -Infinity;
 
   for (const idx of legal) {
-
     const card = hand[idx];
-    const parsed = parseCard(card, trumpSuit);
+    const v = cardVal(card);
+    const trump = isTrumpCard(card);
+    const bigJ = (card === CARD_BIG_JOKER);
+    const lilJ = (card === CARD_LITTLE_JOKER);
 
     let score = 0;
 
-    const isTrump = isTrumpCard(card);
-    const isBigJoker = (card === CARD_BIG_JOKER);
-    const isLittleJoker = (card === CARD_LITTLE_JOKER);
+    // Base: prefer higher cards when trying to win, lower when dumping
+    const winsNow = (trick.length === 0) ? false : wouldWinIfPlayed(card);
 
-    const cardValue = isJoker(card)
-      ? (isBigJoker ? 1000 : 900)
-      : parsed.value;
+    if (neededSelf > 0) {
+      // NEED TRICKS: go hunting
+      score += v * 10;
+      if (trump) score += 300;
+      if (bigJ) score += 600;
+      if (lilJ) score += 500;
+      if (winsNow) score += 250;
+    } else if (neededSelf < 0) {
+      // OVER QUOTA: dump hard, avoid trump/jokers
+      score -= v * 12;
+      if (trump) score -= 250;
+      if (bigJ || lilJ) score -= 1200;
+      if (winsNow) score -= 400;
+    } else {
+      // EXACT QUOTA (B): default dump… BUT spite-block if it hurts opponents who still need tricks
+      score -= v * 9; // dumping preference
+      if (trump) score -= 150;
+      if (bigJ || lilJ) score -= 900;
 
-    // ===== Base value =====
-    score += cardValue;
+      // If an opponent still needs tricks and is currently positioned to take this trick,
+      // increase score for a blocking play even if it risks winning.
+      const someoneNeeds = oppNeed.some(o => o.need > 0);
+      if (someoneNeeds) {
+        // If this play would win the trick (or strongly contest it), that’s a block.
+        if (winsNow) score += 600;
 
-    // ===== If AI needs tricks =====
-    if (needed > 0) {
-
-      // Must aggressively win if time running out
-      if (needed >= tricksLeft) {
-        score += 500;
+        // Also slightly favor trump as a blocking tool (but still cautious)
+        if (trump) score += 120;
       }
+    }
 
-      // Trump helps win
+    // Small bonus for following suit (keeps legality and reduces chaos)
+    if (trick.length > 0 && cardSuitForFollow(card) === leadSuit) score += 40;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = idx;
+    }
+  }
+
+  return bestIdx;
+}      
+
+// Trump helps win
       if (isTrump) score += 300;
 
       // Jokers extremely valuable late
