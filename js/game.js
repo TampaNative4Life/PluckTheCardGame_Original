@@ -1,4 +1,4 @@
-// Pluck Web Demo v8: Quotas HARD-LOCKED to sum 17 (AI2 + AI3 chosen; YOU auto)
+// Pluck Web Demo v10: 0-trick ("0 books") mercy rule implemented in pluck phase
 function showError(msg) {
   const el = document.getElementById("msg");
   if (el) el.textContent = "ERROR: " + msg;
@@ -22,10 +22,6 @@ const trumpLabelEl = document.getElementById("trumpLabel");
 const trumpOpenLabelEl = document.getElementById("trumpOpenLabel");
 
 const phaseLabelEl = document.getElementById("phaseLabel");
-const applyQuotaBtn = document.getElementById("applyQuotaBtn");
-const qAI2El = document.getElementById("qAI2");
-const qAI3El = document.getElementById("qAI3");
-const qYOUEl = document.getElementById("qYOU");
 
 const ai2TricksEl = document.getElementById("ai2Tricks");
 const ai3TricksEl = document.getElementById("ai3Tricks");
@@ -40,6 +36,7 @@ const pluckPanelEl = document.getElementById("pluckPanel");
 const pluckStatusEl = document.getElementById("pluckStatus");
 const pluckNextBtn = document.getElementById("pluckNextBtn");
 
+// ===== Core constants =====
 const TOTAL_TRICKS = 17;
 
 // Rules constants
@@ -79,14 +76,28 @@ function parseCard(cs, trumpSuit) {
   const rank = cs.slice(0, cs.length-1);
   return { raw: cs, kind:"NORMAL", suit, rank, value: RANK_VALUE[rank] };
 }
+function isJoker(cs) { return cs === CARD_BIG_JOKER || cs === CARD_LITTLE_JOKER; }
 
-// Players: 0=AI2, 1=AI3, 2=YOU
+// ===== Players (fixed seating for now) =====
+// 0=AI2, 1=AI3, 2=YOU
+// Dealer fixed as AI2 for demo. Quotas fixed by position: Dealer 7, Left 6, Right 4.
+const dealerIndex = 0;
+function leftOf(i) { return (i + 1) % 3; }
+function rightOf(i) { return (i + 2) % 3; }
+
 const players = [
-  { id:"AI2", name:"Player 2 (AI)", hand:[], tricks:0, quota:7, plucks:0 },
-  { id:"AI3", name:"Player 3 (AI)", hand:[], tricks:0, quota:6, plucks:0 },
-  { id:"YOU", name:"You",            hand:[], tricks:0, quota:4, plucks:0 }
+  { id:"AI2", name:"Player 2 (AI)", hand:[], tricks:0, quota:7, plucksEarned:0, plucksSuffered:0 },
+  { id:"AI3", name:"Player 3 (AI)", hand:[], tricks:0, quota:6, plucksEarned:0, plucksSuffered:0 },
+  { id:"YOU", name:"You",            hand:[], tricks:0, quota:4, plucksEarned:0, plucksSuffered:0 }
 ];
 
+function applyFixedQuotas() {
+  players[dealerIndex].quota = 7;
+  players[leftOf(dealerIndex)].quota = 6;
+  players[rightOf(dealerIndex)].quota = 4;
+}
+
+// ===== Game state =====
 let trumpSuit = "H";
 let trumpOpen = false;
 let leaderIndex = 0;
@@ -99,15 +110,21 @@ let trickNumber = 1;
 let trickMax = TOTAL_TRICKS;
 
 let phase = "PLAY"; // PLAY | PLUCK
+
+// Pluck processing
+// Queue items: { pluckerIndex, pluckeeIndex }
 let pluckQueue = [];
 let activePluck = null;
 
+// Tracks "no duplicate suit plucks for the same plucker->pluckee pair"
+let pluckSuitUsedByPair = new Map(); // key "plucker-pluckee" => Set(suits)
+
 function cardSuitForFollow(cs) {
-  if (cs === CARD_BIG_JOKER || cs === CARD_LITTLE_JOKER) return trumpSuit;
+  if (isJoker(cs)) return trumpSuit;  // jokers count as trump suit
   return cs.slice(-1);
 }
 function isTrumpCard(cs) {
-  if (cs === CARD_BIG_JOKER || cs === CARD_LITTLE_JOKER) return true;
+  if (isJoker(cs)) return true;
   return cs.slice(-1) === trumpSuit;
 }
 function hasNonTrump(playerIndex) {
@@ -118,47 +135,6 @@ function setPhase(newPhase) {
   phase = newPhase;
   phaseLabelEl.textContent = newPhase;
   pluckPanelEl.style.display = (newPhase === "PLUCK") ? "block" : "none";
-}
-
-function clampInt(v, min, max, fallback) {
-  const n = parseInt(v, 10);
-  if (Number.isNaN(n)) return fallback;
-  return Math.max(min, Math.min(max, n));
-}
-
-// HARD-LOCK logic:
-// - user can type AI2 + AI3
-// - YOU becomes: 17 - AI2 - AI3
-// - if AI2+AI3 > 17, clamp the changed field so YOU never negative
-function syncQuotas(changed) {
-  let a2 = clampInt(qAI2El.value, 0, TOTAL_TRICKS, 7);
-  let a3 = clampInt(qAI3El.value, 0, TOTAL_TRICKS, 6);
-
-  if (a2 + a3 > TOTAL_TRICKS) {
-    // clamp the one the user just changed
-    if (changed === "AI2") {
-      a2 = TOTAL_TRICKS - a3;
-    } else if (changed === "AI3") {
-      a3 = TOTAL_TRICKS - a2;
-    } else {
-      // fallback: clamp AI3
-      a3 = TOTAL_TRICKS - a2;
-    }
-  }
-
-  const you = TOTAL_TRICKS - a2 - a3;
-
-  // write back to inputs
-  qAI2El.value = String(a2);
-  qAI3El.value = String(a3);
-  qYOUEl.value = String(you);
-
-  // update model
-  players[0].quota = a2;
-  players[1].quota = a3;
-  players[2].quota = you;
-
-  render();
 }
 
 function render() {
@@ -197,7 +173,7 @@ function render() {
   ai3HandEl.textContent = players[1].hand.map(()=> "🂠").join(" ");
 
   turnBannerEl.textContent =
-    `Phase: ${phase} • Turn: ${players[turnIndex].name} • Lead: ${players[leaderIndex].name} • Lead Suit: ${leadSuit ?? "(none)"} • Trump: ${trumpSuit}`;
+    `Phase: ${phase} • Turn: ${players[turnIndex].name} • Lead: ${players[leaderIndex].name} • Lead Suit: ${leadSuit ?? "(none)"} • Trump: ${trumpSuit} • Dealer: ${players[dealerIndex].name}`;
 
   ai2TricksEl.textContent = String(players[0].tricks);
   ai3TricksEl.textContent = String(players[1].tricks);
@@ -209,12 +185,15 @@ function render() {
 }
 
 function illegalReason(playerIndex, cardStr) {
+  // first lead: must be 2C if in hand
   if (trickNumber === 1 && trick.length === 0 && players[playerIndex].hand.includes(CARD_OPEN_LEAD)) {
     if (cardStr !== CARD_OPEN_LEAD) return "First lead must be 2C.";
   }
+  // can't lead trump until opened (unless clubs is trump)
   if (trick.length === 0 && !trumpOpen && trumpSuit !== "C") {
     if (isTrumpCard(cardStr) && hasNonTrump(playerIndex)) return "Trump not open. Lead a non-trump card.";
   }
+  // follow suit if possible
   if (trick.length > 0) {
     const mustSuit = leadSuit;
     const hasSuit = players[playerIndex].hand.some(c => cardSuitForFollow(c) === mustSuit);
@@ -306,40 +285,118 @@ function roundIsOver() {
   return players.every(p => p.hand.length === 0) && trick.length === 0;
 }
 
-// ===== Plucks scaffold =====
-function computePlucks() {
-  for (const p of players) p.plucks = Math.abs(p.tricks - p.quota);
+// ===== Plucks =====
+function computePlucksEarnedAndSuffered() {
+  for (const p of players) {
+    p.plucksEarned = Math.max(0, p.tricks - p.quota);
+    p.plucksSuffered = Math.max(0, p.quota - p.tricks);
+  }
 }
-function buildPluckQueue() {
-  const order = [0,1,2].slice().sort((a,b)=>players[a].plucks - players[b].plucks);
-  const victims = [0,1,2].slice().sort((a,b)=>players[b].plucks - players[a].plucks);
 
+// Pluckers: most earned first; ties dealer -> left -> right
+function pluckerOrder() {
+  const tiebreak = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
+  const idx = [0,1,2];
+  idx.sort((a,b) => {
+    const da = players[a].plucksEarned;
+    const db = players[b].plucksEarned;
+    if (db !== da) return db - da;
+    return tiebreak.indexOf(a) - tiebreak.indexOf(b);
+  });
+  return idx.filter(i => players[i].plucksEarned > 0);
+}
+
+// Victims: most suffered first; ties dealer -> left -> right
+function victimOrder() {
+  const tiebreak = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
+  const idx = [0,1,2];
+  idx.sort((a,b) => {
+    const da = players[a].plucksSuffered;
+    const db = players[b].plucksSuffered;
+    if (db !== da) return db - da;
+    return tiebreak.indexOf(a) - tiebreak.indexOf(b);
+  });
+  return idx.filter(i => players[i].plucksSuffered > 0);
+}
+
+function buildPluckQueueFromScores() {
+  // Distribute plucks from pluckers to victims until satisfied.
   const queue = [];
-  for (const plucker of order) {
-    let remaining = players[plucker].plucks;
-    if (remaining <= 0) continue;
-    const pluckee = victims.find(v => v !== plucker) ?? ((plucker+1)%3);
-    queue.push({ pluckerIndex: plucker, pluckeeIndex: pluckee, remaining, suitsUsed: new Set() });
+  const pluckers = pluckerOrder();
+  const victims = victimOrder();
+
+  const remainingEarned = new Map(pluckers.map(i => [i, players[i].plucksEarned]));
+  const remainingSuffered = new Map(victims.map(i => [i, players[i].plucksSuffered]));
+
+  for (const plucker of pluckers) {
+    while ((remainingEarned.get(plucker) || 0) > 0) {
+      const victim = victims
+        .filter(v => (remainingSuffered.get(v) || 0) > 0)
+        .sort((a,b) => (remainingSuffered.get(b)||0) - (remainingSuffered.get(a)||0))[0];
+
+      if (victim === undefined) break;
+
+      queue.push({ pluckerIndex: plucker, pluckeeIndex: victim });
+
+      remainingEarned.set(plucker, (remainingEarned.get(plucker) || 0) - 1);
+      remainingSuffered.set(victim, (remainingSuffered.get(victim) || 0) - 1);
+    }
   }
   return queue;
 }
-function lowestCardOfSuitExcludingJokers(playerIndex, suit) {
-  const hand = players[playerIndex].hand.filter(c => c !== CARD_BIG_JOKER && c !== CARD_LITTLE_JOKER && c.slice(-1) === suit);
-  if (hand.length === 0) return null;
-  hand.sort((a,b)=> parseCard(a,trumpSuit).value - parseCard(b,trumpSuit).value);
-  return hand[0];
+
+// Normal pluck exchange:
+// - plucker gives LOWEST in suit (non-joker)
+// - pluckee returns HIGHEST in same suit (non-joker)
+//
+// Mercy (0 tricks) rule:
+// - if pluckee.tricks === 0 and plucker earned plucks,
+//   plucker TAKES the pluckee's HIGHEST in suit
+//   and RETURNS NOTHING.
+function lowestOfSuitNonJoker(playerIndex, suit) {
+  const cards = players[playerIndex].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
+  if (cards.length === 0) return null;
+  cards.sort((a,b)=> parseCard(a,trumpSuit).value - parseCard(b,trumpSuit).value);
+  return cards[0];
 }
-function higherCardSameSuitExcludingJokers(playerIndex, suit, minValue) {
-  const hand = players[playerIndex].hand.filter(c => c !== CARD_BIG_JOKER && c !== CARD_LITTLE_JOKER && c.slice(-1) === suit);
-  const candidates = hand.filter(c => parseCard(c,trumpSuit).value > minValue);
-  if (candidates.length === 0) return null;
-  candidates.sort((a,b)=> parseCard(a,trumpSuit).value - parseCard(b,trumpSuit).value);
-  return candidates[0];
+function highestOfSuitNonJoker(playerIndex, suit) {
+  const cards = players[playerIndex].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
+  if (cards.length === 0) return null;
+  cards.sort((a,b)=> parseCard(b,trumpSuit).value - parseCard(a,trumpSuit).value);
+  return cards[0];
 }
 function removeCardFromHand(playerIndex, cardStr) {
   const i = players[playerIndex].hand.indexOf(cardStr);
   if (i >= 0) players[playerIndex].hand.splice(i, 1);
 }
+function pairKey(pluckerI, pluckeeI) { return `${pluckerI}-${pluckeeI}`; }
+
+// Suit availability differs for mercy vs normal
+function availablePluckSuits(pluckerI, pluckeeI) {
+  const used = pluckSuitUsedByPair.get(pairKey(pluckerI, pluckeeI)) || new Set();
+  const mercy = (players[pluckeeI].tricks === 0);
+
+  const suits = [];
+  for (const s of SUITS) {
+    if (used.has(s)) continue;
+
+    // Jokers cannot be forced: we only consider suits where a real card exists
+    const pluckeeHas = highestOfSuitNonJoker(pluckeeI, s);
+    if (!pluckeeHas) continue;
+
+    if (mercy) {
+      // plucker only needs to be able to RECEIVE; no return required
+      suits.push(s);
+    } else {
+      // normal: plucker must be able to GIVE a low card too
+      const pluckerHas = lowestOfSuitNonJoker(pluckerI, s);
+      if (!pluckerHas) continue;
+      suits.push(s);
+    }
+  }
+  return suits;
+}
+
 function renderPluckStatus() {
   if (pluckQueue.length === 0) {
     pluckStatusEl.textContent = "No plucks to process.";
@@ -347,12 +404,21 @@ function renderPluckStatus() {
     return;
   }
   if (!activePluck) activePluck = pluckQueue[0];
+
   const plucker = players[activePluck.pluckerIndex];
   const pluckee = players[activePluck.pluckeeIndex];
+  const mercy = (pluckee.tricks === 0);
+
+  const suits = availablePluckSuits(activePluck.pluckerIndex, activePluck.pluckeeIndex);
+
   pluckStatusEl.textContent =
-    `${plucker.name} is plucking ${pluckee.name}. Remaining plucks for this plucker: ${activePluck.remaining}.`;
+    `${plucker.name} plucks ${pluckee.name}. ` +
+    (mercy ? `[0-Trick Mercy Rule: ${pluckee.name} surrenders, no return] ` : ``) +
+    (suits.length ? `Available suits: ${suits.join(", ")}.` : `No legal suit available (will skip).`);
+
   pluckNextBtn.disabled = false;
 }
+
 function runOnePluck() {
   if (pluckQueue.length === 0) return;
   if (!activePluck) activePluck = pluckQueue[0];
@@ -360,45 +426,61 @@ function runOnePluck() {
   const pluckerI = activePluck.pluckerIndex;
   const pluckeeI = activePluck.pluckeeIndex;
 
-  const pluckeeSuits = new Set(
-    players[pluckeeI].hand
-      .filter(c => c !== CARD_BIG_JOKER && c !== CARD_LITTLE_JOKER)
-      .map(c => c.slice(-1))
-  );
+  const mercy = (players[pluckeeI].tricks === 0);
 
-  const suitChoices = Array.from(pluckeeSuits).filter(s => !activePluck.suitsUsed.has(s));
-  if (suitChoices.length === 0) {
-    activePluck.remaining = 0;
+  const suits = availablePluckSuits(pluckerI, pluckeeI);
+
+  if (suits.length === 0) {
+    pluckStatusEl.textContent = `No legal pluck suit for ${players[pluckerI].name} → ${players[pluckeeI].name}. Skipped.`;
   } else {
-    const suit = suitChoices[Math.floor(Math.random()*suitChoices.length)];
-    const offered = lowestCardOfSuitExcludingJokers(pluckeeI, suit);
+    const suit = suits[Math.floor(Math.random()*suits.length)];
 
-    if (!offered) {
-      activePluck.suitsUsed.add(suit);
+    const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
+    if (!takeHigh) {
+      pluckStatusEl.textContent = `Unexpected: pluckee missing suit ${suit}. Skipped.`;
     } else {
-      const offeredVal = parseCard(offered, trumpSuit).value;
-      const returned = higherCardSameSuitExcludingJokers(pluckerI, suit, offeredVal);
+      if (mercy) {
+        // MERCY: plucker takes high; returns nothing
+        removeCardFromHand(pluckeeI, takeHigh);
+        players[pluckerI].hand.push(takeHigh);
 
-      if (!returned) {
-        activePluck.suitsUsed.add(suit);
-      } else {
-        removeCardFromHand(pluckeeI, offered);
-        removeCardFromHand(pluckerI, returned);
-        players[pluckeeI].hand.push(returned);
-        players[pluckerI].hand.push(offered);
-
-        activePluck.suitsUsed.add(suit);
-        activePluck.remaining -= 1;
+        const key = pairKey(pluckerI, pluckeeI);
+        if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
+        pluckSuitUsedByPair.get(key).add(suit);
 
         pluckStatusEl.textContent =
-          `${players[pluckerI].name} plucked ${displayCard(offered)} from ${players[pluckeeI].name} and returned ${displayCard(returned)}.`;
+          `${players[pluckeeI].name} (0 tricks) surrendered ${displayCard(takeHigh)} to ${players[pluckerI].name}. Suit=${suit}. (No return)`;
+      } else {
+        // NORMAL: plucker gives low; pluckee returns high
+        const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
+        if (!giveLow) {
+          pluckStatusEl.textContent = `Unexpected: plucker missing suit ${suit}. Skipped.`;
+        } else {
+          removeCardFromHand(pluckerI, giveLow);
+          removeCardFromHand(pluckeeI, takeHigh);
+
+          players[pluckerI].hand.push(takeHigh);
+          players[pluckeeI].hand.push(giveLow);
+
+          const key = pairKey(pluckerI, pluckeeI);
+          if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
+          pluckSuitUsedByPair.get(key).add(suit);
+
+          pluckStatusEl.textContent =
+            `${players[pluckerI].name} passed (low) ${displayCard(giveLow)}. ` +
+            `${players[pluckeeI].name} returned (high) ${displayCard(takeHigh)}. Suit=${suit}.`;
+        }
       }
     }
   }
 
-  if (activePluck.remaining <= 0) {
-    pluckQueue.shift();
-    activePluck = null;
+  // Consume exactly one pluck action from the queue
+  pluckQueue.shift();
+  activePluck = null;
+
+  if (pluckQueue.length === 0) {
+    msgEl.textContent = "Pluck phase complete. Click Reset (New Deal) to start next hand.";
+    pluckNextBtn.disabled = true;
   }
 
   render();
@@ -423,12 +505,17 @@ function maybeContinue() {
         render();
 
         if (roundIsOver()) {
-          computePlucks();
-          pluckQueue = buildPluckQueue();
+          computePlucksEarnedAndSuffered();
+          pluckQueue = buildPluckQueueFromScores();
           activePluck = null;
+          pluckSuitUsedByPair = new Map();
+
           setPhase("PLUCK");
 
-          const p = players.map(x => `${x.id}: tricks=${x.tricks}, quota=${x.quota}, plucks=${x.plucks}`).join(" | ");
+          const p = players.map(x =>
+            `${x.id}: tricks=${x.tricks}, quota=${x.quota}, earned=${x.plucksEarned}, suffered=${x.plucksSuffered}`
+          ).join(" | ");
+
           msgEl.textContent = `Hand over. Plucks computed. ${p}`;
           render();
           return;
@@ -452,8 +539,15 @@ function maybeContinue() {
 }
 
 function dealNewHands() {
+  applyFixedQuotas();
+
   const deck = shuffle(makePluckDeck51());
-  players.forEach(p => { p.hand = []; p.tricks = 0; p.plucks = 0; });
+  players.forEach(p => {
+    p.hand = [];
+    p.tricks = 0;
+    p.plucksEarned = 0;
+    p.plucksSuffered = 0;
+  });
 
   trickMax = TOTAL_TRICKS;
   trickNumber = 1;
@@ -466,8 +560,11 @@ function dealNewHands() {
 
   trick = [];
   leadSuit = null;
-  trumpOpen = false;
 
+  // If clubs is trump, treat trump as opened from the start (2C leads first)
+  trumpOpen = (trumpSuit === "C");
+
+  // Who leads: holder of 2C must lead first.
   let whoHas2C = 0;
   for (let pi=0;pi<3;pi++) if (players[pi].hand.includes(CARD_OPEN_LEAD)) { whoHas2C = pi; break; }
   leaderIndex = whoHas2C;
@@ -475,6 +572,7 @@ function dealNewHands() {
 
   pluckQueue = [];
   activePluck = null;
+  pluckSuitUsedByPair = new Map();
 
   setPhase("PLAY");
   render();
@@ -482,13 +580,6 @@ function dealNewHands() {
 }
 
 // Events
-qAI2El.addEventListener("input", () => syncQuotas("AI2"));
-qAI3El.addEventListener("input", () => syncQuotas("AI3"));
-
-applyQuotaBtn.addEventListener("click", () => {
-  syncQuotas("APPLY");
-});
-
 pluckNextBtn.addEventListener("click", () => {
   if (phase !== "PLUCK") return;
   runOnePluck();
@@ -506,9 +597,6 @@ applyTrumpBtn.addEventListener("click", () => {
 
 // Start
 trumpSuit = trumpSelectEl.value || "H";
-// Initialize inputs and model using hard-lock
-qAI2El.value = qAI2El.value || "7";
-qAI3El.value = qAI3El.value || "6";
-syncQuotas("APPLY");
+applyFixedQuotas();
 dealNewHands();
-console.log("Pluck Demo v8 loaded");
+console.log("Pluck Demo v10 loaded");
