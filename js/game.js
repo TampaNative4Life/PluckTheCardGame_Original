@@ -173,7 +173,8 @@ function render() {
   youQuotaLabelEl.textContent = String(players[2].quota);
 
   handEl.innerHTML = "";
-  players[2].hand.forEach((c, idx) => {
+  const sortedHand = sortHandForDisplay(players[2].hand, trumpSuit);
+sortedHand.forEach((c) => {
     const b = document.createElement("button");
     b.className = "pill";
     b.textContent = displayCard(c);
