@@ -216,10 +216,76 @@ function legalIndexesFor(playerIndex) {
 }
 
 function chooseAiIndex(playerIndex) {
-  const legal = legalIndexesFor(playerIndex);
-  return legal[Math.floor(Math.random()*legal.length)];
-}
 
+  const legal = legalIndexesFor(playerIndex);
+  const hand = players[playerIndex].hand;
+
+  const needed = players[playerIndex].quota - players[playerIndex].tricks;
+  const tricksPlayed = trickNumber - 1;
+  const tricksLeft = TOTAL_TRICKS - tricksPlayed;
+
+  let bestIdx = legal[0];
+  let bestScore = -Infinity;
+
+  for (const idx of legal) {
+
+    const card = hand[idx];
+    const parsed = parseCard(card, trumpSuit);
+
+    let score = 0;
+
+    const isTrump = isTrumpCard(card);
+    const isBigJoker = (card === CARD_BIG_JOKER);
+    const isLittleJoker = (card === CARD_LITTLE_JOKER);
+
+    const cardValue = isJoker(card)
+      ? (isBigJoker ? 1000 : 900)
+      : parsed.value;
+
+    // ===== Base value =====
+    score += cardValue;
+
+    // ===== If AI needs tricks =====
+    if (needed > 0) {
+
+      // Must aggressively win if time running out
+      if (needed >= tricksLeft) {
+        score += 500;
+      }
+
+      // Trump helps win
+      if (isTrump) score += 300;
+
+      // Jokers extremely valuable late
+      if (isBigJoker) score += 500;
+      if (isLittleJoker) score += 400;
+
+    }
+    else {
+      // ===== AI is over quota: dump mode =====
+      score -= 1000; // avoid winning
+
+      // Prefer lowest cards
+      score -= cardValue * 5;
+
+      // Avoid burning trump or joker
+      if (isTrump) score -= 300;
+      if (isBigJoker || isLittleJoker) score -= 1000;
+    }
+
+    // Slight preference to follow suit powerfully if needed
+    if (trick.length > 0 && cardSuitForFollow(card) === leadSuit) {
+      score += 50;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = idx;
+    }
+  }
+
+  return bestIdx;
+}
 function setLeadSuitFromFirstCard(cardStr) { leadSuit = cardSuitForFollow(cardStr); }
 function updateTrumpOpen(cardStr) { if (!trumpOpen && isTrumpCard(cardStr)) trumpOpen = true; }
 
