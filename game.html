@@ -21,7 +21,7 @@
   </header>
 
   <main class="container">
-    <h1>Pluck Demo (Quotas + Pluck Phase)</h1>
+    <h1>Pluck Demo (Quotas Hard-Locked to 17)</h1>
 
     <div class="controlbar">
       <div class="controlitem">
@@ -47,8 +47,11 @@
         <strong>Quotas (AI2 / AI3 / You):</strong>
         <input id="qAI2" type="number" min="0" max="17" value="7" style="width:70px;">
         <input id="qAI3" type="number" min="0" max="17" value="6" style="width:70px;">
-        <input id="qYOU" type="number" min="0" max="17" value="4" style="width:70px;">
+        <input id="qYOU" type="number" min="0" max="17" value="4" style="width:70px;" readonly>
         <button class="btn btn-secondary" id="applyQuotaBtn" type="button">Apply Quotas</button>
+      </div>
+      <div class="controlitem">
+        <strong>Quota Lock:</strong> AI2+AI3 fixed → YOU auto = 17 − AI2 − AI3
       </div>
       <div class="controlitem">
         <strong>Phase:</strong> <span id="phaseLabel">PLAY</span>
@@ -104,6 +107,6 @@
     © 2026 Pluck The Card Game
   </footer>
 
-  <script src="js/game.js?v=7"></script>
+  <script src="js/game.js?v=8"></script>
 </body>
 </html>
