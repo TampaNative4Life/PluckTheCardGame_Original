@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Pluck Demo</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -15,98 +15,100 @@
     </a>
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
-      <a href="rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
   <main class="container">
-    <h1>Pluck Demo (Quotas Hard-Locked to 17)</h1>
+    <h1>Playable Demo</h1>
 
-    <div class="controlbar">
-      <div class="controlitem">
-        <label for="trumpSelect"><strong>Dealer selects trump:</strong></label>
-        <select id="trumpSelect">
-          <option value="S">Spades</option>
-          <option value="H" selected>Hearts</option>
-          <option value="D">Diamonds</option>
-          <option value="C">Clubs</option>
-        </select>
-        <button class="btn btn-secondary" id="applyTrumpBtn" type="button">Apply Trump + Deal</button>
-      </div>
-
-      <div class="controlitem">
-        <strong>Trump:</strong> <span id="trumpLabel">H</span>
-        &nbsp; • &nbsp;
-        <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
-      </div>
-    </div>
-
-    <div class="controlbar">
-      <div class="controlitem">
-        <strong>Quotas (AI2 / AI3 / You):</strong>
-        <input id="qAI2" type="number" min="0" max="17" value="7" style="width:70px;">
-        <input id="qAI3" type="number" min="0" max="17" value="6" style="width:70px;">
-        <input id="qYOU" type="number" min="0" max="17" value="4" style="width:70px;" readonly>
-        <button class="btn btn-secondary" id="applyQuotaBtn" type="button">Apply Quotas</button>
-      </div>
-      <div class="controlitem">
-        <strong>Quota Lock:</strong> AI2+AI3 fixed → YOU auto = 17 − AI2 − AI3
-      </div>
-      <div class="controlitem">
-        <strong>Phase:</strong> <span id="phaseLabel">PLAY</span>
-      </div>
-    </div>
-
-    <p id="turnBanner" style="color:#cfcfcf; text-align:center; margin:0 0 16px 0;"></p>
-
-    <div class="scorebar">
-      <div class="scoreitem"><strong>AI2</strong> Tricks: <span id="ai2Tricks">0</span> / Q <span id="ai2Quota">7</span></div>
-      <div class="scoreitem"><strong>AI3</strong> Tricks: <span id="ai3Tricks">0</span> / Q <span id="ai3Quota">6</span></div>
-      <div class="scoreitem"><strong>You</strong> Tricks: <span id="youTricks">0</span> / Q <span id="youQuota">4</span></div>
-      <div class="scoreitem">Trick #: <span id="trickNum">1</span> / <span id="trickMax">17</span></div>
-    </div>
-
-    <div class="table3">
-
-      <div class="player top">
-        <h3>Player 2 (AI)</h3>
-        <div class="ai-hand" id="ai2Hand">🂠</div>
-      </div>
-
-      <div class="middle-row">
-        <div class="player left">
-          <h3>Player 3 (AI)</h3>
-          <div class="ai-hand" id="ai3Hand">🂠</div>
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="metaRow">
+          <div><strong>Phase:</strong> <span id="phaseLabel">PLAY</span></div>
+          <div><strong>Trick:</strong> <span id="trickNum">1</span>/<span id="trickMax">17</span></div>
         </div>
 
-        <div class="center-area">
-          <div class="trick-box">
-            <h3>Trick</h3>
-            <div id="trick">(empty)</div>
-            <div id="pluckPanel" style="margin-top:14px; padding-top:10px; border-top:1px solid #2a2a2a; display:none;">
-              <h3 style="margin-top:0;">Pluck Phase</h3>
-              <div id="pluckStatus" style="color:#cfcfcf;"></div>
-              <button class="btn btn-secondary" id="pluckNextBtn" type="button" style="margin-top:10px;">Run Next Pluck</button>
-            </div>
+        <div class="metaRow">
+          <label for="trumpSelect"><strong>Trump:</strong></label>
+          <select id="trumpSelect">
+            <option value="S">S (Spades)</option>
+            <option value="H" selected>H (Hearts)</option>
+            <option value="D">D (Diamonds)</option>
+            <option value="C">C (Clubs)</option>
+          </select>
+          <button class="btn btn-secondary" id="applyTrumpBtn">New Deal</button>
+        </div>
+
+        <div class="metaRow">
+          <div><strong>Trump:</strong> <span id="trumpLabel">H</span></div>
+          <div><strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span></div>
+        </div>
+
+        <div id="turnBanner" class="turnBanner"></div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="scoreBox">
+          <div class="scoreRow">
+            <div class="pname">AI2</div>
+            <div class="pmeta">Quota: <span id="ai2Quota">7</span></div>
+            <div class="pmeta">Tricks: <span id="ai2Tricks">0</span></div>
+          </div>
+          <div class="scoreRow">
+            <div class="pname">AI3</div>
+            <div class="pmeta">Quota: <span id="ai3Quota">6</span></div>
+            <div class="pmeta">Tricks: <span id="ai3Tricks">0</span></div>
+          </div>
+          <div class="scoreRow">
+            <div class="pname">YOU</div>
+            <div class="pmeta">Quota: <span id="youQuota">4</span></div>
+            <div class="pmeta">Tricks: <span id="youTricks">0</span></div>
           </div>
         </div>
+
+        <div class="buttons">
+          <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>AI2 (hidden)</h3>
+        <div id="ai2Hand" class="handRow"></div>
       </div>
 
-      <div class="player bottom">
-        <h3>You</h3>
-        <div id="hand"></div>
-        <p id="msg" style="color:#cfcfcf;margin-top:12px;"></p>
-        <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
+      <div class="card">
+        <h3>AI3 (hidden)</h3>
+        <div id="ai3Hand" class="handRow"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Your Hand (sorted by Trump → suits)</h3>
+        <div id="hand" class="hand"></div>
+        <p id="msg" class="msg"></p>
       </div>
 
+      <div class="card">
+        <h3>Trick</h3>
+        <div class="trickBox" id="trick">(empty)</div>
+        <p class="hint">AI2 leads → AI3 plays → Your turn. Follow suit if possible.</p>
+      </div>
+    </div>
+
+    <div class="card pluckPanel" id="pluckPanel" style="display:none;">
+      <h3>Pluck Phase</h3>
+      <p id="pluckStatus" class="msg"></p>
+      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+      <p class="hint">Plucker chooses suit (strategic). Plucker gives low; pluckee returns high (same suit). No jokers forced. No duplicate suit plucks per pair.</p>
     </div>
   </main>
 
-  <footer class="footer">
-    © 2026 Pluck The Card Game
-  </footer>
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
 
-  <script src="js/game.js?v=8"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>
