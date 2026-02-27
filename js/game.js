@@ -1,4 +1,4 @@
-// Pluck Web Demo v7: Play phase + quotas (default 7/6/4) + pluck phase scaffold
+// Pluck Web Demo v8: Quotas HARD-LOCKED to sum 17 (AI2 + AI3 chosen; YOU auto)
 function showError(msg) {
   const el = document.getElementById("msg");
   if (el) el.textContent = "ERROR: " + msg;
@@ -40,25 +40,7 @@ const pluckPanelEl = document.getElementById("pluckPanel");
 const pluckStatusEl = document.getElementById("pluckStatus");
 const pluckNextBtn = document.getElementById("pluckNextBtn");
 
-const required = [
-  ["hand", handEl], ["trick", trickEl], ["msg", msgEl], ["resetBtn", resetBtn],
-  ["ai2Hand", ai2HandEl], ["ai3Hand", ai3HandEl],
-  ["turnBanner", turnBannerEl],
-  ["trumpSelect", trumpSelectEl], ["applyTrumpBtn", applyTrumpBtn],
-  ["trumpLabel", trumpLabelEl], ["trumpOpenLabel", trumpOpenLabelEl],
-  ["phaseLabel", phaseLabelEl],
-  ["qAI2", qAI2El], ["qAI3", qAI3El], ["qYOU", qYOUEl], ["applyQuotaBtn", applyQuotaBtn],
-  ["ai2Tricks", ai2TricksEl], ["ai3Tricks", ai3TricksEl], ["youTricks", youTricksEl],
-  ["ai2Quota", ai2QuotaLabelEl], ["ai3Quota", ai3QuotaLabelEl], ["youQuota", youQuotaLabelEl],
-  ["trickNum", trickNumEl], ["trickMax", trickMaxEl],
-  ["pluckPanel", pluckPanelEl], ["pluckStatus", pluckStatusEl], ["pluckNextBtn", pluckNextBtn],
-];
-for (const [id, el] of required) if (!el) showError(`Missing element id="${id}" in game.html`);
-
-// Defaults you confirmed:
-const DEFAULT_Q_AI2 = 7;
-const DEFAULT_Q_AI3 = 6;
-const DEFAULT_Q_YOU = 4;
+const TOTAL_TRICKS = 17;
 
 // Rules constants
 const SUITS = ["S", "H", "D", "C"];
@@ -100,9 +82,9 @@ function parseCard(cs, trumpSuit) {
 
 // Players: 0=AI2, 1=AI3, 2=YOU
 const players = [
-  { id:"AI2", name:"Player 2 (AI)", hand:[], tricks:0, quota:DEFAULT_Q_AI2, plucks:0 },
-  { id:"AI3", name:"Player 3 (AI)", hand:[], tricks:0, quota:DEFAULT_Q_AI3, plucks:0 },
-  { id:"YOU", name:"You",            hand:[], tricks:0, quota:DEFAULT_Q_YOU, plucks:0 }
+  { id:"AI2", name:"Player 2 (AI)", hand:[], tricks:0, quota:7, plucks:0 },
+  { id:"AI3", name:"Player 3 (AI)", hand:[], tricks:0, quota:6, plucks:0 },
+  { id:"YOU", name:"You",            hand:[], tricks:0, quota:4, plucks:0 }
 ];
 
 let trumpSuit = "H";
@@ -114,10 +96,9 @@ let trick = [];
 let lockInput = false;
 
 let trickNumber = 1;
-let trickMax = 17;
+let trickMax = TOTAL_TRICKS;
 
 let phase = "PLAY"; // PLAY | PLUCK
-
 let pluckQueue = [];
 let activePluck = null;
 
@@ -139,6 +120,47 @@ function setPhase(newPhase) {
   pluckPanelEl.style.display = (newPhase === "PLUCK") ? "block" : "none";
 }
 
+function clampInt(v, min, max, fallback) {
+  const n = parseInt(v, 10);
+  if (Number.isNaN(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
+
+// HARD-LOCK logic:
+// - user can type AI2 + AI3
+// - YOU becomes: 17 - AI2 - AI3
+// - if AI2+AI3 > 17, clamp the changed field so YOU never negative
+function syncQuotas(changed) {
+  let a2 = clampInt(qAI2El.value, 0, TOTAL_TRICKS, 7);
+  let a3 = clampInt(qAI3El.value, 0, TOTAL_TRICKS, 6);
+
+  if (a2 + a3 > TOTAL_TRICKS) {
+    // clamp the one the user just changed
+    if (changed === "AI2") {
+      a2 = TOTAL_TRICKS - a3;
+    } else if (changed === "AI3") {
+      a3 = TOTAL_TRICKS - a2;
+    } else {
+      // fallback: clamp AI3
+      a3 = TOTAL_TRICKS - a2;
+    }
+  }
+
+  const you = TOTAL_TRICKS - a2 - a3;
+
+  // write back to inputs
+  qAI2El.value = String(a2);
+  qAI3El.value = String(a3);
+  qYOUEl.value = String(you);
+
+  // update model
+  players[0].quota = a2;
+  players[1].quota = a3;
+  players[2].quota = you;
+
+  render();
+}
+
 function render() {
   trumpLabelEl.textContent = `${trumpSuit} (${suitName(trumpSuit)})`;
   trumpOpenLabelEl.textContent = trumpOpen ? "Yes" : "No";
@@ -147,7 +169,7 @@ function render() {
   ai3QuotaLabelEl.textContent = String(players[1].quota);
   youQuotaLabelEl.textContent = String(players[2].quota);
 
-  // Your hand (clickable only during PLAY and your turn)
+  // Your hand clickable only during PLAY and your turn
   handEl.innerHTML = "";
   players[2].hand.forEach((c, idx) => {
     const b = document.createElement("button");
@@ -284,11 +306,10 @@ function roundIsOver() {
   return players.every(p => p.hand.length === 0) && trick.length === 0;
 }
 
-// ===== Quotas + Pluck calc =====
+// ===== Plucks scaffold =====
 function computePlucks() {
   for (const p of players) p.plucks = Math.abs(p.tricks - p.quota);
 }
-
 function buildPluckQueue() {
   const order = [0,1,2].slice().sort((a,b)=>players[a].plucks - players[b].plucks);
   const victims = [0,1,2].slice().sort((a,b)=>players[b].plucks - players[a].plucks);
@@ -302,7 +323,6 @@ function buildPluckQueue() {
   }
   return queue;
 }
-
 function lowestCardOfSuitExcludingJokers(playerIndex, suit) {
   const hand = players[playerIndex].hand.filter(c => c !== CARD_BIG_JOKER && c !== CARD_LITTLE_JOKER && c.slice(-1) === suit);
   if (hand.length === 0) return null;
@@ -320,7 +340,6 @@ function removeCardFromHand(playerIndex, cardStr) {
   const i = players[playerIndex].hand.indexOf(cardStr);
   if (i >= 0) players[playerIndex].hand.splice(i, 1);
 }
-
 function renderPluckStatus() {
   if (pluckQueue.length === 0) {
     pluckStatusEl.textContent = "No plucks to process.";
@@ -328,15 +347,12 @@ function renderPluckStatus() {
     return;
   }
   if (!activePluck) activePluck = pluckQueue[0];
-
   const plucker = players[activePluck.pluckerIndex];
   const pluckee = players[activePluck.pluckeeIndex];
-
   pluckStatusEl.textContent =
     `${plucker.name} is plucking ${pluckee.name}. Remaining plucks for this plucker: ${activePluck.remaining}.`;
   pluckNextBtn.disabled = false;
 }
-
 function runOnePluck() {
   if (pluckQueue.length === 0) return;
   if (!activePluck) activePluck = pluckQueue[0];
@@ -439,10 +455,10 @@ function dealNewHands() {
   const deck = shuffle(makePluckDeck51());
   players.forEach(p => { p.hand = []; p.tricks = 0; p.plucks = 0; });
 
-  trickMax = 17;
+  trickMax = TOTAL_TRICKS;
   trickNumber = 1;
 
-  for (let i=0;i<17;i++) {
+  for (let i=0;i<TOTAL_TRICKS;i++) {
     players[0].hand.push(deck.pop());
     players[1].hand.push(deck.pop());
     players[2].hand.push(deck.pop());
@@ -465,12 +481,12 @@ function dealNewHands() {
   maybeContinue();
 }
 
-// Controls
+// Events
+qAI2El.addEventListener("input", () => syncQuotas("AI2"));
+qAI3El.addEventListener("input", () => syncQuotas("AI3"));
+
 applyQuotaBtn.addEventListener("click", () => {
-  players[0].quota = Math.max(0, Math.min(17, parseInt(qAI2El.value || "0", 10)));
-  players[1].quota = Math.max(0, Math.min(17, parseInt(qAI3El.value || "0", 10)));
-  players[2].quota = Math.max(0, Math.min(17, parseInt(qYOUEl.value || "0", 10)));
-  render();
+  syncQuotas("APPLY");
 });
 
 pluckNextBtn.addEventListener("click", () => {
@@ -479,7 +495,6 @@ pluckNextBtn.addEventListener("click", () => {
 });
 
 resetBtn.addEventListener("click", () => {
-  // Reset keeps quotas, just deals new hand
   dealNewHands();
 });
 
@@ -489,11 +504,11 @@ applyTrumpBtn.addEventListener("click", () => {
   dealNewHands();
 });
 
-// Start: force defaults 7/6/4 from inputs (or fallback)
+// Start
 trumpSuit = trumpSelectEl.value || "H";
-players[0].quota = parseInt(qAI2El.value,10); if (Number.isNaN(players[0].quota)) players[0].quota = DEFAULT_Q_AI2;
-players[1].quota = parseInt(qAI3El.value,10); if (Number.isNaN(players[1].quota)) players[1].quota = DEFAULT_Q_AI3;
-players[2].quota = parseInt(qYOUEl.value,10); if (Number.isNaN(players[2].quota)) players[2].quota = DEFAULT_Q_YOU;
-
+// Initialize inputs and model using hard-lock
+qAI2El.value = qAI2El.value || "7";
+qAI3El.value = qAI3El.value || "6";
+syncQuotas("APPLY");
 dealNewHands();
-console.log("Pluck Demo v7 loaded");
+console.log("Pluck Demo v8 loaded");
