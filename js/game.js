@@ -416,59 +416,63 @@ function runOnePluck() {
   const pluckerI = activePluck.pluckerIndex;
   const pluckeeI = activePluck.pluckeeIndex;
 
-  const victimZero = (players[pluckeeI].tricks === 0);
   const suits = availablePluckSuits(pluckerI, pluckeeI);
 
   if (suits.length === 0) {
     pluckStatusEl.textContent = `No legal pluck suit for ${players[pluckerI].name} → ${players[pluckeeI].name}. Skipped.`;
   } else {
-    const suit = suits[Math.floor(Math.random()*suits.length)];
 
-    const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
-    if (!takeHigh) {
-      pluckStatusEl.textContent = `Unexpected: pluckee missing suit ${suit}. Skipped.`;
-    } else {
-      if (victimZero) {
-        // 0-trick victim: plucker takes high; returns lowest overall (any suit) to keep 17 cards.
-        const giveBack = lowestNonJokerOverall(pluckerI);
-        if (!giveBack) {
-          pluckStatusEl.textContent = `Unexpected: plucker has no non-joker to return. Skipped.`;
-        } else {
-          removeCardFromHand(pluckeeI, takeHigh);
-          removeCardFromHand(pluckerI, giveBack);
+    // ===== Strategic Suit Selection =====
+    let bestSuit = null;
+    let bestScore = -Infinity;
 
-          players[pluckerI].hand.push(takeHigh);
-          players[pluckeeI].hand.push(giveBack);
+    for (const suit of suits) {
+      const victimHigh = highestOfSuitNonJoker(pluckeeI, suit);
+      const pluckerLow = lowestOfSuitNonJoker(pluckerI, suit);
 
-          const key = pairKey(pluckerI, pluckeeI);
-          if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
-          pluckSuitUsedByPair.get(key).add(suit);
+      if (!victimHigh || !pluckerLow) continue;
 
-          pluckStatusEl.textContent =
-            `${players[pluckeeI].name} (0 tricks) surrendered ${displayCard(takeHigh)} (high of ${suit}). ` +
-            `${players[pluckerI].name} returned ${displayCard(giveBack)} (worst overall).`;
-        }
-      } else {
-        // Normal: plucker gives low in suit; pluckee returns high in same suit
-        const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
-        if (!giveLow) {
-          pluckStatusEl.textContent = `Unexpected: plucker missing suit ${suit}. Skipped.`;
-        } else {
-          removeCardFromHand(pluckerI, giveLow);
-          removeCardFromHand(pluckeeI, takeHigh);
+      const highVal = parseCard(victimHigh, trumpSuit).value;
+      const lowVal = parseCard(pluckerLow, trumpSuit).value;
 
-          players[pluckerI].hand.push(takeHigh);
-          players[pluckeeI].hand.push(giveLow);
+      const score = highVal - lowVal;
 
-          const key = pairKey(pluckerI, pluckeeI);
-          if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
-          pluckSuitUsedByPair.get(key).add(suit);
-
-          pluckStatusEl.textContent =
-            `${players[pluckerI].name} passed (low) ${displayCard(giveLow)}. ` +
-            `${players[pluckeeI].name} returned (high) ${displayCard(takeHigh)}. Suit=${suit}.`;
-        }
+      if (score > bestScore) {
+        bestScore = score;
+        bestSuit = suit;
       }
+    }
+
+    if (!bestSuit) bestSuit = suits[0];
+
+    const takeHigh = highestOfSuitNonJoker(pluckeeI, bestSuit);
+    const giveLow = lowestOfSuitNonJoker(pluckerI, bestSuit);
+
+    removeCardFromHand(pluckerI, giveLow);
+    removeCardFromHand(pluckeeI, takeHigh);
+
+    players[pluckerI].hand.push(takeHigh);
+    players[pluckeeI].hand.push(giveLow);
+
+    const key = pairKey(pluckerI, pluckeeI);
+    if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
+    pluckSuitUsedByPair.get(key).add(bestSuit);
+
+    pluckStatusEl.textContent =
+      `${players[pluckerI].name} strategically plucked ${bestSuit}. ` +
+      `${players[pluckeeI].name} lost ${displayCard(takeHigh)}.`;
+  }
+
+  pluckQueue.shift();
+  activePluck = null;
+
+  if (pluckQueue.length === 0) {
+    msgEl.textContent = "Pluck phase complete. Click Reset (New Deal) to start next hand.";
+    pluckNextBtn.disabled = true;
+  }
+
+  render();
+}      }
     }
   }
 
