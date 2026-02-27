@@ -179,18 +179,21 @@ sortedHand.forEach((c) => {
     b.className = "pill";
     b.textContent = displayCard(c);
     b.onclick = () => {
-      if (lockInput) return;
-      if (phase !== "PLAY") return;
-      if (turnIndex !== 2) return;
-      const legal = legalIndexesFor(2);
-      if (!legal.includes(idx)) {
-        msgEl.textContent = illegalReason(2, c);
-        return;
-      }
-      playCard(2, idx);
-    };
-    handEl.appendChild(b);
-  });
+  if (lockInput) return;
+  if (phase !== "PLAY") return;
+  if (turnIndex !== 2) return;
+
+  // Find this card in the real hand (handles sorting safely)
+  const realIdx = players[2].hand.indexOf(c);
+  if (realIdx < 0) return;
+
+  const legal = legalIndexesFor(2);
+  if (!legal.includes(realIdx)) {
+    msgEl.textContent = illegalReason(2, c);
+    return;
+  }
+  playCard(2, realIdx);
+};
 
   trickEl.textContent = trick.length
     ? trick.map(t => `${players[t.playerIndex].id}: ${displayCard(t.cardStr)}`).join(" | ")
