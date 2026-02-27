@@ -1,4 +1,35 @@
 // Pluck Web Demo v11: FIX 0-trick mercy -> still returns a card (hand stays 17), but brutal return (any suit junk)
+function sortHandForDisplay(hand, trumpSuit) {
+  const suitOrder = ["S","H","D","C"].filter(s => s !== trumpSuit);
+  const suitRank = (s) => (s === trumpSuit ? 0 : (1 + suitOrder.indexOf(s)));
+
+  const rankOrder = { "A":14,"K":13,"Q":12,"J":11,"10":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2 };
+
+  function cardKey(cs) {
+    // Jokers always first inside trump group
+    if (cs === CARD_BIG_JOKER) return { suitGroup: 0, inner: 0 };
+    if (cs === CARD_LITTLE_JOKER) return { suitGroup: 0, inner: 1 };
+
+    const suit = cs.slice(-1);
+    const rank = cs.slice(0, cs.length - 1);
+
+    const sg = suitRank(suit);
+
+    // Higher ranks first inside suit (A high)
+    const rv = rankOrder[rank] ?? 0;
+
+    // Place non-joker cards after jokers in trump group
+    const inner = 100 - rv;
+
+    return { suitGroup: sg, inner };
+  }
+
+  return hand.slice().sort((a,b) => {
+    const ka = cardKey(a), kb = cardKey(b);
+    if (ka.suitGroup !== kb.suitGroup) return ka.suitGroup - kb.suitGroup;
+    return ka.inner - kb.inner;
+  });
+}
 function showError(msg) {
   const el = document.getElementById("msg");
   if (el) el.textContent = "ERROR: " + msg;
