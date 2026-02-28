@@ -98,7 +98,7 @@ function isTrumpCard(cs, trumpSuit) {
 
 // ===== Players =====
 // 0=AI2, 1=AI3, 2=YOU
-const dealerIndex = 0;
+let dealerIndex = 0;
 function leftOf(i) { return (i + 1) % 3; }
 function rightOf(i) { return (i + 2) % 3; }
 
