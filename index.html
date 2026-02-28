@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pluck: The Card Game</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Pluck The Card Game</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,42 +16,44 @@
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
       <a href="about.html">About</a>
-      <a href="rules.html">Rules</a>
     </nav>
   </header>
 
   <main class="container">
     <section class="hero">
-      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck: The Card Game">
-      <div class="h1">PLUCK: THE CARD GAME</div>
-      <div class="tagline">GET READY FOR SOME FOWL PLAY WITH PLUCK!</div>
+      <div class="heroLogoWrap">
+        <img class="heroLogo" src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo">
+      </div>
 
-      <div class="buttons">
-        <button class="btn btn-primary" onclick="window.location.href='game.html'">PLAY DEMO</button>
-        <button class="btn btn-secondary" onclick="window.location.href='about.html'">ABOUT</button>
+      <h1 class="heroTitle">Pluck The Card Game</h1>
+      <p class="heroSubtitle">
+        A cut-throat, no-mercy trick-taking game where quotas rotate, plucks punish hard times, and every hand can flip the table.
+      </p>
+
+      <div class="heroCtas">
+        <a class="btn heroBtn" href="game.html">Play the Demo</a>
+        <a class="btn btn-secondary heroBtn" href="docs/pluck_rules.md">Read the Rules</a>
+      </div>
+
+      <div class="heroBadges">
+        <span class="badge">3 Players</span>
+        <span class="badge">17 Tricks</span>
+        <span class="badge">Deal → Pluck → Trump → Play</span>
+        <span class="badge">Menace AI (Hard Lock)</span>
       </div>
     </section>
 
-    <section class="grid">
-      <div class="card">
-        <h3>Playable Web Prototype</h3>
-        <p>This is the public build. We’re proving the UI and turn flow first, then plugging in full Pluck rules.</p>
-      </div>
-      <div class="card">
-        <h3>3-Player Strategy</h3>
-        <p>Pluck is made for three players—reads, pressure, and smart timing. No filler.</p>
-      </div>
-      <div class="card">
-        <h3>Stats Later</h3>
-        <p>Once gameplay is stable, we add accounts + history + plucks tracking using free services.</p>
-      </div>
+    <section class="card" style="margin-top:14px;">
+      <h3 style="margin-top:0;">What makes Pluck different?</h3>
+      <ul style="color:var(--muted); line-height:1.7; margin:10px 0 0 18px;">
+        <li><strong>Rotating quotas</strong> force you to adapt every deal.</li>
+        <li><strong>Plucks</strong> reward strength and punish weakness — no mercy.</li>
+        <li><strong>Trump is chosen after plucks</strong>, so the chaos is real.</li>
+        <li><strong>Hard Lock</strong> enforces the rules and makes the AI ruthless.</li>
+      </ul>
     </section>
   </main>
 
-  <footer class="footer">
-    © 2026 Pluck The Card Game • TampaNative4Life
-  </footer>
-
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
 </body>
 </html>
-
