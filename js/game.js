@@ -620,13 +620,12 @@ function availablePluckSuits(pluckerI, pluckeeI) {
   const suits = [];
   for (const s of SUITS) {
     if (used.has(s)) continue;
+    // plucker must be able to give a non-joker in that suit
     if (!lowestOfSuitNonJoker(pluckerI, s)) continue;
-    if (!highestOfSuitNonJoker(pluckeeI, s)) continue;
     suits.push(s);
   }
   return suits;
 }
-
 function renderPluckStatus() {
   if (pluckQueue.length === 0) {
     pluckStatusEl.textContent = "No plucks to process.";
