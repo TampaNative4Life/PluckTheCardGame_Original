@@ -22,30 +22,30 @@
   <main class="container">
     <h1>Playable Demo</h1>
 
-    <div class="topbar">
+    <!-- PHASE TIMELINE -->
+    <div class="card" style="padding:14px;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <div id="pDeal"  class="phaseChip">1) Deal</div>
+        <div class="phaseArrow">→</div>
+        <div id="pPluck" class="phaseChip">2) Pluck</div>
+        <div class="phaseArrow">→</div>
+        <div id="pTrump" class="phaseChip">3) Trump Pick</div>
+        <div class="phaseArrow">→</div>
+        <div id="pPlay"  class="phaseChip">4) Play</div>
+      </div>
+      <div style="margin-top:10px;color:#a6b0c3;">
+        <strong>Current Phase:</strong> <span id="phaseLabel">PLAY</span>
+        &nbsp;•&nbsp; <strong>Trump:</strong> <span id="trumpLabel">(not picked)</span>
+        &nbsp;•&nbsp; <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
+      </div>
+      <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="topbar" style="margin-top:12px;">
       <div class="topbar-left">
         <div class="metaRow">
-          <div><strong>Phase:</strong> <span id="phaseLabel">PLAY</span></div>
           <div><strong>Trick:</strong> <span id="trickNum">1</span>/<span id="trickMax">17</span></div>
         </div>
-
-        <div class="metaRow">
-          <label for="trumpSelect"><strong>Trump:</strong></label>
-          <select id="trumpSelect">
-            <option value="S">S (Spades)</option>
-            <option value="H" selected>H (Hearts)</option>
-            <option value="D">D (Diamonds)</option>
-            <option value="C">C (Clubs)</option>
-          </select>
-          <button class="btn btn-secondary" id="applyTrumpBtn">New Deal</button>
-        </div>
-
-        <div class="metaRow">
-          <div><strong>Trump:</strong> <span id="trumpLabel">H</span></div>
-          <div><strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span></div>
-        </div>
-
-        <div id="turnBanner" class="turnBanner"></div>
       </div>
 
       <div class="topbar-right">
@@ -85,25 +85,40 @@
       </div>
     </div>
 
+    <!-- PLUCK PANEL -->
+    <div class="card pluckPanel" id="pluckPanel" style="display:none;">
+      <h3>Pluck Phase</h3>
+      <p id="pluckStatus" class="msg"></p>
+      <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
+      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+      <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
+    </div>
+
+    <!-- TRUMP PICK PANEL (AFTER PLUCKS) -->
+    <div class="card" id="trumpPanel" style="display:none;">
+      <h3>Pick Trump (after plucks)</h3>
+      <p id="trumpStatus" class="msg"></p>
+      <div class="buttons" style="flex-wrap:wrap;">
+        <button class="btn" data-trump="S">S (Spades)</button>
+        <button class="btn" data-trump="H">H (Hearts)</button>
+        <button class="btn" data-trump="D">D (Diamonds)</button>
+        <button class="btn" data-trump="C">C (Clubs)</button>
+      </div>
+    </div>
+
     <div class="grid">
       <div class="card">
-        <h3>Your Hand (sorted by Trump → suits)</h3>
+        <h3>Your Hand</h3>
         <div id="hand" class="hand"></div>
         <p id="msg" class="msg"></p>
+        <p class="hint">Before trump is picked, hand is grouped by suits (no trump-first sort yet).</p>
       </div>
 
       <div class="card">
         <h3>Trick</h3>
         <div class="trickBox" id="trick">(empty)</div>
-        <p class="hint">AI2 leads → AI3 plays → Your turn. Follow suit if possible.</p>
+        <p class="hint">After trump pick, Trick 1 begins. 2♣ leads Trick 1.</p>
       </div>
-    </div>
-
-    <div class="card pluckPanel" id="pluckPanel" style="display:none;">
-      <h3>Pluck Phase</h3>
-      <p id="pluckStatus" class="msg"></p>
-      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
-      <p class="hint">Plucker chooses suit (strategic). Plucker gives low; pluckee returns high (same suit). No jokers forced. No duplicate suit plucks per pair.</p>
     </div>
   </main>
 
