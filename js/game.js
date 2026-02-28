@@ -636,15 +636,17 @@ function renderPluckStatus() {
 
   const plucker = players[activePluck.pluckerIndex];
   const pluckee = players[activePluck.pluckeeIndex];
+
   const suits = availablePluckSuits(activePluck.pluckerIndex, activePluck.pluckeeIndex);
 
   pluckStatusEl.textContent =
-    `${plucker.name} plucks ${pluckee.name}. ` +
-    (suits.length ? `AI chooses suit strategically from: ${suits.join(", ")}.` : `No legal suit available (will skip).`);
+    `${plucker.name} is plucking ${pluckee.name}. ` +
+    (suits.length
+      ? `Plucker can attempt: ${suits.join(", ")}. (Victim return is unknown until attempted.)`
+      : `No suit available for plucker. Will skip.`);
 
   pluckNextBtn.disabled = false;
 }
-
 function runOnePluck() {
   if (phase !== "PLUCK") return;
   if (pluckQueue.length === 0) return;
@@ -653,52 +655,96 @@ function runOnePluck() {
   const pluckerI = activePluck.pluckerIndex;
   const pluckeeI = activePluck.pluckeeIndex;
 
-  const suits = availablePluckSuits(pluckerI, pluckeeI);
+  const candidates = availablePluckSuits(pluckerI, pluckeeI);
 
-  if (suits.length === 0) {
-    pluckStatusEl.textContent = `No legal pluck suit for ${players[pluckerI].name} → ${players[pluckeeI].name}. Skipped.`;
-  } else {
-    // Strategic suit pick: maximize (victimHigh - pluckerLow)
-    let bestSuit = suits[0];
-    let bestScore = -Infinity;
+  if (candidates.length === 0) {
+    pluckStatusEl.textContent = `No available suit for ${players[pluckerI].name} → ${players[pluckeeI].name}. Skipped.`;
+    pluckQueue.shift();
+    activePluck = null;
+    render();
+    return;
+  }
 
-    for (const s of suits) {
-      const vh = highestOfSuitNonJoker(pluckeeI, s);
-      const pl = lowestOfSuitNonJoker(pluckerI, s);
-      if (!vh || !pl) continue;
-
-      const score = parseCard(vh, trumpSuit).value - parseCard(pl, trumpSuit).value;
-      if (score > bestScore) { bestScore = score; bestSuit = s; }
+  // ===== Blind Suit Choice (no reading victim hand) =====
+  // Heuristic: favor suits where plucker gives a very low card (cheap) and the suit is likely to have high cards unseen.
+  function remainingHighWeightForSuit(suit) {
+    const highRanks = ["A","K","Q","J","10"];
+    let w = 0;
+    for (const r of highRanks) {
+      const c = r + suit;
+      // public info: played cards are known
+      if (memory && memory.played && memory.played.has(c)) continue;
+      // AI knows its own hand; if it has the high card, victim can't have it
+      if (players[pluckerI].hand.includes(c)) continue;
+      w += 1;
     }
+    return w;
+  }
 
-    const takeHigh = highestOfSuitNonJoker(pluckeeI, bestSuit);
-    const giveLow = lowestOfSuitNonJoker(pluckerI, bestSuit);
+  // Score each candidate suit without checking victim hand
+  const scored = candidates.map(s => {
+    const low = lowestOfSuitNonJoker(pluckerI, s);
+    const lowVal = low ? parseCard(low, trumpSuit).value : 99;
+    const highW = remainingHighWeightForSuit(s);
+    // lower lowVal is better; higher highW is better
+    const score = (highW * 10) - (lowVal * 1);
+    return { s, score };
+  }).sort((a,b) => b.score - a.score);
 
-    removeCardFromHand(pluckerI, giveLow);
-    removeCardFromHand(pluckeeI, takeHigh);
+  // Try suits in score order until one works (engine checks victim can return)
+  let success = null;
+  for (const pick of scored) {
+    const res = attemptPluck(pluckerI, pluckeeI, pick.s);
+    if (res.ok) {
+      success = { suit: pick.s, ...res };
+      break;
+    }
+  }
 
-    players[pluckerI].hand.push(takeHigh);
-    players[pluckeeI].hand.push(giveLow);
-
-    const key = pairKey(pluckerI, pluckeeI);
-    if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
-    pluckSuitUsedByPair.get(key).add(bestSuit);
-
+  if (!success) {
     pluckStatusEl.textContent =
-      `${players[pluckerI].name} plucked ${bestSuit} for max damage: ${players[pluckeeI].name} lost ${displayTrickLine(takeHigh)}.`;
+      `${players[pluckerI].name} tried to pluck ${players[pluckeeI].name}, but none of the candidate suits could be returned. Skipped.`;
+  } else {
+    pluckStatusEl.textContent =
+      `${players[pluckerI].name} plucked ${success.suit}: gave ${displayTrickLine(success.giveLow)}, ` +
+      `received ${displayTrickLine(success.takeHigh)}.`;
   }
 
   pluckQueue.shift();
   activePluck = null;
 
   if (pluckQueue.length === 0) {
-    // After plucks complete, start PLAY for trick 1 based on whoever holds 2C
     setPhase("PLAY");
     msgEl.textContent = "Plucks complete. Trick 1 begins.";
     startTrickOneAfterPluck();
   }
 
   render();
+}
+function pluckeeCanReturnSuit(pluckeeI, suit) {
+  return !!highestOfSuitNonJoker(pluckeeI, suit);
+}
+
+// One attempt: try to pluck a suit; if victim can't return, fail and force re-pick.
+function attemptPluck(pluckerI, pluckeeI, suit) {
+  const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
+  if (!giveLow) return { ok:false, reason:`Plucker has no ${suit}.` };
+
+  const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
+  if (!takeHigh) return { ok:false, reason:`Victim has no ${suit} to return.` };
+
+  // Do the exchange (rules: give low, receive high, same suit, no jokers forced)
+  removeCardFromHand(pluckerI, giveLow);
+  removeCardFromHand(pluckeeI, takeHigh);
+
+  players[pluckerI].hand.push(takeHigh);
+  players[pluckeeI].hand.push(giveLow);
+
+  const key = pairKey(pluckerI, pluckeeI);
+  if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
+  pluckSuitUsedByPair.get(key).add(suit);
+
+  return { ok:true, giveLow, takeHigh };
 }
 
 // ===== Phase transitions =====
