@@ -235,3 +235,18 @@ h1{margin:10px 0 18px 0}
 }
 
 .pluckPanel{ margin-top:14px; }
+.phaseChip{
+  padding:6px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--panel2);
+  color:var(--muted);
+  font-weight:800;
+  font-size:13px;
+}
+.phaseArrow{ color: var(--muted); opacity:.7; font-weight:900; }
+.activeChip{
+  color:#111;
+  background: var(--brand);
+  border-color: rgba(212,178,84,.65);
+}
