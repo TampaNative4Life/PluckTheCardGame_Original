@@ -1,7 +1,8 @@
-// Pluck Web Demo v15
+// Pluck Web Demo v16
 // Order enforced: DEAL -> PLUCK -> TRUMP PICK -> PLAY
 // Pluck failure = LOST (no re-pick), for both YOU and AI.
 // AI cannot read other players' hands for decision-making (pluck & trump pick are blind).
+// NEW: Dealer rotates RIGHT each deal. Quotas rotate with dealer: Dealer=7, Left=6, Right=4.
 
 function showError(msg) {
   const el = document.getElementById("msg");
@@ -98,7 +99,7 @@ function isTrumpCard(cs, trumpSuit) {
 
 // ===== Players =====
 // 0=AI2, 1=AI3, 2=YOU
-let dealerIndex = 0;
+let dealerIndex = 0; // rotates RIGHT each new deal
 function leftOf(i) { return (i + 1) % 3; }
 function rightOf(i) { return (i + 2) % 3; }
 
@@ -108,7 +109,16 @@ const players = [
   { id:"YOU", name:"You",            hand:[], tricks:0, quota:4, plucksEarned:0, plucksSuffered:0 }
 ];
 
-function applyFixedQuotas() {
+// NEW: rotate dealer RIGHT, then apply quotas: Dealer=7, Left=6, Right=4
+function rotateDealerAndApplyQuotas() {
+  dealerIndex = rightOf(dealerIndex);
+  players[dealerIndex].quota = 7;
+  players[leftOf(dealerIndex)].quota = 6;
+  players[rightOf(dealerIndex)].quota = 4;
+}
+
+// Apply quotas without rotating (used on very first load if you want dealerIndex=0 to be dealer)
+function applyQuotasForCurrentDealer() {
   players[dealerIndex].quota = 7;
   players[leftOf(dealerIndex)].quota = 6;
   players[rightOf(dealerIndex)].quota = 4;
@@ -327,7 +337,7 @@ function render() {
   const leadSuitText = leadSuit ?? "(none)";
   const trumpText = trumpSuit ?? "(not picked)";
   turnBannerEl.textContent =
-    `Phase: ${phase} • Turn: ${players[turnIndex].name} • Lead: ${players[leaderIndex].name} • Lead Suit: ${leadSuitText} • Trump: ${trumpText}`;
+    `Phase: ${phase} • Dealer: ${players[dealerIndex].name} • Turn: ${players[turnIndex].name} • Lead: ${players[leaderIndex].name} • Lead Suit: ${leadSuitText} • Trump: ${trumpText}`;
 
   ai2TricksEl.textContent = String(players[0].tricks);
   ai3TricksEl.textContent = String(players[1].tricks);
@@ -452,7 +462,6 @@ function possibleReturnCandidates(pluckerI, suit, limit = 5) {
   for (const r of ranksHighToLow()) {
     const c = r + suit;
     // Public-only preview: we cannot inspect victim hands.
-    // (We *can* exclude played cards later when play begins; before play, memory.played is empty.)
     if (memory.played.has(c)) continue;
     if (players[pluckerI].hand.includes(c)) continue;
     out.push(c);
@@ -692,15 +701,21 @@ function wireTrumpButtons() {
   });
 }
 
+// After plucks complete, move to trump pick
 function moveToTrumpPick() {
   setPhase("TRUMP_PICK");
+
+  // FIX: store caller index so UI and click logic are correct
   trumpCallerIndex = computeTrumpCallerIndex();
+
+  renderTrumpPickStatus();
   render();
 
+  // AI caller picks immediately, YOU caller clicks button
   if (trumpCallerIndex !== 2) {
-    const s = aiChooseTrumpFromOwnHand(trumpCallerIndex);
-    setTrump(s);
-    msgEl.textContent = `${players[trumpCallerIndex].name} picked trump: ${s} (${suitName(s)}).`;
+    const suit = aiChooseTrumpFromOwnHand(trumpCallerIndex);
+    setTrump(suit);
+    msgEl.textContent = `${players[trumpCallerIndex].name} picked trump: ${suit} (${suitName(suit)}).`;
     moveToPlay();
     render();
   } else {
@@ -1033,8 +1048,9 @@ function dealNewHands() {
     players[2].hand.push(deck.pop());
   }
 
-  leaderIndex = 0;
-  turnIndex = 0;
+  // Show dealer in banner; play still starts with whoever holds 2C
+  leaderIndex = dealerIndex;
+  turnIndex = dealerIndex;
 
   // Trump not picked until AFTER plucks
   trumpSuit = null;
@@ -1062,75 +1078,21 @@ function startPluckPhaseAfterDeal() {
   render();
 }
 
-// After plucks complete, move to trump pick
-function moveToTrumpPick() {
-  setPhase("TRUMP_PICK");
-  const caller = computeTrumpCallerIndex(); // highest quota (7)
-  renderTrumpPickStatus();
-  render();
-
-  // AI caller picks immediately, YOU caller clicks button
-  if (caller !== 2) {
-    const suit = aiChooseTrumpFromOwnHand(caller);
-    setTrump(suit);
-    msgEl.textContent = `${players[caller].name} picked trump: ${suit} (${suitName(suit)}).`;
-    moveToPlay();
-    render();
-  } else {
-    msgEl.textContent = "Pick trump now.";
-  }
-}
-
-function moveToPlay() {
-  setPhase("PLAY");
-  msgEl.textContent = "Trump set. Trick 1 begins.";
-  startTrickOne();
-}
-
-// Wire trump buttons
-function wireTrumpButtons() {
-  const btns = trumpPanelEl.querySelectorAll("button[data-trump]");
-  btns.forEach(b => {
-    b.onclick = () => {
-      if (phase !== "TRUMP_PICK") return;
-      if (trumpSuit) return;
-
-      // In your current rules, highest quota is AI2 so you normally won't click.
-      // If later you decide YOU can be caller, this is ready.
-      const suit = b.getAttribute("data-trump");
-      if (!SUITS.includes(suit)) return;
-
-      setTrump(suit);
-      trumpStatusEl.textContent = `You picked trump: ${suit} (${suitName(suit)}).`;
-      moveToPlay();
-      render();
-    };
-  });
-}
-
-function renderTrumpPickStatus() {
-  if (trumpSuit) {
-    trumpStatusEl.textContent = `Trump picked: ${trumpSuit} (${suitName(trumpSuit)}).`;
-    return;
-  }
-  const caller = players[computeTrumpCallerIndex()];
-  trumpStatusEl.textContent =
-    `${caller.name} has the most books to make (quota ${caller.quota}). Trump is picked now (after plucks).`;
-}
-
 // Events
 pluckNextBtn.addEventListener("click", () => runOnePluck());
+
+// Reset = NEW DEAL (dealer rotates right first), then deal, then plucks
 resetBtn.addEventListener("click", () => {
-  applyFixedQuotas();
+  rotateDealerAndApplyQuotas();
   dealNewHands();
   startPluckPhaseAfterDeal();
 });
 
 wireTrumpButtons();
 
-// Start
-applyFixedQuotas();
+// Start (first load): keep dealerIndex=0 as dealer and apply quotas without rotating
+applyQuotasForCurrentDealer();
 pendingPluckQueue = null;
 dealNewHands();
 startPluckPhaseAfterDeal();
-console.log("Pluck Demo v15 loaded");
+console.log("Pluck Demo v16 loaded");
