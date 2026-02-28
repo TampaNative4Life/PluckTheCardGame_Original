@@ -1090,8 +1090,8 @@ resetBtn.addEventListener("click", () => {
 
 wireTrumpButtons();
 
-// Start (first load): keep dealerIndex=0 as dealer and apply quotas without rotating
-applyQuotasForCurrentDealer();
+// Start (first load): FIRST deal must rotate dealer right, then apply quotas, then deal
+rotateDealerAndApplyQuotas();
 pendingPluckQueue = null;
 dealNewHands();
 startPluckPhaseAfterDeal();
