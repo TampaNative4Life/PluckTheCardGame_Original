@@ -21,50 +21,35 @@
   </header>
 
   <main class="container">
-    <h1>Pluck Rules (Web Demo)</h1>
+    <h1>Pluck Rules (Quick Read)</h1>
 
-    <div class="card" style="margin-bottom:14px;">
-      <h3>Game Flow</h3>
-      <ol style="color:var(--muted);line-height:1.7;">
-        <li><strong>Deal</strong> — 17 tricks worth of cards each (3 players).</li>
-        <li><strong>Pluck</strong> — happens only after a new deal. No auto-pluck. Plucks can be hairy.</li>
-        <li><strong>Trump Pick</strong> — happens AFTER plucks. Player with the most books to make (highest quota) calls trump based on their hand.</li>
-        <li><strong>Play</strong> — trick-taking. Winner leads next trick.</li>
-      </ol>
-    </div>
+    <div class="card" style="line-height:1.6;">
+      <h3>Core Flow</h3>
+      <p><strong>Deal → Pluck → Trump Pick → Play</strong></p>
 
-    <div class="grid">
-      <div class="card">
-        <h3>Key Rules (as implemented)</h3>
-        <ul style="color:var(--muted);line-height:1.7;margin:0;padding-left:18px;">
-          <li><strong>No mercy</strong>: falling behind means you get plucked.</li>
-          <li><strong>Pluck failure is LOST</strong> (no re-pick).</li>
-          <li><strong>No trump chosen before plucks</strong>: redeal → plucks → trump pick.</li>
-          <li><strong>Joker rule</strong>: if you must play the joker, you play it (per your call).</li>
-          <li><strong>Quota rotation</strong>: dealer rotates and quotas rotate with it.</li>
-        </ul>
-      </div>
+      <h3>Dealer + Quotas (Rotating)</h3>
+      <ul>
+        <li>Dealer rotates <strong>RIGHT</strong> every deal (including first load).</li>
+        <li>Quotas are always: <strong>Dealer = 7</strong>, <strong>Left of Dealer = 6</strong>, <strong>Right of Dealer = 4</strong>.</li>
+      </ul>
 
-      <div class="card">
-        <h3>Docs</h3>
-        <p style="color:var(--muted);line-height:1.7;">
-          Your repo docs are here:
-        </p>
-        <div class="buttons" style="flex-wrap:wrap;">
-          <a class="btn" href="docs/pluck_rules.md" style="text-decoration:none;">Open pluck_rules.md</a>
-          <a class="btn btn-secondary" href="docs/roadmap.md" style="text-decoration:none;">Open roadmap.md</a>
-        </div>
-        <p class="hint" style="margin-top:10px;">
-          If GitHub Pages doesn’t render the MD nicely, we can convert the rules into pure HTML on this page.
-        </p>
-      </div>
-    </div>
+      <h3>Pluck Phase</h3>
+      <ul>
+        <li>Plucks happen <strong>after a new deal</strong> and before trump selection.</li>
+        <li>Pluck attempt can be <strong>LOST</strong> (no re-pick).</li>
+        <li>Plucker gives a low card in chosen suit; pluckee returns a higher card (same suit) if they have it.</li>
+        <li>No “auto pluck” — it can get hairy.</li>
+      </ul>
 
-    <div class="card" style="margin-top:14px;">
-      <h3>One important note</h3>
-      <p style="color:var(--muted);line-height:1.7;margin:0;">
-        The demo is a “rules engine + UI test bed.” It’s not the full production game yet.
-        But the goal is: every rule you’ve defined gets enforced here first.
+      <h3>Trump</h3>
+      <ul>
+        <li>Trump is picked <strong>after</strong> plucks.</li>
+        <li>No “never no trump” (your rule: <strong>always a trump suit</strong>).</li>
+        <li>Jokers: <strong>must play joker</strong> (your rule callout).</li>
+      </ul>
+
+      <p class="hint">
+        This page is the “quick read.” Your full PDF rules can also be linked here later.
       </p>
     </div>
   </main>
