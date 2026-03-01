@@ -22,32 +22,16 @@
   <main class="container">
     <h1>Playable Demo</h1>
 
-    <!-- PHASE TIMELINE + CONTROLS -->
+    <!-- PHASE TIMELINE -->
     <div class="card" style="padding:14px;">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-          <div id="pDeal"  class="phaseChip">1) Deal</div>
-          <div class="phaseArrow">→</div>
-          <div id="pPluck" class="phaseChip">2) Pluck</div>
-          <div class="phaseArrow">→</div>
-          <div id="pTrump" class="phaseChip">3) Trump Pick</div>
-          <div class="phaseArrow">→</div>
-          <div id="pPlay"  class="phaseChip">4) Play</div>
-        </div>
-
-        <div class="pillRow">
-          <div class="pillGroup">
-            <span class="pillLabel">Hard Lock</span>
-            <button id="hardLockOn"  class="pill active" type="button">ON</button>
-            <button id="hardLockOff" class="pill" type="button">OFF</button>
-          </div>
-
-          <div class="pillGroup">
-            <span class="pillLabel">AI</span>
-            <button id="aiModeMenace" class="pill active" type="button">MENACE</button>
-            <button id="aiModeNormal" class="pill" type="button">NORMAL</button>
-          </div>
-        </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <div id="pDeal"  class="phaseChip">1) Deal</div>
+        <div class="phaseArrow">→</div>
+        <div id="pPluck" class="phaseChip">2) Pluck</div>
+        <div class="phaseArrow">→</div>
+        <div id="pTrump" class="phaseChip">3) Trump Pick</div>
+        <div class="phaseArrow">→</div>
+        <div id="pPlay"  class="phaseChip">4) Play</div>
       </div>
 
       <div style="margin-top:10px;color:#a6b0c3;">
@@ -56,6 +40,26 @@
         &nbsp;•&nbsp; <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
       </div>
 
+      <div class="pillRow" style="margin-top:10px;">
+        <div class="pillGroup">
+          <span class="pillLabel">Hard Lock</span>
+          <button id="hardLockOn" class="pill active" type="button">ON</button>
+          <button id="hardLockOff" class="pill" type="button">OFF</button>
+        </div>
+
+        <div class="pillGroup">
+          <span class="pillLabel">AI Mode</span>
+          <button id="aiModeMenace" class="pill active" type="button">MENACE</button>
+          <button id="aiModeNormal" class="pill" type="button">NORMAL</button>
+        </div>
+
+        <div class="pillGroup">
+          <span class="pillLabel">Card Images</span>
+          <button id="imgOn" class="pill active" type="button">ON</button>
+          <button id="imgOff" class="pill" type="button">OFF</button>
+        </div>
+      </div>
+
       <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
     </div>
 
@@ -108,7 +112,7 @@
       <h3>Pluck Phase</h3>
       <p id="pluckStatus" class="msg"></p>
       <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
-      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+      <button class="btn" id="pluckNextBtn" type="button">Run Next Pluck</button>
       <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
     </div>
 
@@ -117,10 +121,10 @@
       <h3>Pick Trump (after plucks)</h3>
       <p id="trumpStatus" class="msg"></p>
       <div class="buttons" style="flex-wrap:wrap;">
-        <button class="btn" data-trump="S">S (Spades)</button>
-        <button class="btn" data-trump="H">H (Hearts)</button>
-        <button class="btn" data-trump="D">D (Diamonds)</button>
-        <button class="btn" data-trump="C">C (Clubs)</button>
+        <button class="btn" data-trump="S" type="button">S (Spades)</button>
+        <button class="btn" data-trump="H" type="button">H (Hearts)</button>
+        <button class="btn" data-trump="D" type="button">D (Diamonds)</button>
+        <button class="btn" data-trump="C" type="button">C (Clubs)</button>
       </div>
     </div>
 
@@ -129,137 +133,13 @@
         <h3>Your Hand</h3>
         <div id="hand" class="hand"></div>
         <p id="msg" class="msg"></p>
-        <p class="hint">PLUCK is interactive now — if YOU get plucked, you choose the return card.</p>
+        <p class="hint">Hand is ordered by suits. After trump is picked, trump group comes first: BJ, LJ, A, K, Q…</p>
       </div>
 
       <div class="card">
         <h3>Trick</h3>
         <div class="trickBox" id="trick">(empty)</div>
-        <p class="hint">After trump pick, Trick 1 begins. 2♣ leads Trick 1.</p>
-      </div>
-    </div>
-  </main>
-
-  <footer class="footer">© 2026 Pluck The Card Game</footer>
-
-  <!-- PLUCKEE MODAL (YOU returning a card) -->
-  <div id="pluckModal" class="modalBackdrop" style="display:none;">
-    <div class="modalCard">
-      <div class="modalHeader">
-        <div class="modalTitle">You’re Being Plucked</div>
-        <div class="modalSub" id="pluckModalSub">Suit requested: —</div>
-      </div>
-
-      <div class="modalBody">
-        <div class="modalRow">
-          <div class="modalCol">
-            <div class="modalLabel">Plucker is giving you:</div>
-            <div id="pluckModalGive" class="modalPreview">(none)</div>
-          </div>
-          <div class="modalCol">
-            <div class="modalLabel">You must return (same suit):</div>
-            <div class="modalHint" id="pluckModalHint">Click a card below to return it.</div>
-          </div>
-        </div>
-
-        <div class="modalLabel" style="margin-top:10px;">Your legal return cards:</div>
-        <div id="pluckModalChoices" class="modalChoices"></div>
-
-        <div class="modalFooterNote" id="pluckModalNote"></div>
-      </div>
-
-      <div class="modalFooter">
-        <button class="btn btn-secondary" id="pluckModalCancel" type="button">Cancel (not allowed)</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/game.js"></script>
-</body>
-</html>          <button class="pill" id="aiModeNormal">NORMAL</button>
-        </div>
-      </div>
-
-      <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="topbar" style="margin-top:12px;">
-      <div class="topbar-left">
-        <div class="metaRow">
-          <div><strong>Trick:</strong> <span id="trickNum">1</span>/<span id="trickMax">17</span></div>
-        </div>
-      </div>
-
-      <div class="topbar-right">
-        <div class="scoreBox">
-          <div class="scoreRow">
-            <div class="pname">AI2</div>
-            <div class="pmeta">Quota: <span id="ai2Quota">7</span></div>
-            <div class="pmeta">Tricks: <span id="ai2Tricks">0</span></div>
-          </div>
-          <div class="scoreRow">
-            <div class="pname">AI3</div>
-            <div class="pmeta">Quota: <span id="ai3Quota">6</span></div>
-            <div class="pmeta">Tricks: <span id="ai3Tricks">0</span></div>
-          </div>
-          <div class="scoreRow">
-            <div class="pname">YOU</div>
-            <div class="pmeta">Quota: <span id="youQuota">4</span></div>
-            <div class="pmeta">Tricks: <span id="youTricks">0</span></div>
-          </div>
-        </div>
-
-        <div class="buttons">
-          <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h3>AI2 (hidden)</h3>
-        <div id="ai2Hand" class="handRow"></div>
-      </div>
-
-      <div class="card">
-        <h3>AI3 (hidden)</h3>
-        <div id="ai3Hand" class="handRow"></div>
-      </div>
-    </div>
-
-    <!-- PLUCK PANEL -->
-    <div class="card pluckPanel" id="pluckPanel" style="display:none;">
-      <h3>Pluck Phase</h3>
-      <p id="pluckStatus" class="msg"></p>
-      <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
-      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
-      <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
-    </div>
-
-    <!-- TRUMP PICK PANEL (AFTER PLUCKS) -->
-    <div class="card" id="trumpPanel" style="display:none;">
-      <h3>Pick Trump (after plucks)</h3>
-      <p id="trumpStatus" class="msg"></p>
-      <div class="buttons" style="flex-wrap:wrap;">
-        <button class="btn" data-trump="S">S (Spades)</button>
-        <button class="btn" data-trump="H">H (Hearts)</button>
-        <button class="btn" data-trump="D">D (Diamonds)</button>
-        <button class="btn" data-trump="C">C (Clubs)</button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Your Hand</h3>
-        <div id="hand" class="hand"></div>
-        <p id="msg" class="msg"></p>
-        <p class="hint">Tip: In Hard Lock ON, illegal plays are blocked and explained.</p>
-      </div>
-
-      <div class="card">
-        <h3>Trick</h3>
-        <div class="trickBox" id="trick">(empty)</div>
-        <p class="hint">After trump pick, Trick 1 begins. 2♣ leads Trick 1.</p>
+        <p class="hint">Trick 1 lead: 2♣ (whoever holds it MUST lead it).</p>
       </div>
     </div>
   </main>
@@ -269,4 +149,3 @@
   <script src="js/game.js"></script>
 </body>
 </html>
-
