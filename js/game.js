@@ -35,6 +35,7 @@
   window.addEventListener("error", (e) => {
     showError(e?.message || "Unknown script error");
   });
+  console.log("game.js loaded");
 
   // ---------- DOM (required) ----------
   const handEl = $("hand");
