@@ -52,6 +52,7 @@ body{
 }
 
 h1{margin:10px 0 18px 0}
+
 .card{
   background:var(--panel);
   border:1px solid var(--line);
@@ -59,6 +60,7 @@ h1{margin:10px 0 18px 0}
   padding:14px;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
 }
+
 .grid{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -73,7 +75,7 @@ h1{margin:10px 0 18px 0}
   display:grid;
   grid-template-columns: 1.2fr .8fr;
   gap:14px;
-  margin-bottom:14px;
+  margin:14px 0;
 }
 @media (max-width: 900px){
   .topbar{grid-template-columns:1fr}
@@ -85,17 +87,16 @@ h1{margin:10px 0 18px 0}
   align-items:center;
   flex-wrap:wrap;
   color:var(--muted);
-  margin-bottom:8px;
 }
 
 .turnBanner{
-  margin-top:12px;
-  padding:12px;
+  margin-top:10px;
+  padding:10px;
   border:1px dashed var(--line);
   border-radius:12px;
   background:var(--panel2);
   color:var(--muted);
-  font-size:14px;
+  font-size:13px;
 }
 
 .scoreBox{
@@ -113,7 +114,7 @@ h1{margin:10px 0 18px 0}
   gap:10px;
   align-items:center;
 }
-.pname{font-weight:900}
+.pname{font-weight:800}
 .pmeta{color:var(--muted); font-size:13px}
 
 .buttons{
@@ -128,12 +129,10 @@ h1{margin:10px 0 18px 0}
   padding:10px 12px;
   border-radius:12px;
   cursor:pointer;
-  font-weight:800;
+  font-weight:700;
 }
 .btn:hover{filter:brightness(1.08)}
-.btn-secondary{
-  background:#141b2a;
-}
+.btn-secondary{ background:#141b2a; }
 
 .msg{
   color:#cfcfcf;
@@ -158,18 +157,14 @@ h1{margin:10px 0 18px 0}
   align-items:center;
 }
 
-.handRow{
-  color:#6e7a93;
-  font-size:18px;
-}
+.handRow{ color:#6e7a93; font-size:18px; }
 
-/* Cards */
+/* Card faces */
 .hand{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
 }
-
 .cardFace{
   width:74px;
   height:104px;
@@ -187,7 +182,6 @@ h1{margin:10px 0 18px 0}
 }
 .cardFace:hover{ transform: translateY(-2px); }
 .cardFace:active{ transform: translateY(0px); }
-
 .cardFace.disabled{
   opacity:.45;
   cursor:not-allowed;
@@ -202,11 +196,7 @@ h1{margin:10px 0 18px 0}
 }
 .corner.tl{top:6px; left:7px;}
 .corner.br{bottom:6px; right:7px; transform:rotate(180deg);}
-.suitBig{
-  font-size:34px;
-  font-weight:900;
-  margin-top:6px;
-}
+.suitBig{ font-size:34px; font-weight:900; margin-top:6px; }
 .red{ color:#c0152a; }
 .black{ color:#111; }
 
@@ -235,70 +225,63 @@ h1{margin:10px 0 18px 0}
   margin-top:18px;
 }
 
-.pluckPanel{ margin-top:14px; }
-
-/* ===== Bigger phase bar ===== */
+/* ===== BIG PHASES + HIGHLIGHT ===== */
+.phaseCard{ padding:16px; }
 .phaseRow{
   display:flex;
-  gap:10px;
+  gap:14px;
   flex-wrap:wrap;
   align-items:center;
 }
 .phaseChip{
-  border:1px solid var(--line);
-  background: #121a2a;
-  color: var(--muted);
-  padding:10px 14px;
-  border-radius:999px;
+  font-size:18px;
   font-weight:900;
-  font-size:15px;
-  letter-spacing:.2px;
+  padding:10px 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: #101522;
+  color: var(--muted);
+}
+.phaseChip.activeChip{
+  border-color: rgba(212,178,84,.8);
+  box-shadow: 0 0 0 2px rgba(212,178,84,.2);
+  color: var(--text);
 }
 .phaseArrow{
-  color:#55627a;
+  color: #6e7a93;
   font-weight:900;
   font-size:18px;
 }
-.phaseChip.activeChip{
-  border-color: rgba(212,178,84,.65);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.12);
-  background: rgba(212,178,84,.10);
-  color: var(--text);
-}
 .phaseMeta{
-  margin-top:12px;
+  margin-top:10px;
   color:#a6b0c3;
-  font-size:14px;
-}
-/* ===== Phase timeline (bigger + active highlight) ===== */
-.phaseRow{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  align-items:center;
 }
 
-.phaseChip{
-  display:inline-flex;
+/* ===== FIRST DEAL DRAW UI ===== */
+.deckRow{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin:10px 0 6px 0;
+}
+.deckCard{
+  width:92px;
+  height:128px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: linear-gradient(135deg, #101522, #0b0d10);
+  box-shadow: 0 10px 16px rgba(0,0,0,.25);
+  display:flex;
   align-items:center;
   justify-content:center;
-  padding:14px 18px;
-  border-radius:16px;
-  border:1px solid var(--line);
-  background:var(--panel2);
-  color:var(--text);
+  cursor:pointer;
+  user-select:none;
+}
+.deckCard:hover{ filter:brightness(1.08); transform: translateY(-2px); }
+.deckCard:active{ transform: translateY(0px); }
+.deckCard .backMark{
   font-weight:900;
-  font-size:16px;
-  letter-spacing:.2px;
-}
-
-.phaseArrow{
-  color:var(--muted);
-  font-size:22px;
-  font-weight:900;
-}
-
-.activeChip{
-  border:1px solid var(--brand);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.18), 0 12px 28px rgba(0,0,0,.35);
-}
+  letter-spacing:2px;
+  color: rgba(212,178,84,.9);
+  border: 1px dashed rgba(212,178,84,.35);
+  padding:
