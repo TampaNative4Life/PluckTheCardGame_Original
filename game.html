@@ -23,25 +23,8 @@
   <main class="container">
     <h1>Playable Demo</h1>
 
-    <!-- CUT FOR DEAL (FIRST GAME ONLY) -->
-    <div class="card" id="cutPanel" style="display:none;">
-      <h3 style="margin-top:0;">Cut for Deal (First Game)</h3>
-      <p class="hint" style="margin-top:6px;">
-        Three cards are drawn from the Pluck deck. Click one card to pick yours.
-        AI picks from the remaining. Lowest card becomes the dealer.
-      </p>
-
-      <div id="cutRow" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:14px;"></div>
-
-      <p id="cutStatus" class="msg" style="text-align:center;"></p>
-
-      <div class="buttons" style="justify-content:center;">
-        <button class="btn" id="cutContinueBtn" disabled>Continue</button>
-      </div>
-    </div>
-
-    <!-- PHASE TIMELINE -->
-    <div class="card" style="padding:16px;margin-top:12px;">
+    <!-- PHASE TIMELINE (BIGGER + HIGHLIGHT ACTIVE PHASE) -->
+    <div class="card">
       <div class="phaseRow">
         <div id="pDeal"  class="phaseChip">1) The Deal</div>
         <div class="phaseArrow">→</div>
@@ -52,10 +35,104 @@
         <div id="pPlay"  class="phaseChip">4) Play</div>
       </div>
 
-      <div class="phaseMeta">
-        <strong>Current Phase:</strong> <span id="phaseLabel">—</span>
-        &nbsp;•&nbsp; <strong>Trump:</strong> <span id="trumpLabel">(not picked)</span>
-        &nbsp;•&nbsp; <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
+      <div class="metaRow" style="margin-top:12px;">
+        <div><strong>Current Phase:</strong> <span id="phaseLabel">—</span></div>
+        <div>•</div>
+        <div><strong>Trump:</strong> <span id="trumpLabel">(not picked)</span></div>
+        <div>•</div>
+        <div><strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span></div>
       </div>
 
-      <div id="turnBanner"
+      <div id="turnBanner" class="turnBanner"></div>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="topbar" style="margin-top:14px;">
+      <div class="topbar-left">
+        <div class="metaRow">
+          <div><strong>Trick:</strong> <span id="trickNum">1</span>/<span id="trickMax">17</span></div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="scoreBox">
+          <div class="scoreRow">
+            <div class="pname">AI2</div>
+            <div class="pmeta">Quota: <span id="ai2Quota">7</span></div>
+            <div class="pmeta">Tricks: <span id="ai2Tricks">0</span></div>
+          </div>
+          <div class="scoreRow">
+            <div class="pname">AI3</div>
+            <div class="pmeta">Quota: <span id="ai3Quota">6</span></div>
+            <div class="pmeta">Tricks: <span id="ai3Tricks">0</span></div>
+          </div>
+          <div class="scoreRow">
+            <div class="pname">YOU</div>
+            <div class="pmeta">Quota: <span id="youQuota">4</span></div>
+            <div class="pmeta">Tricks: <span id="youTricks">0</span></div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI HANDS (HIDDEN) -->
+    <div class="grid">
+      <div class="card">
+        <h3>AI2 (hidden)</h3>
+        <div id="ai2Hand" class="handRow"></div>
+      </div>
+
+      <div class="card">
+        <h3>AI3 (hidden)</h3>
+        <div id="ai3Hand" class="handRow"></div>
+      </div>
+    </div>
+
+    <!-- PLUCK PANEL -->
+    <div class="card pluckPanel" id="pluckPanel" style="display:none;">
+      <h3>Pluck Phase</h3>
+      <p id="pluckStatus" class="msg"></p>
+      <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
+      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+      <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
+    </div>
+
+    <!-- TRUMP PICK PANEL -->
+    <div class="card" id="trumpPanel" style="display:none;">
+      <h3>Dealer Selects Trump (after plucks)</h3>
+      <p id="trumpStatus" class="msg"></p>
+      <div class="buttons" style="flex-wrap:wrap;">
+        <button class="btn" data-trump="S">S (Spades)</button>
+        <button class="btn" data-trump="H">H (Hearts)</button>
+        <button class="btn" data-trump="D">D (Diamonds)</button>
+        <button class="btn" data-trump="C">C (Clubs)</button>
+      </div>
+    </div>
+
+    <!-- YOUR HAND + TRICK -->
+    <div class="grid">
+      <div class="card">
+        <h3>Your Hand</h3>
+        <div id="hand" class="hand"></div>
+        <p id="msg" class="msg"></p>
+        <p class="hint">Click a card on your turn. Must follow suit if possible.</p>
+      </div>
+
+      <div class="card">
+        <h3>Trick</h3>
+        <div class="trickBox" id="trick">(empty)</div>
+        <p class="hint">Trick 1 lead is 2♣ when it appears in the leader’s hand.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
+
+  <script src="js/game.js"></script>
+</body>
+</html>
