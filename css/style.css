@@ -59,6 +59,7 @@ h1{margin:10px 0 18px 0}
   padding:14px;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
 }
+
 .grid{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -73,7 +74,7 @@ h1{margin:10px 0 18px 0}
   display:grid;
   grid-template-columns: 1.2fr .8fr;
   gap:14px;
-  margin-bottom:14px;
+  margin:12px 0 14px 0;
 }
 @media (max-width: 900px){
   .topbar{grid-template-columns:1fr}
@@ -87,6 +88,7 @@ h1{margin:10px 0 18px 0}
   color:var(--muted);
   margin-bottom:8px;
 }
+
 .turnBanner{
   margin-top:10px;
   padding:10px;
@@ -119,6 +121,7 @@ h1{margin:10px 0 18px 0}
   display:flex;
   gap:10px;
   margin-top:12px;
+  flex-wrap:wrap;
 }
 .btn{
   border:1px solid var(--line);
@@ -136,7 +139,7 @@ h1{margin:10px 0 18px 0}
 
 .msg{
   color:#cfcfcf;
-  margin-top:12px;
+  margin-top:10px;
   min-height:22px;
 }
 .hint{
@@ -146,7 +149,7 @@ h1{margin:10px 0 18px 0}
 }
 
 .trickBox{
-  min-height:70px;
+  min-height:110px;
   padding:10px;
   border:1px solid var(--line);
   border-radius:14px;
@@ -154,7 +157,7 @@ h1{margin:10px 0 18px 0}
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  align-items:center;
+  align-items:flex-start;
 }
 
 .handRow{
@@ -162,13 +165,42 @@ h1{margin:10px 0 18px 0}
   font-size:18px;
 }
 
-/* ====== Real-looking card faces (HTML/SVG-ish style) ====== */
+/* Phase chips */
+.phaseCard{ padding:14px; }
+.phaseRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.phaseChip{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--muted);
+  font-weight:800;
+  font-size:13px;
+}
+.phaseChip.activeChip{
+  border-color: rgba(212,178,84,.65);
+  color: var(--text);
+  box-shadow: 0 0 0 3px rgba(212,178,84,.12);
+}
+.phaseArrow{ color:#53607a; font-weight:900; }
+.phaseMeta{
+  margin-top:10px;
+  color:var(--muted);
+}
+
+/* Cards area */
 .hand{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
 }
 
+/* Fallback “drawn” cards */
 .cardFace{
   width:74px;
   height:104px;
@@ -186,12 +218,6 @@ h1{margin:10px 0 18px 0}
 }
 .cardFace:hover{ transform: translateY(-2px); }
 .cardFace:active{ transform: translateY(0px); }
-
-.cardFace.disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  transform:none;
-}
 
 .corner{
   position:absolute;
@@ -233,209 +259,4 @@ h1{margin:10px 0 18px 0}
   border-top:1px solid var(--line);
   margin-top:18px;
 }
-
 .pluckPanel{ margin-top:14px; }
-.phaseChip{
-  padding:6px 10px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:var(--panel2);
-  color:var(--muted);
-  font-weight:800;
-  font-size:13px;
-}
-.phaseArrow{ color: var(--muted); opacity:.7; font-weight:900; }
-.activeChip{
-  color:#111;
-  background: var(--brand);
-  border-color: rgba(212,178,84,.65);
-}
-/* ===== Homepage Hero ===== */
-.hero{
-  margin-top:14px;
-  padding:18px;
-  border-radius:16px;
-  border:1px solid var(--line);
-  background: radial-gradient(1200px 450px at 50% 0%, rgba(212,178,84,.12), transparent 60%),
-              linear-gradient(180deg, #0f1320, #0d0f12);
-  box-shadow: 0 16px 40px rgba(0,0,0,.35);
-  text-align:center;
-}
-.heroLogoWrap{
-  display:flex;
-  justify-content:center;
-  margin-top:6px;
-  margin-bottom:10px;
-}
-.heroLogo{
-  max-width:520px;
-  width:min(520px, 92%);
-  height:auto;
-  border-radius:16px;
-  border:1px solid rgba(212,178,84,.25);
-  box-shadow: 0 18px 50px rgba(0,0,0,.45);
-}
-.heroTitle{
-  margin:14px 0 8px 0;
-  font-size: clamp(28px, 4vw, 44px);
-  letter-spacing: 1px;
-}
-.heroSubtitle{
-  margin:0 auto;
-  max-width: 780px;
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1.6;
-}
-.heroCtas{
-  display:flex;
-  gap:12px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-top:16px;
-}
-.heroBtn{ text-decoration:none; display:inline-block; }
-
-.heroBadges{
-  margin-top:14px;
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-.badge{
-  border:1px solid var(--line);
-  background: rgba(19,23,34,.65);
-  padding:6px 10px;
-  border-radius:999px;
-  color: var(--muted);
-  font-weight:800;
-  font-size:12px;
-}
-
-/* ===== Phase chips (timeline) ===== */
-.phaseChip{
-  padding:6px 10px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:var(--panel2);
-  color:var(--muted);
-  font-weight:800;
-  font-size:13px;
-}
-.phaseArrow{ color: var(--muted); opacity:.7; font-weight:900; }
-.activeChip{
-  color:#111;
-  background: var(--brand);
-  border-color: rgba(212,178,84,.65);
-}
-
-/* ===== Toggle UI ===== */
-.toggleRow{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:10px;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--panel2);
-}
-.toggleLabel{
-  color: var(--muted);
-  font-weight:800;
-}
-.toggleGroup{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.pill{
-  border:1px solid var(--line);
-  background:#141b2a;
-  color: var(--text);
-  padding:8px 10px;
-  border-radius:999px;
-  cursor:pointer;
-  font-weight:900;
-  font-size:13px;
-}
-.pill.active{
-  background: var(--brand);
-  color:#111;
-  border-color: rgba(212,178,84,.65);
-}
-/* ===== Homepage Hero ===== */
-.hero{
-  text-align:center;
-  padding:28px 16px;
-}
-.heroLogo{
-  display:block;
-  margin:0 auto 14px auto;
-  max-width:520px;
-  width:min(520px, 90%);
-  height:auto;
-}
-.heroTitle{
-  margin:8px 0 8px 0;
-  letter-spacing:1px;
-}
-.heroSub{
-  margin:0 auto;
-  max-width:720px;
-  color:var(--muted);
-  line-height:1.5;
-}
-.heroCtas{
-  margin-top:16px;
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-.heroFoot{
-  margin-top:18px;
-  display:flex;
-  gap:14px;
-  justify-content:center;
-  flex-wrap:wrap;
-  color:#6e7a93;
-  font-size:13px;
-}
-/* ===== NEW: phase chips + pills ===== */
-.phaseChip{
-  padding:8px 10px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background: #141b2a;
-  color: var(--muted);
-  font-weight:800;
-  font-size:13px;
-}
-.phaseChip.activeChip{
-  background: rgba(212,178,84,.14);
-  border-color: rgba(212,178,84,.55);
-  color: var(--text);
-}
-.phaseArrow{color:#4b5875;font-weight:900}
-
-.pillRow{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.pillGroup{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
-.pillLabel{color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.5px}
-.pill{
-  border:1px solid var(--line);
-  background:#1b2336;
-  color:var(--text);
-  padding:8px 10px;
-  border-radius:999px;
-  cursor:pointer;
-  font-weight:900;
-  font-size:12px;
-}
-.pill.active{
-  background: rgba(212,178,84,.14);
-  border-color: rgba(212,178,84,.55);
-}
