@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Pluck Rules</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -21,42 +21,54 @@
   </header>
 
   <main class="container">
-    <h1>Official Rules (Draft)</h1>
+    <h1>Pluck Rules (Web Demo)</h1>
 
-    <div class="card">
-      <h3>Players</h3>
-      <p>Pluck is designed for 3 players.</p>
-
-      <h3>Objective</h3>
-      <p>Each player aims to meet their trick quota while avoiding unnecessary plucks.</p>
-
-      <h3>Basic Round Flow</h3>
-      <ol>
-        <li>Cards are dealt.</li>
-        <li>Players declare or are assigned quotas.</li>
-        <li>Tricks are played clockwise.</li>
-        <li>Trick winners are determined.</li>
-        <li>Pluck phase occurs based on quota results.</li>
+    <div class="card" style="margin-bottom:14px;">
+      <h3>Game Flow</h3>
+      <ol style="color:var(--muted);line-height:1.7;">
+        <li><strong>Deal</strong> — 17 tricks worth of cards each (3 players).</li>
+        <li><strong>Pluck</strong> — happens only after a new deal. No auto-pluck. Plucks can be hairy.</li>
+        <li><strong>Trump Pick</strong> — happens AFTER plucks. Player with the most books to make (highest quota) calls trump based on their hand.</li>
+        <li><strong>Play</strong> — trick-taking. Winner leads next trick.</li>
       </ol>
+    </div>
 
-      <h3>Pluck Phase</h3>
-      <p>
-        Players who fail to meet their quota may be plucked according to the official pluck rules.
-        (Full pluck logic to be inserted here once finalized.)
+    <div class="grid">
+      <div class="card">
+        <h3>Key Rules (as implemented)</h3>
+        <ul style="color:var(--muted);line-height:1.7;margin:0;padding-left:18px;">
+          <li><strong>No mercy</strong>: falling behind means you get plucked.</li>
+          <li><strong>Pluck failure is LOST</strong> (no re-pick).</li>
+          <li><strong>No trump chosen before plucks</strong>: redeal → plucks → trump pick.</li>
+          <li><strong>Joker rule</strong>: if you must play the joker, you play it (per your call).</li>
+          <li><strong>Quota rotation</strong>: dealer rotates and quotas rotate with it.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Docs</h3>
+        <p style="color:var(--muted);line-height:1.7;">
+          Your repo docs are here:
+        </p>
+        <div class="buttons" style="flex-wrap:wrap;">
+          <a class="btn" href="docs/pluck_rules.md" style="text-decoration:none;">Open pluck_rules.md</a>
+          <a class="btn btn-secondary" href="docs/roadmap.md" style="text-decoration:none;">Open roadmap.md</a>
+        </div>
+        <p class="hint" style="margin-top:10px;">
+          If GitHub Pages doesn’t render the MD nicely, we can convert the rules into pure HTML on this page.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>One important note</h3>
+      <p style="color:var(--muted);line-height:1.7;margin:0;">
+        The demo is a “rules engine + UI test bed.” It’s not the full production game yet.
+        But the goal is: every rule you’ve defined gets enforced here first.
       </p>
-
-      <h3>Coming Soon</h3>
-      <ul>
-        <li>Full rulebook formatting</li>
-        <li>Pluck examples with diagrams</li>
-        <li>Advanced scoring system</li>
-      </ul>
     </div>
   </main>
 
-  <footer class="footer">
-    © 2026 Pluck The Card Game
-  </footer>
-
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
 </body>
 </html>
