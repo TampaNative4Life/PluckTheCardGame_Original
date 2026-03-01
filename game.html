@@ -23,8 +23,8 @@
     <h1>Playable Demo</h1>
 
     <!-- PHASE TIMELINE -->
-    <div class="card" style="padding:14px;">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <div class="card phaseCard">
+      <div class="phaseRow">
         <div id="pDeal"  class="phaseChip">1) Deal</div>
         <div class="phaseArrow">→</div>
         <div id="pPluck" class="phaseChip">2) Pluck</div>
@@ -34,36 +34,17 @@
         <div id="pPlay"  class="phaseChip">4) Play</div>
       </div>
 
-      <div style="margin-top:10px;color:#a6b0c3;">
+      <div class="phaseMeta">
         <strong>Current Phase:</strong> <span id="phaseLabel">PLAY</span>
         &nbsp;•&nbsp; <strong>Trump:</strong> <span id="trumpLabel">(not picked)</span>
         &nbsp;•&nbsp; <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
       </div>
 
-      <div class="pillRow" style="margin-top:10px;">
-        <div class="pillGroup">
-          <span class="pillLabel">Hard Lock</span>
-          <button id="hardLockOn" class="pill active" type="button">ON</button>
-          <button id="hardLockOff" class="pill" type="button">OFF</button>
-        </div>
-
-        <div class="pillGroup">
-          <span class="pillLabel">AI Mode</span>
-          <button id="aiModeMenace" class="pill active" type="button">MENACE</button>
-          <button id="aiModeNormal" class="pill" type="button">NORMAL</button>
-        </div>
-
-        <div class="pillGroup">
-          <span class="pillLabel">Card Images</span>
-          <button id="imgOn" class="pill active" type="button">ON</button>
-          <button id="imgOff" class="pill" type="button">OFF</button>
-        </div>
-      </div>
-
-      <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
+      <div id="turnBanner" class="turnBanner"></div>
+      <div id="msg" class="msg"></div>
     </div>
 
-    <div class="topbar" style="margin-top:12px;">
+    <div class="topbar">
       <div class="topbar-left">
         <div class="metaRow">
           <div><strong>Trick:</strong> <span id="trickNum">1</span>/<span id="trickMax">17</span></div>
@@ -91,6 +72,7 @@
 
         <div class="buttons">
           <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
+          <button class="btn" id="pluckNextBtn" style="display:none;">Run Next Pluck</button>
         </div>
       </div>
     </div>
@@ -112,19 +94,18 @@
       <h3>Pluck Phase</h3>
       <p id="pluckStatus" class="msg"></p>
       <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
-      <button class="btn" id="pluckNextBtn" type="button">Run Next Pluck</button>
       <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
     </div>
 
-    <!-- TRUMP PICK PANEL -->
+    <!-- TRUMP PICK PANEL (AFTER PLUCKS) -->
     <div class="card" id="trumpPanel" style="display:none;">
       <h3>Pick Trump (after plucks)</h3>
       <p id="trumpStatus" class="msg"></p>
       <div class="buttons" style="flex-wrap:wrap;">
-        <button class="btn" data-trump="S" type="button">S (Spades)</button>
-        <button class="btn" data-trump="H" type="button">H (Hearts)</button>
-        <button class="btn" data-trump="D" type="button">D (Diamonds)</button>
-        <button class="btn" data-trump="C" type="button">C (Clubs)</button>
+        <button class="btn" data-trump="S">S (Spades)</button>
+        <button class="btn" data-trump="H">H (Hearts)</button>
+        <button class="btn" data-trump="D">D (Diamonds)</button>
+        <button class="btn" data-trump="C">C (Clubs)</button>
       </div>
     </div>
 
@@ -132,14 +113,13 @@
       <div class="card">
         <h3>Your Hand</h3>
         <div id="hand" class="hand"></div>
-        <p id="msg" class="msg"></p>
         <p class="hint">Hand is ordered by suits. After trump is picked, trump group comes first: BJ, LJ, A, K, Q…</p>
       </div>
 
       <div class="card">
         <h3>Trick</h3>
         <div class="trickBox" id="trick">(empty)</div>
-        <p class="hint">Trick 1 lead: 2♣ (whoever holds it MUST lead it).</p>
+        <p class="hint">Trick 1 lead is 2♣ (whoever holds it).</p>
       </div>
     </div>
   </main>
