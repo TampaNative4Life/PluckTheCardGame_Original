@@ -9,32 +9,65 @@
 <body>
 
   <header class="nav">
-    <a class="brand" href="index.html">
+    <a class="brand" href="index.html" style="gap:12px;">
+      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
       <span>PLUCK</span>
     </a>
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
+      <a href="rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
   <main class="container">
-    <section class="hero card">
-      <img class="heroLogo" src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" />
-      <h1 class="heroTitle">Pluck: The Card Game</h1>
-      <p class="heroSub">
-        A cut-throat, no-mercy trick game built for serious players.  
-        Deal → Pluck → Pick Trump → Play. If you fall behind, you pay for it.
+    <!-- HERO -->
+    <section class="card hero" style="text-align:center;padding:26px;">
+      <img
+        src="assets/PluckTheCardGame_Logo.jpg"
+        alt="Pluck The Card Game"
+        style="max-width:420px;width:92%;height:auto;display:block;margin:0 auto 14px auto;border-radius:16px;"
+      />
+
+      <h1 style="margin:10px 0 6px 0;letter-spacing:.6px;">Welcome to Pluck</h1>
+
+      <p style="max-width:780px;margin:0 auto;color:var(--muted);font-size:15px;line-height:1.5;">
+        Cut-throat, no mercy, and built for players who can take pressure. Deal → Pluck → Pick Trump → Play.
+        This site is the live build of the web demo.
       </p>
 
-      <div class="heroCtas">
-        <a class="btn" href="game.html">Play the Web Demo</a>
-        <a class="btn btn-secondary" href="docs/pluck_rules.md">Read the Rules</a>
+      <div class="buttons" style="justify-content:center;flex-wrap:wrap;margin-top:18px;">
+        <a class="btn" href="game.html" style="text-decoration:none;">Play Demo</a>
+        <a class="btn btn-secondary" href="rules.html" style="text-decoration:none;">Read Rules</a>
+        <a class="btn btn-secondary" href="about.html" style="text-decoration:none;">About Pluck</a>
       </div>
 
-      <div class="heroFoot">
-        <span>Built in public on GitHub Pages.</span>
-        <span>Free demo • Fast iteration • Sunday-ready AI</span>
+      <p class="hint" style="margin-top:14px;">
+        Tip: If a card image is missing, the game still works (v19 keeps cards clickable even with fallback faces).
+      </p>
+    </section>
+
+    <!-- QUICK LINKS -->
+    <section class="grid" style="margin-top:14px;">
+      <div class="card">
+        <h3>What’s working now</h3>
+        <ul style="color:var(--muted);line-height:1.6;margin:0;padding-left:18px;">
+          <li>3 players (2 AI + you)</li>
+          <li>Dealer + quotas rotate (Dealer=7, Left=6, Right=4)</li>
+          <li>Order enforced: Deal → Pluck → Trump Pick → Play</li>
+          <li>Hard Lock option (illegal plays blocked)</li>
+          <li>AI “Menace” mode (pushes pressure)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Next build targets</h3>
+        <ul style="color:var(--muted);line-height:1.6;margin:0;padding-left:18px;">
+          <li>Manual pluck UI (hairy plucks)</li>
+          <li>Better trump logic + open rules visualization</li>
+          <li>Score + plucks tracking across hands</li>
+          <li>Cleaner animations + “winner leads” clarity</li>
+        </ul>
       </div>
     </section>
   </main>
