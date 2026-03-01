@@ -1,6 +1,14 @@
-// Pluck Web Demo (stable reset)
-// Fixes: click-to-play broken, first-hand no pluck, dealer pick (show all 3 cards), phase highlight,
-// left sidebar used for dealer pick + trump ace display, play area shifted right.
+// Pluck Web Demo v19
+// Fixes: no-card display, no-click play, and adds Initial Dealer Pick + OK confirm.
+// Rules implemented:
+// - INITIAL PICK: each player draws 1 visible card; LOWEST card becomes Dealer.
+// - If tie for LOWEST: repack and re-pick.
+// - First hand: NO PLUCK phase (because no previous hand result).
+// - Later hands: DEAL -> PLUCK (based on prior hand) -> Dealer Selects Trump -> PLAY.
+// - Must follow suit if possible.
+// - Trick winner leads next trick.
+// - Dealer rotates RIGHT each new deal after the first hand (as part of complexity).
+// - Show Ace of trump suit selected.
 
 function showError(msg) {
   const el = document.getElementById("msg");
@@ -9,7 +17,7 @@ function showError(msg) {
 }
 window.addEventListener("error", (e) => showError(e.message || "Unknown script error"));
 
-// Elements (must exist)
+// ===== Elements (must exist in game.html) =====
 const handEl = document.getElementById("hand");
 const trickEl = document.getElementById("trick");
 const msgEl = document.getElementById("msg");
@@ -19,24 +27,20 @@ const ai2HandEl = document.getElementById("ai2Hand");
 const ai3HandEl = document.getElementById("ai3Hand");
 
 const turnBannerEl = document.getElementById("turnBanner");
-const phaseLabelEl = document.getElementById("phaseLabel");
+const dealerBannerEl = document.getElementById("dealerBanner");
 
 const trumpLabelEl = document.getElementById("trumpLabel");
 const trumpOpenLabelEl = document.getElementById("trumpOpenLabel");
-const trumpAceEl = document.getElementById("trumpAce");
+const phaseLabelEl = document.getElementById("phaseLabel");
 
 const ai2TricksEl = document.getElementById("ai2Tricks");
 const ai3TricksEl = document.getElementById("ai3Tricks");
 const youTricksEl = document.getElementById("youTricks");
-
 const ai2QuotaLabelEl = document.getElementById("ai2Quota");
 const ai3QuotaLabelEl = document.getElementById("ai3Quota");
 const youQuotaLabelEl = document.getElementById("youQuota");
-
 const trickNumEl = document.getElementById("trickNum");
 const trickMaxEl = document.getElementById("trickMax");
-const handNumEl = document.getElementById("handNum");
-const dealerLabelEl = document.getElementById("dealerLabel");
 
 const pluckPanelEl = document.getElementById("pluckPanel");
 const pluckStatusEl = document.getElementById("pluckStatus");
@@ -46,23 +50,31 @@ const pluckChoicesEl = document.getElementById("pluckChoices");
 const trumpPanelEl = document.getElementById("trumpPanel");
 const trumpStatusEl = document.getElementById("trumpStatus");
 
-// Phase chips
-const pPick = document.getElementById("pPick");
 const pDeal = document.getElementById("pDeal");
 const pPluck = document.getElementById("pPluck");
 const pTrump = document.getElementById("pTrump");
 const pPlay = document.getElementById("pPlay");
 
-// Dealer pick UI
-const pickPanelEl = document.getElementById("pickPanel");
-const pickRowEl = document.getElementById("pickRow");
-const pickMsgEl = document.getElementById("pickMsg");
-const pickRestartBtn = document.getElementById("pickRestartBtn");
+// Pick UI
+const pickBtn = document.getElementById("pickBtn");
+const pickOkBtn = document.getElementById("pickOkBtn");
+const pickReBtn = document.getElementById("pickReBtn");
+const pickStatusEl = document.getElementById("pickStatus");
+const pickAI2El = document.getElementById("pickAI2");
+const pickAI3El = document.getElementById("pickAI3");
+const pickYOUEl = document.getElementById("pickYOU");
+const dealerLabelEl = document.getElementById("dealerLabel");
 
-// ===== Core constants =====
+// Trump Ace slot
+const trumpAceSlotEl = document.getElementById("trumpAceSlot");
+
+// ===== Constants =====
 const TOTAL_TRICKS = 17;
+
+// Pluck deck is 51 in your demo: 3..A in 4 suits (48) + 2C + BJ + LJ = 51
 const SUITS = ["S", "H", "D", "C"];
 const RANKS_NO_2 = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
+
 const RANK_VALUE = { "3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14, "2":2 };
 
 const CARD_BIG_JOKER = "BJ";
@@ -74,10 +86,20 @@ function suitSymbol(s){ return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣"; 
 function isRedSuit(s){ return s==="H" || s==="D"; }
 function isJoker(cs) { return cs === CARD_BIG_JOKER || cs === CARD_LITTLE_JOKER; }
 
+// Card image support (optional). If images not found, we fallback to HTML card.
+const USE_CARD_IMAGES = true;
+const CARD_IMG_DIR = "assets/cards"; // if your images are in /assets/cards
+
+// Timing
+const AI_DELAY_MS = 450;
+const TRICK_RESOLVE_MS = 450;
+const BETWEEN_TRICKS_MS = 350;
+
+// ===== Deck helpers =====
 function makePluckDeck51() {
   const deck = [];
   for (const s of SUITS) for (const r of RANKS_NO_2) deck.push(r + s);
-  deck.push("2C");
+  deck.push(CARD_OPEN_LEAD);
   deck.push(CARD_BIG_JOKER);
   deck.push(CARD_LITTLE_JOKER);
   return deck;
@@ -89,6 +111,7 @@ function shuffle(a) {
   }
   return a;
 }
+
 function parseCard(cs, trumpSuit) {
   if (cs === CARD_BIG_JOKER) return { raw: cs, kind:"JOKER", suit: trumpSuit, value: 1000 };
   if (cs === CARD_LITTLE_JOKER) return { raw: cs, kind:"JOKER", suit: trumpSuit, value: 900 };
@@ -96,6 +119,7 @@ function parseCard(cs, trumpSuit) {
   const rank = cs.slice(0, cs.length-1);
   return { raw: cs, kind:"NORMAL", suit, rank, value: RANK_VALUE[rank] };
 }
+
 function cardSuitForFollow(cs, trumpSuit) {
   if (isJoker(cs)) return trumpSuit || null;
   return cs.slice(-1);
@@ -117,9 +141,22 @@ const players = [
   { id:"YOU", name:"You",            hand:[], tricks:0, quota:4, plucksEarned:0, plucksSuffered:0 }
 ];
 
-// Dealer/hand state
-let dealerIndex = 0;
-let handNumber = 1;
+// Dealer state
+let dealerIndex = 0;          // set by initial pick
+let initialDealerChosen = false;
+
+// Quotas rotate with dealer position: Dealer=7, Left=6, Right=4
+function applyQuotasFromDealer() {
+  players[dealerIndex].quota = 7;
+  players[leftOf(dealerIndex)].quota = 6;
+  players[rightOf(dealerIndex)].quota = 4;
+}
+
+// Rotating dealer each new deal AFTER first hand starts (you wanted rotation complexity)
+function rotateDealerRight() {
+  dealerIndex = rightOf(dealerIndex);
+  applyQuotasFromDealer();
+}
 
 // ===== Memory (public inference only) =====
 let memory = null;
@@ -131,8 +168,7 @@ function resetMemory() {
   };
 }
 
-// ===== Game state =====
-let phase = "PICK"; // PICK | DEAL | PLUCK | TRUMP_PICK | PLAY
+// ===== Game State =====
 let trumpSuit = null;
 let trumpOpen = false;
 
@@ -142,45 +178,46 @@ let leadSuit = null;
 let trick = [];
 let lockInput = false;
 
-let trickNumber = 1;
+let trickNumber = 0;
 let trickMax = TOTAL_TRICKS;
 
-let pendingPluckQueue = null;
+// Phases: PICK_DEALER, DEAL, PLUCK, TRUMP_PICK, PLAY
+let phase = "PICK_DEALER";
+
+// Pluck queue (computed from previous hand)
+let pendingPluckQueue = null;   // computed at end of hand; used on next hand
 let pluckQueue = [];
 let activePluck = null;
-let pluckSuitUsedByPair = new Map(); // "plucker-pluckee" => Set(suits)
+let pluckSuitUsedByPair = new Map();
 
+// ===== Phase UI =====
 function setPhase(newPhase) {
   phase = newPhase;
   if (phaseLabelEl) phaseLabelEl.textContent = newPhase;
 
-  // panels
+  // Panels
   if (pluckPanelEl) pluckPanelEl.style.display = (newPhase === "PLUCK") ? "block" : "none";
   if (trumpPanelEl) trumpPanelEl.style.display = (newPhase === "TRUMP_PICK") ? "block" : "none";
-  if (pickPanelEl)  pickPanelEl.style.display  = (newPhase === "PICK") ? "block" : "none";
 
-  // highlight chips
-  [pPick,pDeal,pPluck,pTrump,pPlay].forEach(x => x && x.classList.remove("activeChip"));
-  if (newPhase === "PICK" && pPick) pPick.classList.add("activeChip");
-  if (newPhase === "DEAL" && pDeal) pDeal.classList.add("activeChip");
-  if (newPhase === "PLUCK" && pPluck) pPluck.classList.add("activeChip");
-  if (newPhase === "TRUMP_PICK" && pTrump) pTrump.classList.add("activeChip");
-  if (newPhase === "PLAY" && pPlay) pPlay.classList.add("activeChip");
+  // Chips
+  [pDeal,pPluck,pTrump,pPlay].forEach(x => x && x.classList.remove("activeChip"));
+
+  if (newPhase === "DEAL")  pDeal && pDeal.classList.add("activeChip");
+  if (newPhase === "PLUCK") pPluck && pPluck.classList.add("activeChip");
+  if (newPhase === "TRUMP_PICK") pTrump && pTrump.classList.add("activeChip");
+  if (newPhase === "PLAY")  pPlay && pPlay.classList.add("activeChip");
 }
 
-// ===== Card UI (reliable click faces) =====
-function makeCardFace(cardStr, disabled=false, faceDown=false) {
+function updateDealerLabels() {
+  const d = players[dealerIndex]?.id || "(not set)";
+  if (dealerBannerEl) dealerBannerEl.textContent = d;
+  if (dealerLabelEl) dealerLabelEl.textContent = d;
+}
+
+// ===== Card faces (fallback + images) =====
+function makeCardFaceFallback(cardStr, disabled=false) {
   const el = document.createElement("div");
   el.className = "cardFace" + (disabled ? " disabled" : "");
-  if (faceDown) el.classList.add("faceDown");
-
-  if (faceDown) {
-    const mid = document.createElement("div");
-    mid.className = "suitBig";
-    mid.textContent = "PLUCK";
-    el.appendChild(mid);
-    return el;
-  }
 
   if (cardStr === CARD_BIG_JOKER || cardStr === CARD_LITTLE_JOKER) {
     el.classList.add("joker");
@@ -200,6 +237,7 @@ function makeCardFace(cardStr, disabled=false, faceDown=false) {
     return el;
   }
 
+  // Normal card
   const suit = cardStr.slice(-1);
   const rank = cardStr.slice(0, cardStr.length-1);
   const colorClass = isRedSuit(suit) ? "red" : "black";
@@ -221,7 +259,41 @@ function makeCardFace(cardStr, disabled=false, faceDown=false) {
   return el;
 }
 
-// ===== Sorting =====
+function makeCardFace(cardStr, disabled=false) {
+  if (!USE_CARD_IMAGES) return makeCardFaceFallback(cardStr, disabled);
+
+  const el = document.createElement("div");
+  el.className = "cardFace" + (disabled ? " disabled" : "");
+  el.style.padding = "0";
+  el.style.overflow = "hidden";
+
+  const img = document.createElement("img");
+  img.alt = cardStr;
+  img.src = `${CARD_IMG_DIR}/${cardStr}.png`;
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "cover";
+
+  img.onerror = () => {
+    const fb = makeCardFaceFallback(cardStr, disabled);
+    el.replaceWith(fb);
+  };
+
+  el.appendChild(img);
+  return el;
+}
+
+// For sidebar slots (not clickable)
+function renderCardIntoSlot(slotEl, cardStr) {
+  if (!slotEl) return;
+  slotEl.innerHTML = "";
+  if (!cardStr) { slotEl.textContent = "(none)"; return; }
+  const face = makeCardFace(cardStr, true);
+  face.style.cursor = "default";
+  slotEl.appendChild(face);
+}
+
+// ===== Sorting your hand =====
 function sortHandForDisplay(hand) {
   const suitOrder = ["S","H","D","C"];
   const rankOrder = { "A":14,"K":13,"Q":12,"J":11,"10":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2 };
@@ -251,126 +323,172 @@ function sortHandForDisplay(hand) {
   });
 }
 
-// ===== Dealer Pick (initial only) =====
-let pickDeck = [];
-let pickPicks = [null, null, null];
-let pickRevealed = false;
+function clearPluckChoicesUI() { if (pluckChoicesEl) pluckChoicesEl.innerHTML = ""; }
 
-function cardPickValue(cs) {
-  // Lowest wins dealer. 2C treated as rank 2 (lowest), 3..A, then LJ,BJ (highest).
-  if (cs === CARD_BIG_JOKER) return 200;
-  if (cs === CARD_LITTLE_JOKER) return 190;
-  if (cs === "2C") return 2;
-  const suit = cs.slice(-1);
-  const rank = cs.slice(0, cs.length-1);
-  const base = RANK_VALUE[rank] || 999;
+// ===== Render =====
+function render() {
+  // top labels
+  if (trumpLabelEl) trumpLabelEl.textContent = trumpSuit ? `${trumpSuit} (${suitName(trumpSuit)})` : "(not picked)";
+  if (trumpOpenLabelEl) trumpOpenLabelEl.textContent = trumpOpen ? "Yes" : "No";
 
-  // suit tiebreak (rare): Clubs < Diamonds < Hearts < Spades
-  const suitTie = (suit === "C" ? 0 : suit === "D" ? 1 : suit === "H" ? 2 : 3);
-  return base * 10 + suitTie;
-}
+  updateDealerLabels();
 
-function resetDealerPick() {
-  setPhase("PICK");
-  pickDeck = shuffle(makePluckDeck51().slice());
-  pickPicks = [null, null, null];
-  pickRevealed = false;
-  if (pickMsgEl) pickMsgEl.textContent = "Pick a card (YOU).";
-  renderDealerPick();
-  render();
-}
+  // Quotas + tricks
+  if (ai2QuotaLabelEl) ai2QuotaLabelEl.textContent = String(players[0].quota);
+  if (ai3QuotaLabelEl) ai3QuotaLabelEl.textContent = String(players[1].quota);
+  if (youQuotaLabelEl) youQuotaLabelEl.textContent = String(players[2].quota);
 
-function renderDealerPick() {
-  if (!pickRowEl) return;
-  pickRowEl.innerHTML = "";
+  if (ai2TricksEl) ai2TricksEl.textContent = String(players[0].tricks);
+  if (ai3TricksEl) ai3TricksEl.textContent = String(players[1].tricks);
+  if (youTricksEl) youTricksEl.textContent = String(players[2].tricks);
 
-  const labels = ["AI2", "AI3", "YOU"];
-  for (let i=0;i<3;i++) {
-    const slot = document.createElement("div");
-    slot.className = "pickSlot";
+  if (trickNumEl) trickNumEl.textContent = String(trickNumber);
+  if (trickMaxEl) trickMaxEl.textContent = String(trickMax);
 
-    const nm = document.createElement("div");
-    nm.className = "pickName";
-    nm.textContent = labels[i];
+  // AI hidden hands
+  if (ai2HandEl) ai2HandEl.textContent = players[0].hand.map(()=> "🂠").join(" ");
+  if (ai3HandEl) ai3HandEl.textContent = players[1].hand.map(()=> "🂠").join(" ");
 
-    let face;
-    const card = pickPicks[i];
-
-    if (!pickRevealed) {
-      // Before reveal: YOU can click your facedown; AIs are facedown too.
-      face = makeCardFace("X", false, true);
-      if (i === 2 && !pickPicks[2]) {
-        face.title = "Click to pick";
-        face.onclick = () => {
-          if (phase !== "PICK") return;
-          if (pickPicks[2]) return;
-
-          // YOU pick random from deck
-          pickPicks[2] = pickDeck.pop();
-
-          // AI pick two random remaining
-          pickPicks[0] = pickDeck.pop();
-          pickPicks[1] = pickDeck.pop();
-
-          pickRevealed = true;
-
-          // Decide dealer = lowest value
-          const vals = pickPicks.map(cardPickValue);
-          let best = 0;
-          for (let k=1;k<3;k++) if (vals[k] < vals[best]) best = k;
-
-          // Map best index in pick view to playerIndex (0=AI2,1=AI3,2=YOU)
-          dealerIndex = best;
-
-          if (pickMsgEl) {
-            pickMsgEl.textContent =
-              `Revealed: AI2=${pickPicks[0]}, AI3=${pickPicks[1]}, YOU=${pickPicks[2]}. Lowest card deals → ${players[dealerIndex].id}.`;
-          }
-
-          // Start game flow
-          startNewHandAfterDealerPick();
-        };
-      }
-    } else {
-      // Reveal actual cards
-      face = makeCardFace(card, true, false);
-      face.style.cursor = "default";
-    }
-
-    slot.appendChild(nm);
-    slot.appendChild(face);
-    pickRowEl.appendChild(slot);
+  // Banner
+  const whoseTurn = (phase === "PLAY")
+    ? (turnIndex === 2 ? "YOUR TURN" : `${players[turnIndex].id} TURN`)
+    : "—";
+  const leadTxt = leadSuit || "(none)";
+  if (turnBannerEl) {
+    turnBannerEl.textContent =
+      `Phase: ${phase} • Dealer: ${players[dealerIndex].id} • ${whoseTurn} • Lead Suit: ${leadTxt}`;
   }
+
+  // Render your hand (clickable only during your turn in PLAY)
+  if (handEl) {
+    handEl.innerHTML = "";
+    const sorted = sortHandForDisplay(players[2].hand);
+    for (const c of sorted) {
+      const realIdx = players[2].hand.indexOf(c);
+      const isYourTurn = (phase === "PLAY" && turnIndex === 2 && !lockInput);
+      const legal = isYourTurn ? legalIndexesFor(2) : [];
+      const disabled = !(isYourTurn && legal.includes(realIdx));
+
+      const face = makeCardFace(c, disabled);
+      face.onclick = () => {
+        if (disabled) return;
+        if (lockInput) return;
+        if (phase !== "PLAY") return;
+        if (turnIndex !== 2) return;
+
+        const legalNow = legalIndexesFor(2);
+        if (!legalNow.includes(realIdx)) {
+          msgEl.textContent = illegalReason(2, c);
+          return;
+        }
+        playCard(2, realIdx);
+      };
+      handEl.appendChild(face);
+    }
+  }
+
+  // Trick display
+  if (trickEl) {
+    trickEl.innerHTML = "";
+    if (!trick.length) trickEl.textContent = "(empty)";
+    else {
+      for (const t of trick) {
+        const wrap = document.createElement("div");
+        wrap.style.display = "flex";
+        wrap.style.flexDirection = "column";
+        wrap.style.alignItems = "center";
+        wrap.style.gap = "6px";
+
+        const label = document.createElement("div");
+        label.style.fontSize = "12px";
+        label.style.color = "#a6b0c3";
+        label.textContent = players[t.playerIndex].id;
+
+        const face = makeCardFace(t.cardStr, true);
+        face.style.cursor = "default";
+
+        wrap.appendChild(label);
+        wrap.appendChild(face);
+        trickEl.appendChild(wrap);
+      }
+    }
+  }
+
+  // Panels
+  if (phase === "PLUCK") renderPluckStatus();
+  if (phase === "TRUMP_PICK") renderTrumpPickStatus();
+
+  // Trump Ace display
+  if (trumpSuit) renderCardIntoSlot(trumpAceSlotEl, "A" + trumpSuit);
+  else renderCardIntoSlot(trumpAceSlotEl, null);
 }
 
-function startNewHandAfterDealerPick() {
-  // Hand 1 begins right after dealer pick
-  handNumber = 1;
-  if (handNumEl) handNumEl.textContent = String(handNumber);
-
-  // First hand: NO PLUCK phase
-  dealNewHands();
-  setPhase("TRUMP_PICK");
-  msgEl.textContent = "Hand 1: Dealer selects trump (no pluck phase on first hand).";
-  render();
-  // If dealer is AI, auto-pick trump
-  autoTrumpIfAiDealer();
+// ===== Initial Pick (choose dealer) =====
+// lowest card wins deal; Jokers are highest so they almost never win "lowest".
+function pickCardRankValue(cs) {
+  if (cs === CARD_BIG_JOKER) return 1000;
+  if (cs === CARD_LITTLE_JOKER) return 900;
+  const rank = cs.slice(0, cs.length-1);
+  // Treat 2C as rank 2 so it can be the lowest.
+  return RANK_VALUE[rank] || 999;
 }
 
-// ===== Quotas rotate with dealer =====
-function applyQuotasByDealer() {
-  players[dealerIndex].quota = 7;
-  players[leftOf(dealerIndex)].quota = 6;
-  players[rightOf(dealerIndex)].quota = 4;
+let lastPick = null; // { ai2, ai3, you, lowestIndexes[], dealerIndexCandidate }
+
+function doInitialPick() {
+  // repack: new shuffled pluck deck, draw 3 top cards
+  const deck = shuffle(makePluckDeck51());
+  const ai2 = deck.pop();
+  const ai3 = deck.pop();
+  const you = deck.pop();
+
+  lastPick = { ai2, ai3, you };
+
+  renderCardIntoSlot(pickAI2El, ai2);
+  renderCardIntoSlot(pickAI3El, ai3);
+  renderCardIntoSlot(pickYOUEl, you);
+
+  const picks = [ai2, ai3, you].map(pickCardRankValue);
+  const minVal = Math.min(...picks);
+  const lowest = picks.map((v,i)=>({v,i})).filter(x=>x.v===minVal).map(x=>x.i);
+
+  if (lowest.length > 1) {
+    pickStatusEl.textContent = `Tie for lowest (${lowest.map(i=>players[i].id).join(", ")}). Repack and re-pick.`;
+    pickOkBtn.disabled = true;
+    pickReBtn.disabled = false;
+    dealerLabelEl.textContent = "(not set)";
+    dealerBannerEl.textContent = "(not set)";
+    initialDealerChosen = false;
+    return;
+  }
+
+  dealerIndex = lowest[0];
+  initialDealerChosen = true;
+  applyQuotasFromDealer();
+  updateDealerLabels();
+
+  pickStatusEl.textContent = `Lowest card: ${players[dealerIndex].id}. Click OK to start.`;
+  pickOkBtn.disabled = false;
+  pickReBtn.disabled = false;
 }
 
-// ===== Plucks =====
+function acceptInitialPickAndStart() {
+  if (!initialDealerChosen) {
+    pickStatusEl.textContent = "Pick must produce a single lowest dealer first.";
+    return;
+  }
+  // Start first hand: NO PLUCK phase
+  startFirstHand_NoPluck();
+}
+
+// ===== Plucks (same logic you already had) =====
 function computePlucksEarnedAndSuffered() {
   for (const p of players) {
     p.plucksEarned = Math.max(0, p.tricks - p.quota);
     p.plucksSuffered = Math.max(0, p.quota - p.tricks);
   }
 }
+
 function pluckerOrder() {
   const tiebreak = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
   const idx = [0,1,2];
@@ -382,6 +500,7 @@ function pluckerOrder() {
   });
   return idx.filter(i => players[i].plucksEarned > 0);
 }
+
 function victimOrder() {
   const tiebreak = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
   const idx = [0,1,2];
@@ -393,6 +512,7 @@ function victimOrder() {
   });
   return idx.filter(i => players[i].plucksSuffered > 0);
 }
+
 function buildPluckQueueFromScores() {
   const queue = [];
   const pluckers = pluckerOrder();
@@ -421,24 +541,27 @@ function removeCardFromHand(playerIndex, cardStr) {
   const i = players[playerIndex].hand.indexOf(cardStr);
   if (i >= 0) players[playerIndex].hand.splice(i, 1);
 }
+
 function lowestOfSuitNonJoker(playerIndex, suit) {
   const cards = players[playerIndex].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
-  if (!cards.length) return null;
+  if (cards.length === 0) return null;
   cards.sort((a,b)=> (RANK_VALUE[a.slice(0,-1)]||0) - (RANK_VALUE[b.slice(0,-1)]||0));
   return cards[0];
 }
 function highestOfSuitNonJoker(playerIndex, suit) {
   const cards = players[playerIndex].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
-  if (!cards.length) return null;
+  if (cards.length === 0) return null;
   cards.sort((a,b)=> (RANK_VALUE[b.slice(0,-1)]||0) - (RANK_VALUE[a.slice(0,-1)]||0));
   return cards[0];
 }
+
 function pairKey(pluckerI, pluckeeI) { return `${pluckerI}-${pluckeeI}`; }
 function markPluckSuitUsed(pluckerI, pluckeeI, suit) {
   const key = pairKey(pluckerI, pluckeeI);
   if (!pluckSuitUsedByPair.has(key)) pluckSuitUsedByPair.set(key, new Set());
   pluckSuitUsedByPair.get(key).add(suit);
 }
+
 function availablePluckSuits(pluckerI, pluckeeI) {
   const used = pluckSuitUsedByPair.get(pairKey(pluckerI, pluckeeI)) || new Set();
   const suits = [];
@@ -449,6 +572,7 @@ function availablePluckSuits(pluckerI, pluckeeI) {
   }
   return suits;
 }
+
 function attemptPluck(pluckerI, pluckeeI, suit) {
   const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
   if (!giveLow) return { ok:false, reason:`Plucker has no ${suit}.` };
@@ -467,8 +591,6 @@ function attemptPluck(pluckerI, pluckeeI, suit) {
   return { ok:true, giveLow, takeHigh };
 }
 
-function clearPluckChoicesUI() { if (pluckChoicesEl) pluckChoicesEl.innerHTML = ""; }
-
 function renderPluckStatus() {
   clearPluckChoicesUI();
 
@@ -481,22 +603,19 @@ function renderPluckStatus() {
 
   const pluckerI = activePluck.pluckerIndex;
   const pluckeeI = activePluck.pluckeeIndex;
-  const plucker = players[pluckerI];
-  const pluckee = players[pluckeeI];
-
   const suits = availablePluckSuits(pluckerI, pluckeeI);
 
-  // YOU pluck: suit buttons
+  // YOU plucks manually with suit buttons
   if (pluckerI === 2) {
     pluckNextBtn.disabled = true;
 
-    if (!suits.length) {
-      pluckStatusEl.textContent = `You are plucking ${pluckee.name}, but have no suit to attempt. Skipping.`;
-      pluckNextBtn.disabled = false;
+    if (suits.length === 0) {
+      pluckStatusEl.textContent = `You are plucking ${players[pluckeeI].name}, but have no suit to attempt. Skipping.`;
       return;
     }
 
-    pluckStatusEl.textContent = `You are plucking ${pluckee.name}. Choose a suit. Wrong suit attempt = LOST.`;
+    pluckStatusEl.textContent =
+      `You are plucking ${players[pluckeeI].name}. Choose a suit. Wrong suit attempt = LOST.`;
 
     for (const s of suits) {
       const give = lowestOfSuitNonJoker(pluckerI, s);
@@ -504,7 +623,13 @@ function renderPluckStatus() {
       const btn = document.createElement("button");
       btn.className = "btn";
       btn.style.padding = "10px 12px";
-      btn.innerHTML = `<strong>${s}</strong> (${suitName(s)})<div style="font-size:12px;opacity:.85;">Give: ${give}</div>`;
+      btn.style.display = "flex";
+      btn.style.flexDirection = "column";
+      btn.style.alignItems = "flex-start";
+      btn.style.gap = "4px";
+      btn.innerHTML =
+        `<div><strong>${s}</strong> (${suitName(s)})</div>` +
+        `<div style="font-size:12px;opacity:.85;">Give: ${give || "(none)"}</div>`;
 
       btn.onclick = () => {
         const res = attemptPluck(pluckerI, pluckeeI, s);
@@ -513,7 +638,7 @@ function renderPluckStatus() {
           markPluckSuitUsed(pluckerI, pluckeeI, s);
           pluckStatusEl.textContent = `FAILED (${res.reason}). Pluck LOST. Next.`;
         } else {
-          pluckStatusEl.textContent = `Plucked ${s}: gave ${res.giveLow}, received ${res.takeHigh}.`;
+          pluckStatusEl.textContent = `Pluck success: gave ${res.giveLow}, received ${res.takeHigh}.`;
         }
 
         pluckQueue.shift();
@@ -528,132 +653,149 @@ function renderPluckStatus() {
     return;
   }
 
-  // AI pluck
+  // AI pluck: click Run Next Pluck
   pluckNextBtn.disabled = false;
-  if (!suits.length) pluckStatusEl.textContent = `${plucker.name} → ${pluckee.name}: no suit to attempt. Skipping.`;
-  else pluckStatusEl.textContent = `${plucker.name} is plucking ${pluckee.name}. Candidate suits: ${suits.join(", ")}.`;
+
+  if (suits.length === 0) {
+    pluckStatusEl.textContent = `${players[pluckerI].name} has no suit to attempt. Skipping.`;
+  } else {
+    pluckStatusEl.textContent = `${players[pluckerI].name} is plucking ${players[pluckeeI].name}. Candidate suits: ${suits.join(", ")}.`;
+  }
 }
 
 function runOnePluck() {
   if (phase !== "PLUCK") return;
-  if (!pluckQueue.length) return;
+  if (pluckQueue.length === 0) return;
   if (!activePluck) activePluck = pluckQueue[0];
 
   const pluckerI = activePluck.pluckerIndex;
   const pluckeeI = activePluck.pluckeeIndex;
-
   const candidates = availablePluckSuits(pluckerI, pluckeeI);
 
-  if (!candidates.length) {
+  if (candidates.length === 0) {
     pluckStatusEl.textContent = `No available suit for ${players[pluckerI].name} → ${players[pluckeeI].name}. Skipped.`;
     pluckQueue.shift();
     activePluck = null;
-    if (!pluckQueue.length) moveToTrumpPick();
+    if (pluckQueue.length === 0) moveToTrumpPick();
     render();
     return;
   }
 
+  // If YOU is plucker, buttons handle it
   if (pluckerI === 2) {
     pluckStatusEl.textContent = "Choose a suit button to pluck.";
     render();
     return;
   }
 
-  // AI picks a random candidate (blind, chaotic)
-  const pick = candidates[Math.floor(Math.random() * candidates.length)];
-  const res = attemptPluck(pluckerI, pluckeeI, pick);
+  // AI blind: pick suit with cheapest give card
+  let bestSuit = candidates[0];
+  let bestVal = 999;
+  for (const s of candidates) {
+    const low = lowestOfSuitNonJoker(pluckerI, s);
+    const v = low ? (RANK_VALUE[low.slice(0,-1)]||999) : 999;
+    if (v < bestVal) { bestVal = v; bestSuit = s; }
+  }
 
+  const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
   if (!res.ok) {
-    markPluckSuitUsed(pluckerI, pluckeeI, pick);
-    pluckStatusEl.textContent = `${players[pluckerI].name} attempted ${pick} and FAILED. Pluck LOST.`;
+    markPluckSuitUsed(pluckerI, pluckeeI, bestSuit);
+    pluckStatusEl.textContent = `AI failed (${res.reason}). Pluck LOST.`;
   } else {
-    pluckStatusEl.textContent = `${players[pluckerI].name} plucked ${pick}: gave ${res.giveLow}, received ${res.takeHigh}.`;
+    pluckStatusEl.textContent = `AI pluck: gave ${res.giveLow}, received ${res.takeHigh}.`;
   }
 
   pluckQueue.shift();
   activePluck = null;
 
-  if (!pluckQueue.length) moveToTrumpPick();
+  if (pluckQueue.length === 0) moveToTrumpPick();
   render();
 }
 
 // ===== Trump Pick =====
+function computeTrumpCallerIndex() {
+  // Dealer selects trump in this version (per your label “Dealer Selects Trump”)
+  return dealerIndex;
+}
+
+// AI chooses trump from OWN hand only
 function aiChooseTrumpFromOwnHand(aiIndex) {
   const hand = players[aiIndex].hand;
   const suitScore = { S:0, H:0, D:0, C:0 };
 
   for (const cs of hand) {
-    if (isJoker(cs)) { suitScore.S += 6; suitScore.H += 6; suitScore.D += 6; suitScore.C += 6; continue; }
+    if (isJoker(cs)) {
+      suitScore.S += 6; suitScore.H += 6; suitScore.D += 6; suitScore.C += 6;
+      continue;
+    }
     const suit = cs.slice(-1);
     const rank = cs.slice(0, cs.length-1);
     const v = RANK_VALUE[rank] || 0;
-    suitScore[suit] += 2;
-    if (v >= 11) suitScore[suit] += (v - 10) * 2;
+
+    suitScore[suit] += 2; // length
+    if (v >= 11) suitScore[suit] += (v - 10) * 2; // J/Q/K/A boost
     else suitScore[suit] += Math.max(0, v - 6) * 0.5;
   }
 
   let bestSuit = "H", bestScore = -Infinity;
-  for (const s of SUITS) if (suitScore[s] > bestScore) { bestScore = suitScore[s]; bestSuit = s; }
+  for (const s of SUITS) {
+    if (suitScore[s] > bestScore) { bestScore = suitScore[s]; bestSuit = s; }
+  }
   return bestSuit;
 }
 
 function setTrump(suit) {
   trumpSuit = suit;
-  trumpOpen = (trumpSuit === "C"); // keep your existing behavior
+  // keep your current rule: trump "opens" when clubs selected (or will open when trump played)
+  trumpOpen = (trumpSuit === "C");
+  render(); // update ace slot etc.
 }
 
-function renderTrumpAce() {
-  if (!trumpAceEl) return;
-  trumpAceEl.innerHTML = "";
+let trumpCallerIndex = 0;
 
-  if (!trumpSuit) {
-    trumpAceEl.textContent = "(none)";
+function renderTrumpPickStatus() {
+  if (trumpSuit) {
+    trumpStatusEl.textContent = `Trump picked: ${trumpSuit} (${suitName(trumpSuit)}).`;
     return;
   }
-  const ace = "A" + trumpSuit;
-  const face = makeCardFace(ace, true, false);
-  face.style.cursor = "default";
-  trumpAceEl.appendChild(face);
-}
-
-function autoTrumpIfAiDealer() {
-  if (phase !== "TRUMP_PICK") return;
-
-  if (dealerIndex !== 2) {
-    const suit = aiChooseTrumpFromOwnHand(dealerIndex);
-    setTrump(suit);
-    msgEl.textContent = `${players[dealerIndex].name} selected trump: ${suit} (${suitName(suit)}).`;
-    moveToPlay();
-    render();
-  } else {
-    msgEl.textContent = "You are the dealer. Select trump.";
-    render();
-  }
+  const caller = players[trumpCallerIndex];
+  if (trumpCallerIndex === 2) trumpStatusEl.textContent = `You are Dealer. Pick trump now.`;
+  else trumpStatusEl.textContent = `${caller.name} is Dealer. AI will pick trump now.`;
 }
 
 function wireTrumpButtons() {
-  if (!trumpPanelEl) return;
   const btns = trumpPanelEl.querySelectorAll("button[data-trump]");
   btns.forEach(b => {
     b.onclick = () => {
       if (phase !== "TRUMP_PICK") return;
-      if (dealerIndex !== 2) return;
+      if (trumpSuit) return;
+      if (trumpCallerIndex !== 2) return;
 
       const suit = b.getAttribute("data-trump");
       if (!SUITS.includes(suit)) return;
 
       setTrump(suit);
-      trumpStatusEl.textContent = `You selected trump: ${suit} (${suitName(suit)}).`;
+      msgEl.textContent = `You picked trump: ${suit} (${suitName(suit)}).`;
       moveToPlay();
-      render();
     };
   });
 }
 
 function moveToTrumpPick() {
   setPhase("TRUMP_PICK");
+  trumpCallerIndex = computeTrumpCallerIndex();
   render();
-  autoTrumpIfAiDealer();
+
+  if (trumpCallerIndex !== 2) {
+    const s = aiChooseTrumpFromOwnHand(trumpCallerIndex);
+    setTrump(s);
+    msgEl.textContent = `${players[trumpCallerIndex].name} picked trump: ${s} (${suitName(s)}).`;
+    moveToPlay();
+    render();
+  } else {
+    msgEl.textContent = "Dealer: pick trump.";
+    render();
+  }
 }
 
 function moveToPlay() {
@@ -685,16 +827,19 @@ function illegalReason(playerIndex, cardStr) {
 function legalIndexesFor(playerIndex) {
   const hand = players[playerIndex].hand;
 
+  // Trick 1 lead forced to 2C if you have it
   if (trickNumber === 1 && trick.length === 0 && hand.includes(CARD_OPEN_LEAD)) {
     return hand.map((c,i)=>({c,i})).filter(x=>x.c === CARD_OPEN_LEAD).map(x=>x.i);
   }
 
+  // Trump closed rule on lead
   if (trick.length === 0 && !trumpOpen && trumpSuit !== "C") {
     const nonTrumpIdx = hand.map((c,i)=>({c,i})).filter(x=>!isTrumpCard(x.c, trumpSuit)).map(x=>x.i);
     if (nonTrumpIdx.length > 0) return nonTrumpIdx;
     return hand.map((_,i)=>i);
   }
 
+  // Must follow suit
   if (trick.length > 0) {
     const suited = hand.map((c,i)=>({c,i})).filter(x => cardSuitForFollow(x.c, trumpSuit) === leadSuit).map(x=>x.i);
     return suited.length ? suited : hand.map((_,i)=>i);
@@ -709,7 +854,6 @@ function updateTrumpOpen(cardStr) { if (!trumpOpen && isTrumpCard(cardStr, trump
 function cardPower(cardStr) {
   if (cardStr === CARD_BIG_JOKER) return 1000000;
   if (cardStr === CARD_LITTLE_JOKER) return 900000;
-
   const c = parseCard(cardStr, trumpSuit);
   if (isTrumpCard(cardStr, trumpSuit)) return 10000 + c.value;
   return c.value;
@@ -717,7 +861,6 @@ function cardPower(cardStr) {
 
 function evaluateTrickWinner() {
   const anyTrump = trick.some(t => isTrumpCard(t.cardStr, trumpSuit));
-
   if (anyTrump) {
     let best = null, bestP = -1;
     for (const t of trick) {
@@ -738,6 +881,12 @@ function evaluateTrickWinner() {
 }
 
 function clearTrickForNext(winnerIndex) {
+  memory.trickLog.push({
+    trickNumber,
+    plays: trick.map(t => ({ pi: t.playerIndex, card: t.cardStr })),
+    winner: winnerIndex
+  });
+
   trick = [];
   leadSuit = null;
   leaderIndex = winnerIndex;
@@ -764,6 +913,7 @@ function playCard(playerIndex, handIdx) {
 
   trick.push({ playerIndex, cardStr });
   memory.played.add(cardStr);
+
   updateTrumpOpen(cardStr);
 
   turnIndex = (turnIndex + 1) % 3;
@@ -771,45 +921,57 @@ function playCard(playerIndex, handIdx) {
   maybeContinue();
 }
 
-// AI: simple “try to win” (no hand reading)
+// ===== AI play: "always try to win" =====
+function wouldWinIfPlayedNow(playerIndex, cardStr) {
+  const temp = trick.concat([{ playerIndex, cardStr }]);
+  const anyTrump = temp.some(t => isTrumpCard(t.cardStr, trumpSuit));
+  if (anyTrump) {
+    let bestPi = temp[0].playerIndex;
+    let bestP = -1;
+    for (const t of temp) {
+      if (!isTrumpCard(t.cardStr, trumpSuit)) continue;
+      const p = cardPower(t.cardStr);
+      if (p > bestP) { bestP = p; bestPi = t.playerIndex; }
+    }
+    return bestPi === playerIndex;
+  } else {
+    let bestPi = temp[0].playerIndex;
+    let bestV = -1;
+    for (const t of temp) {
+      if (cardSuitForFollow(t.cardStr, trumpSuit) !== leadSuit) continue;
+      const v = parseCard(t.cardStr, trumpSuit).value;
+      if (v > bestV) { bestV = v; bestPi = t.playerIndex; }
+    }
+    return bestPi === playerIndex;
+  }
+}
+
 function chooseAiIndex(playerIndex) {
   const legal = legalIndexesFor(playerIndex);
   const hand = players[playerIndex].hand;
 
-  // If leading, play highest legal (aggressive)
-  if (trick.length === 0) {
-    let bestIdx = legal[0], bestPow = -Infinity;
-    for (const idx of legal) {
-      const p = cardPower(hand[idx]);
-      if (p > bestPow) { bestPow = p; bestIdx = idx; }
-    }
-    return bestIdx;
-  }
-
-  // If following, try to win trick: pick smallest card that still wins; else dump smallest.
-  let winning = [];
+  // priority 1: choose a winning card if possible (lowest winning if following; if leading choose strong but not suicide)
+  const winning = [];
   for (const idx of legal) {
-    const temp = trick.concat([{ playerIndex, cardStr: hand[idx] }]);
-    const anyTrump = temp.some(t => isTrumpCard(t.cardStr, trumpSuit));
-    let bestPi = temp[0].playerIndex;
-    let bestScore = -1;
-    for (const t of temp) {
-      const score = anyTrump
-        ? (isTrumpCard(t.cardStr, trumpSuit) ? cardPower(t.cardStr) : -1)
-        : (cardSuitForFollow(t.cardStr, trumpSuit) === leadSuit ? parseCard(t.cardStr, trumpSuit).value : -1);
-      if (score > bestScore) { bestScore = score; bestPi = t.playerIndex; }
-    }
-    if (bestPi === playerIndex) winning.push(idx);
+    const c = hand[idx];
+    if (trick.length === 0) winning.push({ idx, power: cardPower(c) });
+    else if (wouldWinIfPlayedNow(playerIndex, c)) winning.push({ idx, power: cardPower(c) });
   }
 
-  function cardSize(idx) { return cardPower(hand[idx]); }
-  if (winning.length) {
-    winning.sort((a,b)=> cardSize(a) - cardSize(b));
-    return winning[0];
-  } else {
-    const sorted = legal.slice().sort((a,b)=> cardSize(a) - cardSize(b));
-    return sorted[0];
+  if (trick.length > 0 && winning.length) {
+    // play the LOWEST power that still wins (saves bigger guns)
+    winning.sort((a,b)=> a.power - b.power);
+    return winning[0].idx;
   }
+
+  // if no winning follow: dump lowest power legal
+  let best = legal[0];
+  let bestP = cardPower(hand[best]);
+  for (const idx of legal) {
+    const p = cardPower(hand[idx]);
+    if (p < bestP) { bestP = p; best = idx; }
+  }
+  return best;
 }
 
 // ===== Trick start =====
@@ -820,7 +982,6 @@ function startTrickOne() {
 
   trumpOpen = (trumpSuit === "C");
 
-  // Who has 2C leads trick 1
   let whoHas2C = 0;
   for (let pi=0; pi<3; pi++) {
     if (players[pi].hand.includes(CARD_OPEN_LEAD)) { whoHas2C = pi; break; }
@@ -836,6 +997,7 @@ function startTrickOne() {
 function maybeContinue() {
   if (phase !== "PLAY") return;
 
+  // resolve trick
   if (trick.length === 3) {
     lockInput = true;
 
@@ -852,21 +1014,21 @@ function maybeContinue() {
         render();
 
         if (roundIsOver()) {
-          // end hand -> compute pending plucks for NEXT deal
+          // end hand -> compute plucks for NEXT deal
           computePlucksEarnedAndSuffered();
           pendingPluckQueue = buildPluckQueueFromScores();
 
-          msgEl.textContent = "Hand over. Click Reset (New Deal).";
+          msgEl.textContent = "Hand over. Click Reset for next deal.";
           return;
         }
         maybeContinue();
-      }, 250);
-    }, 250);
+      }, BETWEEN_TRICKS_MS);
+    }, TRICK_RESOLVE_MS);
 
     return;
   }
 
-  // AI turn
+  // AI turns
   if (turnIndex !== 2) {
     lockInput = true;
     setTimeout(() => {
@@ -874,11 +1036,11 @@ function maybeContinue() {
       playCard(turnIndex, aiIdx);
       lockInput = false;
       render();
-    }, 220);
+    }, AI_DELAY_MS);
   }
 }
 
-// ===== Deal / Next Hand =====
+// ===== Deal / phases =====
 function dealNewHands() {
   resetMemory();
 
@@ -891,7 +1053,7 @@ function dealNewHands() {
   });
 
   trickMax = TOTAL_TRICKS;
-  trickNumber = 1;
+  trickNumber = 0;
   trick = [];
   leadSuit = null;
 
@@ -901,170 +1063,71 @@ function dealNewHands() {
     players[2].hand.push(deck.pop());
   }
 
-  // Trump resets each hand
+  // Trump not picked until TRUMP_PICK
   trumpSuit = null;
   trumpOpen = false;
 
-  // Pluck tracking resets
   pluckSuitUsedByPair = new Map();
   activePluck = null;
-}
-
-function startHandFlowAfterDeal() {
-  // Apply quotas based on CURRENT dealerIndex
-  applyQuotasByDealer();
-
-  // First hand: skip pluck
-  if (handNumber === 1) {
-    setPhase("TRUMP_PICK");
-    msgEl.textContent = "Hand 1: Dealer selects trump (no pluck phase).";
-    render();
-    autoTrumpIfAiDealer();
-    return;
-  }
-
-  // Later hands: plucks happen first (using pending queue from previous hand)
-  setPhase("PLUCK");
-
-  pluckQueue = (pendingPluckQueue && pendingPluckQueue.length) ? pendingPluckQueue.slice() : [];
-  pendingPluckQueue = null;
-
-  if (!pluckQueue.length) {
-    msgEl.textContent = "No plucks this hand. Dealer selects trump.";
-    moveToTrumpPick();
-  } else {
-    msgEl.textContent = "Pluck phase begins (manual).";
-  }
 
   render();
 }
 
-// ===== Render =====
-function render() {
-  if (!handEl || !trickEl) return;
+function startFirstHand_NoPluck() {
+  // First hand starts after initial pick, no pluck phase.
+  setPhase("DEAL");
+  msgEl.textContent = "First deal: no pluck phase. Dealer will select trump.";
+  dealNewHands();
+  // Immediately go to trump pick
+  moveToTrumpPick();
+}
 
-  // Labels
-  if (handNumEl) handNumEl.textContent = String(handNumber);
-  if (dealerLabelEl) dealerLabelEl.textContent = players[dealerIndex].id;
+function startNextHand_WithPluck() {
+  // Rotate dealer right each new deal
+  rotateDealerRight();
+  updateDealerLabels();
 
-  if (trumpLabelEl) trumpLabelEl.textContent = trumpSuit ? `${trumpSuit} (${suitName(trumpSuit)})` : "(not picked)";
-  if (trumpOpenLabelEl) trumpOpenLabelEl.textContent = trumpOpen ? "Yes" : "No";
-  renderTrumpAce();
+  setPhase("DEAL");
+  dealNewHands();
 
-  ai2QuotaLabelEl.textContent = String(players[0].quota);
-  ai3QuotaLabelEl.textContent = String(players[1].quota);
-  youQuotaLabelEl.textContent = String(players[2].quota);
+  // PLUCK phase only if there were pending plucks from previous hand
+  pluckQueue = (pendingPluckQueue && pendingPluckQueue.length) ? pendingPluckQueue.slice() : [];
+  pendingPluckQueue = null;
 
-  ai2TricksEl.textContent = String(players[0].tricks);
-  ai3TricksEl.textContent = String(players[1].tricks);
-  youTricksEl.textContent = String(players[2].tricks);
-
-  trickNumEl.textContent = String(trickNumber);
-  trickMaxEl.textContent = String(trickMax);
-
-  // Dealer pick view
-  if (phase === "PICK") renderDealerPick();
-
-  // Your hand
-  handEl.innerHTML = "";
-  const sorted = sortHandForDisplay(players[2].hand);
-
-  for (const c of sorted) {
-    const realIdx = players[2].hand.indexOf(c);
-    const isPlayableTurn = (phase === "PLAY" && turnIndex === 2);
-    const legal = isPlayableTurn ? legalIndexesFor(2) : [];
-    const disabled = !(isPlayableTurn && legal.includes(realIdx));
-
-    const face = makeCardFace(c, disabled, false);
-
-    // IMPORTANT: attach click to THIS node (never replace it later)
-    face.onclick = () => {
-      if (disabled) return;
-      if (lockInput) return;
-      if (phase !== "PLAY") return;
-      if (turnIndex !== 2) return;
-
-      const legalNow = legalIndexesFor(2);
-      if (!legalNow.includes(realIdx)) {
-        msgEl.textContent = illegalReason(2, c);
-        return;
-      }
-      playCard(2, realIdx);
-    };
-
-    handEl.appendChild(face);
+  if (pluckQueue.length === 0) {
+    msgEl.textContent = "No plucks this hand. Dealer selects trump.";
+    moveToTrumpPick();
+  } else {
+    setPhase("PLUCK");
+    msgEl.textContent = "Pluck phase begins (manual).";
+    render();
   }
-
-  // Trick display
-  trickEl.innerHTML = "";
-  if (!trick.length) trickEl.textContent = "(empty)";
-  else {
-    for (const t of trick) {
-      const wrap = document.createElement("div");
-      wrap.style.display = "flex";
-      wrap.style.flexDirection = "column";
-      wrap.style.alignItems = "center";
-      wrap.style.gap = "6px";
-
-      const label = document.createElement("div");
-      label.style.fontSize = "12px";
-      label.style.color = "#a6b0c3";
-      label.textContent = players[t.playerIndex].id;
-
-      const face = makeCardFace(t.cardStr, true, false);
-      face.style.cursor = "default";
-
-      wrap.appendChild(label);
-      wrap.appendChild(face);
-      trickEl.appendChild(wrap);
-    }
-  }
-
-  // Hidden AI hands
-  ai2HandEl.textContent = players[0].hand.map(()=> "🂠").join(" ");
-  ai3HandEl.textContent = players[1].hand.map(()=> "🂠").join(" ");
-
-  // Phase panels
-  if (phase === "PLUCK") renderPluckStatus();
-  if (phase === "TRUMP_PICK") {
-    if (!trumpSuit) {
-      const d = players[dealerIndex];
-      trumpStatusEl.textContent = (dealerIndex === 2)
-        ? `You are the dealer (quota ${d.quota}). Select trump.`
-        : `${d.name} is the dealer (quota ${d.quota}). Selecting trump...`;
-    } else {
-      trumpStatusEl.textContent = `Trump selected: ${trumpSuit} (${suitName(trumpSuit)}).`;
-    }
-  }
-
-  // Turn banner
-  const turnTxt = (phase === "PLAY") ? (turnIndex === 2 ? "YOUR TURN" : `${players[turnIndex].id} TURN`) : "—";
-  turnBannerEl.textContent =
-    `Phase: ${phase} • Hand: ${handNumber} • Dealer: ${players[dealerIndex].id} • ${turnTxt}`;
-
-  // phase chips highlight
-  setPhase(phase);
 }
 
 // ===== Events =====
 if (pluckNextBtn) pluckNextBtn.addEventListener("click", () => runOnePluck());
 
-if (resetBtn) resetBtn.addEventListener("click", () => {
-  // Rotate dealer RIGHT each new deal (after hand 1)
-  if (handNumber >= 1) dealerIndex = rightOf(dealerIndex);
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    if (!initialDealerChosen) {
+      msgEl.textContent = "Do the initial pick first.";
+      return;
+    }
+    // After first hand is complete, Reset starts next hand (with possible plucks from last hand)
+    startNextHand_WithPluck();
+  });
+}
 
-  handNumber += 1;
-  dealNewHands();
-  startHandFlowAfterDeal();
-  render();
-});
-
-if (pickRestartBtn) pickRestartBtn.addEventListener("click", () => {
-  resetDealerPick();
-});
+if (pickBtn) pickBtn.addEventListener("click", () => doInitialPick());
+if (pickReBtn) pickReBtn.addEventListener("click", () => doInitialPick());
+if (pickOkBtn) pickOkBtn.addEventListener("click", () => acceptInitialPickAndStart());
 
 wireTrumpButtons();
 
-// ===== Start =====
-resetDealerPick(); // starts at dealer pick
-console.log("Pluck Demo loaded (stable reset)");
+// ===== Boot =====
+setPhase("PICK_DEALER");
+pickStatusEl.textContent = "Click “Pick Cards”.";
+pickOkBtn.disabled = true;
+pickReBtn.disabled = true;
+render();
+console.log("Pluck Demo v19 loaded");
