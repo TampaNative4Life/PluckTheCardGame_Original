@@ -231,4 +231,74 @@ h1{margin:10px 0 18px 0}
   padding:18px;
   text-align:center;
   color:#6e7a93;
-  border-top:1px solid var(--
+  border-top:1px solid var(--line);
+  margin-top:18px;
+}
+
+.pluckPanel{ margin-top:14px; }
+
+/* ===== Bigger phase bar ===== */
+.phaseRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.phaseChip{
+  border:1px solid var(--line);
+  background: #121a2a;
+  color: var(--muted);
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:15px;
+  letter-spacing:.2px;
+}
+.phaseArrow{
+  color:#55627a;
+  font-weight:900;
+  font-size:18px;
+}
+.phaseChip.activeChip{
+  border-color: rgba(212,178,84,.65);
+  box-shadow: 0 0 0 2px rgba(212,178,84,.12);
+  background: rgba(212,178,84,.10);
+  color: var(--text);
+}
+.phaseMeta{
+  margin-top:12px;
+  color:#a6b0c3;
+  font-size:14px;
+}
+/* ===== Phase timeline (bigger + active highlight) ===== */
+.phaseRow{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.phaseChip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px 18px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  font-weight:900;
+  font-size:16px;
+  letter-spacing:.2px;
+}
+
+.phaseArrow{
+  color:var(--muted);
+  font-size:22px;
+  font-weight:900;
+}
+
+.activeChip{
+  border:1px solid var(--brand);
+  box-shadow: 0 0 0 2px rgba(212,178,84,.18), 0 12px 28px rgba(0,0,0,.35);
+}
