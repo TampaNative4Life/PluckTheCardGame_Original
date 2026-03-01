@@ -1,40 +1,24 @@
 // Pluck Web Demo v19 (single-file replacement)
 // Goals:
-// - Fix "cards won't click/play" by making click wiring + phase/turn state robust.
+// - Fix "cards won't click/play" by making click wiring + phase/turn state robust (tablet-safe).
 // - First-time dealer selection: show all 3 picked cards + OK. If tie, repick.
 // - First hand has NO PLUCK phase: DEAL -> TRUMP PICK -> PLAY
 // - Later hands: DEAL -> PLUCK -> TRUMP PICK -> PLAY
-// - AI plays automatically: AI2 leads, AI3 plays, then YOU (must follow suit if possible)
-// - Card images are optional: if missing, auto-fallback to drawn card faces.
-// - Show Ace of Trump in UI if an element exists.
+// - AI plays automatically: leader leads, then next, then next (AI2/AI3/YOU depending on leader)
+// - YOU must follow suit if possible.
+// - Card images optional: if missing, fallback to drawn card faces.
+// - Show Ace of Trump in UI (left panel) if trumpAceSlot exists.
 
 (function () {
   "use strict";
 
   // ---------- helpers ----------
   const $ = (id) => document.getElementById(id);
-  const on = (el, evt, fn) => el && el.addEventListener(evt, fn);
-  // ===== Tablet diagnostics (safe to keep) =====
-(function tabletDiag(){
-  const m = document.getElementById("msg");
-  if (m) m.textContent = "JS OK: game.js loaded. Tap a card.";
-  document.addEventListener("pointerdown", (e) => {
-    // shows you if touches are reaching the page at all
-    if (m) m.textContent = "PointerDown: " + (e.target && e.target.className ? e.target.className : e.target.tagName);
-  }, { passive: true });
-})();
-
+  const on = (el, evt, fn, opt) => el && el.addEventListener(evt, fn, opt || false);
   const log = (...a) => console.log("[Pluck v19]", ...a);
 
-  function setText(el, txt) {
-    if (el) el.textContent = txt;
-  }
-
-  function showMsg(txt) {
-    const el = $("msg");
-    if (el) el.textContent = txt;
-  }
-
+  function setText(el, txt) { if (el) el.textContent = txt; }
+  function showMsg(txt) { const el = $("msg"); if (el) el.textContent = txt; }
   function showError(txt) {
     const el = $("msg");
     if (el) el.textContent = "ERROR: " + txt;
@@ -44,7 +28,16 @@
   window.addEventListener("error", (e) => {
     showError(e?.message || "Unknown script error");
   });
-  console.log("game.js loaded");
+
+  // Tablet/phone: prove JS is alive + pointer events are reaching the page
+  (function tabletDiag(){
+    const m = $("msg");
+    if (m) m.textContent = "JS OK: game.js loaded.";
+    document.addEventListener("pointerdown", (e) => {
+      // comment out if you hate the message changing:
+      // if (m) m.textContent = "PointerDown: " + (e.target?.className || e.target?.tagName);
+    }, { passive: true });
+  })();
 
   // ---------- DOM (required) ----------
   const handEl = $("hand");
@@ -52,9 +45,7 @@
   const resetBtn = $("resetBtn");
 
   if (!handEl || !trickEl || !resetBtn) {
-    showError(
-      "Missing required elements. game.html must include id='hand', id='trick', id='resetBtn'."
-    );
+    showError("Missing required elements. game.html must include id='hand', id='trick', id='resetBtn'.");
     return;
   }
 
@@ -64,6 +55,27 @@
 
   const phaseLabelEl = $("phaseLabel");
   const trumpLabelEl = $("trumpLabel");
+  const trumpOpenLabelEl = $("trumpOpenLabel");
+  const turnBannerEl = $("turnBanner");
+
+  const ai2TricksEl = $("ai2Tricks");
+  const ai3TricksEl = $("ai3Tricks");
+  const youTricksEl = $("youTricks");
+
+  const ai2QuotaEl = $("ai2Quota");
+  const ai3QuotaEl = $("ai3Quota");
+  const youQuotaEl = $("youQuota");
+
+  const trickNumEl = $("trickNum");
+  const trickMaxEl = $("trickMax");
+
+  const pDeal = $("pDeal");
+  const pPluck = $("pPluck");
+  const pTrump = $("pTrump");
+  const pPlay = $("pPlay");
+
+  const pluckPanelEl = $("pluckPanel");
+  const pluckStatusEl = $("pluckStatus");  const trumpLabelEl = $("trumpLabel");
   const trumpOpenLabelEl = $("trumpOpenLabel");
   const turnBannerEl = $("turnBanner");
 
