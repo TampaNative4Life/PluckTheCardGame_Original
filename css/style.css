@@ -51,8 +51,23 @@ body{
   padding:18px;
 }
 
-h1{margin:10px 0 18px 0}
+/* ===== Layout ===== */
+.layout{
+  display:grid;
+  grid-template-columns: 320px 1fr;
+  gap:18px;
 
+  /* “move play area right about an inch” */
+  margin-left:72px;
+}
+@media (max-width: 1100px){
+  .layout{ grid-template-columns: 1fr; margin-left:0; }
+}
+
+.sidebar{ height: fit-content; }
+.main{}
+
+/* ===== Cards & Panels ===== */
 .card{
   background:var(--panel);
   border:1px solid var(--line);
@@ -61,76 +76,21 @@ h1{margin:10px 0 18px 0}
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
 }
 
-.layout{
+.grid{
   display:grid;
-  grid-template-columns: 320px 1fr; /* left rail + main */
-  gap:18px;
-  align-items:start;
-}
-
-/* mobile stack */
-@media (max-width: 980px){
-  .layout{grid-template-columns:1fr}
-}
-
-.rail{
-  position:sticky;
-  top:14px;
-}
-
-.railHr{
-  border:none;
-  border-top:1px solid var(--line);
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
   margin:14px 0;
 }
-
-.cutGrid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  margin-top:10px;
-}
-.cutSlot{
-  border:1px dashed var(--line);
-  border-radius:12px;
-  padding:10px;
-  background:var(--panel2);
-}
-.cutName{
-  font-weight:800;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-.cutCard{
-  min-height:110px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.trumpBox{
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-  background:var(--panel2);
-}
-.trumpLine{color:var(--muted); margin:4px 0;}
-.aceSlot{
-  min-height:120px;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0b0d10;
-  overflow:hidden;
+@media (max-width: 900px){
+  .grid{grid-template-columns:1fr}
 }
 
 .topbar{
   display:grid;
-  grid-template-columns: 1.2fr .8fr;
+  grid-template-columns: 1.1fr .9fr;
   gap:14px;
-  margin-bottom:14px;
+  margin:14px 0 6px 0;
 }
 @media (max-width: 900px){
   .topbar{grid-template-columns:1fr}
@@ -144,14 +104,16 @@ h1{margin:10px 0 18px 0}
   color:var(--muted);
   margin-bottom:8px;
 }
+
 .turnBanner{
-  margin-top:12px;
+  margin-top:10px;
   padding:12px;
   border:1px dashed var(--line);
   border-radius:12px;
   background:var(--panel2);
   color:var(--muted);
-  font-size:13px;
+  font-size:14px;
+  min-height:42px;
 }
 
 .scoreBox{
@@ -187,13 +149,11 @@ h1{margin:10px 0 18px 0}
   font-weight:700;
 }
 .btn:hover{filter:brightness(1.08)}
-.btn-secondary{
-  background:#141b2a;
-}
+.btn-secondary{ background:#141b2a; }
 
 .msg{
   color:#cfcfcf;
-  margin-top:12px;
+  margin-top:10px;
   min-height:22px;
 }
 .hint{
@@ -202,18 +162,8 @@ h1{margin:10px 0 18px 0}
   font-size:13px;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-  margin:14px 0;
-}
-@media (max-width: 900px){
-  .grid{grid-template-columns:1fr}
-}
-
 .trickBox{
-  min-height:90px;
+  min-height:110px;
   padding:10px;
   border:1px solid var(--line);
   border-radius:14px;
@@ -227,40 +177,40 @@ h1{margin:10px 0 18px 0}
 .handRow{
   color:#6e7a93;
   font-size:18px;
+  min-height:26px;
 }
 
-/* ===== Phase bar (bigger + highlights) ===== */
-.phaseBar{ padding:16px; }
-.phaseRow{
+/* ===== Phase chips bigger + highlight ===== */
+.phaseBar{
   display:flex;
-  align-items:center;
-  flex-wrap:wrap;
   gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
 }
+
 .phaseChip{
   border:1px solid var(--line);
   background:#0f1320;
-  color:var(--muted);
-  padding:12px 14px;
+  padding:10px 12px;
   border-radius:999px;
   font-weight:900;
-  font-size:15px;
-}
-.phaseChip.activeChip{
-  border-color:var(--brand);
-  color:var(--text);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.18) inset;
-}
-.phaseArrow{
-  color:#5e6c86;
-  font-weight:900;
-}
-.phaseMeta{
-  margin-top:12px;
+  letter-spacing:.2px;
+  font-size:14px;
   color:var(--muted);
 }
+.phaseChip.activeChip{
+  background: rgba(212,178,84,.15);
+  border-color: rgba(212,178,84,.55);
+  color: var(--text);
+  box-shadow: 0 0 0 2px rgba(212,178,84,.12) inset;
+}
+.phaseArrow{
+  color:#4b5873;
+  font-weight:900;
+  font-size:16px;
+}
 
-/* ===== Card faces (fallback HTML cards) ===== */
+/* ===== Real-looking card faces (no images, reliable clicks) ===== */
 .hand{
   display:flex;
   flex-wrap:wrap;
@@ -281,6 +231,7 @@ h1{margin:10px 0 18px 0}
   display:flex;
   align-items:center;
   justify-content:center;
+  transition: transform .08s ease;
 }
 .cardFace:hover{ transform: translateY(-2px); }
 .cardFace:active{ transform: translateY(0px); }
@@ -324,6 +275,43 @@ h1{margin:10px 0 18px 0}
   opacity:.95;
 }
 
+/* ===== Sidebar bits ===== */
+.panelBlock{
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--panel2);
+  margin-top:12px;
+}
+
+.pickRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.pickSlot{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  min-width:92px;
+}
+.pickName{
+  font-weight:900;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.faceDown{
+  background: linear-gradient(135deg, #1b2336, #0f1320);
+  border:1px solid rgba(212,178,84,.35);
+  color:#e9eef6;
+}
+.faceDown .suitBig{ font-size:18px; }
+
+.trumpAceWrap{ margin-top:8px; }
+
 .footer{
   padding:18px;
   text-align:center;
@@ -331,5 +319,3 @@ h1{margin:10px 0 18px 0}
   border-top:1px solid var(--line);
   margin-top:18px;
 }
-
-.pluckPanel{ margin-top:14px; }
