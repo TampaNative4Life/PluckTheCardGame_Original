@@ -474,3 +474,5 @@ body{
 #trumpPanel[style*="display:none"]{
   pointer-events: none;
 }
+.cardFace img{ pointer-events:none; }
+.cardFace{ touch-action: manipulation; }
