@@ -23,61 +23,57 @@
   <main class="container">
     <h1>Playable Demo</h1>
 
-    <!-- Layout: left info rail + main play area (shifted right) -->
-    <div class="layout">
+    <!-- SHIFTED LAYOUT: left sidebar + main play area -->
+    <div class="playLayout">
 
-      <!-- LEFT RAIL (new space you asked for) -->
-      <aside class="rail card">
-        <h3 style="margin-top:0;">Cut for Deal</h3>
-        <p class="hint" style="margin-top:6px;">
-          Click <strong>Draw Your Card</strong>. AI draws too. Lowest card deals.
-        </p>
+      <!-- LEFT SIDEBAR (new space) -->
+      <aside class="sidebar">
+        <div class="card">
+          <h3>Dealer Pick</h3>
+          <p class="hint">Click once to pick for each player. All cards will be revealed. Lowest card deals.</p>
 
-        <div class="cutGrid">
-          <div class="cutSlot">
-            <div class="cutName">AI2</div>
-            <div id="cutAI2" class="cutCard">(face down)</div>
+          <div id="pickStatus" class="msg"></div>
+
+          <div class="pickGrid">
+            <div class="pickBox">
+              <div class="pickTitle">YOU</div>
+              <div id="pickYou" class="pickCard">(not picked)</div>
+            </div>
+            <div class="pickBox">
+              <div class="pickTitle">AI2</div>
+              <div id="pickAi2" class="pickCard">(not picked)</div>
+            </div>
+            <div class="pickBox">
+              <div class="pickTitle">AI3</div>
+              <div id="pickAi3" class="pickCard">(not picked)</div>
+            </div>
           </div>
-          <div class="cutSlot">
-            <div class="cutName">AI3</div>
-            <div id="cutAI3" class="cutCard">(face down)</div>
+
+          <div class="buttons" style="justify-content:flex-start;">
+            <button class="btn" id="pickStartBtn">Start Dealer Pick</button>
           </div>
-          <div class="cutSlot">
-            <div class="cutName">YOU</div>
-            <div id="cutYOU" class="cutCard">(face down)</div>
+
+          <div id="pickDeckArea" class="pickDeckArea" style="display:none;">
+            <div class="hint">Pick a face-down card for: <strong id="pickWhoseTurn">YOU</strong></div>
+            <div id="pickDeck" class="pickDeck"></div>
           </div>
         </div>
 
-        <div class="buttons" style="justify-content:flex-start; flex-wrap:wrap;">
-          <button class="btn" id="cutDrawBtn">Draw Your Card</button>
-          <button class="btn btn-secondary" id="cutRedoBtn">Re-cut</button>
-        </div>
-
-        <p id="cutMsg" class="msg"></p>
-
-        <hr class="railHr" />
-
-        <h3 style="margin:10px 0 6px 0;">Trump</h3>
-        <div class="trumpBox">
-          <div class="trumpLine">
-            <strong>Suit:</strong> <span id="trumpLabel">(not picked)</span>
+        <div class="card" style="margin-top:14px;">
+          <h3>Trump</h3>
+          <div class="metaRow" style="margin-bottom:6px;">
+            <div><strong>Trump Suit:</strong> <span id="trumpLabel">(not picked)</span></div>
           </div>
-          <div class="trumpLine">
-            <strong>Trump Open:</strong> <span id="trumpOpenLabel">No</span>
-          </div>
-
-          <div style="margin-top:10px;">
-            <div class="hint" style="margin-bottom:6px;">Ace of Trump</div>
-            <div id="trumpAce" class="aceSlot">(waiting)</div>
-          </div>
+          <div class="hint">When trump is selected, the Ace of trump is shown here.</div>
+          <div id="trumpAceBox" class="trumpAceBox">(no trump yet)</div>
         </div>
       </aside>
 
       <!-- MAIN PLAY AREA -->
-      <section class="main">
+      <section class="mainPlay">
 
         <!-- PHASE BAR -->
-        <div class="card phaseBar">
+        <div class="card phaseCard">
           <div class="phaseRow">
             <div id="pDeal"  class="phaseChip">1) The Deal</div>
             <div class="phaseArrow">→</div>
@@ -89,8 +85,8 @@
           </div>
 
           <div class="phaseMeta">
-            <strong>Current Phase:</strong> <span id="phaseLabel">CUT</span>
-            &nbsp;•&nbsp; <strong>Dealer:</strong> <span id="dealerLabel">(not set)</span>
+            <strong>Current Phase:</strong> <span id="phaseLabel">DEALER_PICK</span>
+            &nbsp;•&nbsp; <strong>Trump:</strong> <span id="trumpMeta">(not picked)</span>
           </div>
 
           <div id="turnBanner" class="turnBanner"></div>
@@ -99,7 +95,8 @@
         <div class="topbar" style="margin-top:12px;">
           <div class="topbar-left">
             <div class="metaRow">
-              <div><strong>Trick:</strong> <span id="trickNum">1</span>/<span id="trickMax">17</span></div>
+              <div><strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span></div>
+              <div><strong>Dealer:</strong> <span id="dealerLabel">?</span></div>
             </div>
           </div>
 
@@ -128,29 +125,8 @@
           </div>
         </div>
 
-        <div class="grid">
-          <div class="card">
-            <h3>AI2 (hidden)</h3>
-            <div id="ai2Hand" class="handRow"></div>
-          </div>
-
-          <div class="card">
-            <h3>AI3 (hidden)</h3>
-            <div id="ai3Hand" class="handRow"></div>
-          </div>
-        </div>
-
-        <!-- PLUCK PANEL -->
-        <div class="card pluckPanel" id="pluckPanel" style="display:none;">
-          <h3>Pluck Phase</h3>
-          <p id="pluckStatus" class="msg"></p>
-          <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
-          <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
-          <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
-        </div>
-
         <!-- TRUMP PICK PANEL -->
-        <div class="card" id="trumpPanel" style="display:none;">
+        <div class="card" id="trumpPanel" style="display:none;margin-top:14px;">
           <h3>Dealer Selects Trump</h3>
           <p id="trumpStatus" class="msg"></p>
           <div class="buttons" style="flex-wrap:wrap;">
@@ -161,18 +137,37 @@
           </div>
         </div>
 
+        <!-- PLUCK PANEL (hidden until hand 2+) -->
+        <div class="card pluckPanel" id="pluckPanel" style="display:none;margin-top:14px;">
+          <h3>Pluck Phase</h3>
+          <p id="pluckStatus" class="msg"></p>
+          <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
+          <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+        </div>
+
+        <div class="grid" style="margin-top:14px;">
+          <div class="card">
+            <h3>AI2 (hidden)</h3>
+            <div id="ai2Hand" class="handRow"></div>
+          </div>
+          <div class="card">
+            <h3>AI3 (hidden)</h3>
+            <div id="ai3Hand" class="handRow"></div>
+          </div>
+        </div>
+
         <div class="grid">
           <div class="card">
             <h3>Your Hand</h3>
             <div id="hand" class="hand"></div>
             <p id="msg" class="msg"></p>
-            <p class="hint">Hand is ordered by suits. After trump is picked, trump group comes first.</p>
+            <p class="hint">Click a legal card on YOUR TURN. Must follow suit if you can.</p>
           </div>
 
           <div class="card">
             <h3>Trick</h3>
             <div class="trickBox" id="trick">(empty)</div>
-            <p class="hint">Trick 1 lead is always 2♣.</p>
+            <p class="hint">2♣ leads Trick 1 (whoever has it).</p>
           </div>
         </div>
 
@@ -184,4 +179,5 @@
 
   <script src="js/game.js"></script>
 </body>
-</html>
+</html>            
+
