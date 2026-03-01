@@ -14,6 +14,15 @@
   // ---------- helpers ----------
   const $ = (id) => document.getElementById(id);
   const on = (el, evt, fn) => el && el.addEventListener(evt, fn);
+  // ===== Tablet diagnostics (safe to keep) =====
+(function tabletDiag(){
+  const m = document.getElementById("msg");
+  if (m) m.textContent = "JS OK: game.js loaded. Tap a card.";
+  document.addEventListener("pointerdown", (e) => {
+    // shows you if touches are reaching the page at all
+    if (m) m.textContent = "PointerDown: " + (e.target && e.target.className ? e.target.className : e.target.tagName);
+  }, { passive: true });
+})();
 
   const log = (...a) => console.log("[Pluck v19]", ...a);
 
