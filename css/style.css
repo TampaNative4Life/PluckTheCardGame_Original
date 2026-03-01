@@ -448,3 +448,29 @@ body{
   h1{ font-size: 22px; }
   .turnBanner{ font-size: 12px; }
 }
+/* ===== Tablet tap fixes ===== */
+
+/* If the card is an <img>, make sure the image doesn't steal or block taps */
+.cardFace img{
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Make sure the card itself can receive taps */
+.cardFace{
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+/* If anything is accidentally overlaying the play area, this helps */
+.trickBox, .hand, #hand, #trick{
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure panels don't overlap & block taps when hidden */
+#pluckPanel[style*="display:none"],
+#trumpPanel[style*="display:none"]{
+  pointer-events: none;
+}
