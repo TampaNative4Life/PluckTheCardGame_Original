@@ -21,36 +21,42 @@
   </header>
 
   <main class="container">
-    <h1>Pluck Rules (Quick Read)</h1>
+    <h1>Pluck Rules (Web Demo)</h1>
 
-    <div class="card" style="line-height:1.6;">
-      <h3>Core Flow</h3>
-      <p><strong>Deal → Pluck → Trump Pick → Play</strong></p>
-
-      <h3>Dealer + Quotas (Rotating)</h3>
+    <div class="card">
+      <h3>Order of Play</h3>
+      <p class="hint"><strong>Deal → Pluck → Trump Pick → Play</strong></p>
       <ul>
-        <li>Dealer rotates <strong>RIGHT</strong> every deal (including first load).</li>
-        <li>Quotas are always: <strong>Dealer = 7</strong>, <strong>Left of Dealer = 6</strong>, <strong>Right of Dealer = 4</strong>.</li>
+        <li><strong>Dealer rotates RIGHT</strong> every deal (including first load).</li>
+        <li><strong>Quotas rotate with dealer:</strong> Dealer=7, Left=6, Right=4.</li>
+        <li><strong>No auto-pluck:</strong> Plucks can be hairy. You choose.</li>
+        <li><strong>Trump is NOT chosen before plucks:</strong> Redeal → Plucks → Trump Pick.</li>
       </ul>
+    </div>
 
-      <h3>Pluck Phase</h3>
+    <div class="card" style="margin-top:14px;">
+      <h3>Hard Lock (Rule Enforcement)</h3>
       <ul>
-        <li>Plucks happen <strong>after a new deal</strong> and before trump selection.</li>
-        <li>Pluck attempt can be <strong>LOST</strong> (no re-pick).</li>
-        <li>Plucker gives a low card in chosen suit; pluckee returns a higher card (same suit) if they have it.</li>
-        <li>No “auto pluck” — it can get hairy.</li>
+        <li>If you can follow suit, you must follow suit.</li>
+        <li>If trump is not open, you can’t lead trump when you still have non-trump.</li>
+        <li>On Trick 1, whoever has <strong>2♣</strong> leads Trick 1 with it.</li>
       </ul>
+      <p class="hint">This demo enforces “Hard Lock” by disabling illegal cards.</p>
+    </div>
 
-      <h3>Trump</h3>
+    <div class="card" style="margin-top:14px;">
+      <h3>Pluck Notes</h3>
       <ul>
-        <li>Trump is picked <strong>after</strong> plucks.</li>
-        <li>No “never no trump” (your rule: <strong>always a trump suit</strong>).</li>
-        <li>Jokers: <strong>must play joker</strong> (your rule callout).</li>
+        <li>Wrong suit attempt = <strong>Pluck LOST</strong> (no re-pick).</li>
+        <li>Players who fall on hard times are just <strong>SOL</strong>—game has no mercy.</li>
+        <li>Player with 0 tricks is at the mercy of players above quota during pluck process.</li>
+        <li>After pluck exchange, hands must remain the correct size.</li>
       </ul>
+    </div>
 
-      <p class="hint">
-        This page is the “quick read.” Your full PDF rules can also be linked here later.
-      </p>
+    <div class="buttons" style="margin-top:14px;">
+      <button class="btn" onclick="location.href='game.html'">Play Demo</button>
+      <button class="btn btn-secondary" onclick="location.href='index.html'">Back Home</button>
     </div>
   </main>
 
