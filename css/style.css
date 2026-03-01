@@ -42,6 +42,7 @@ body{
   color:var(--muted);
   text-decoration:none;
   margin-left:14px;
+  font-weight:700;
 }
 .navlinks a:hover{color:var(--text)}
 
@@ -52,6 +53,7 @@ body{
 }
 
 h1{margin:10px 0 18px 0}
+
 .card{
   background:var(--panel);
   border:1px solid var(--line);
@@ -74,7 +76,7 @@ h1{margin:10px 0 18px 0}
   display:grid;
   grid-template-columns: 1.2fr .8fr;
   gap:14px;
-  margin:12px 0 14px 0;
+  margin-bottom:14px;
 }
 @media (max-width: 900px){
   .topbar{grid-template-columns:1fr}
@@ -91,7 +93,7 @@ h1{margin:10px 0 18px 0}
 
 .turnBanner{
   margin-top:10px;
-  padding:10px;
+  padding:12px;
   border:1px dashed var(--line);
   border-radius:12px;
   background:var(--panel2);
@@ -114,14 +116,13 @@ h1{margin:10px 0 18px 0}
   gap:10px;
   align-items:center;
 }
-.pname{font-weight:800}
+.pname{font-weight:900}
 .pmeta{color:var(--muted); font-size:13px}
 
 .buttons{
   display:flex;
   gap:10px;
   margin-top:12px;
-  flex-wrap:wrap;
 }
 .btn{
   border:1px solid var(--line);
@@ -130,7 +131,7 @@ h1{margin:10px 0 18px 0}
   padding:10px 12px;
   border-radius:12px;
   cursor:pointer;
-  font-weight:700;
+  font-weight:800;
 }
 .btn:hover{filter:brightness(1.08)}
 .btn-secondary{
@@ -139,7 +140,7 @@ h1{margin:10px 0 18px 0}
 
 .msg{
   color:#cfcfcf;
-  margin-top:10px;
+  margin-top:12px;
   min-height:22px;
 }
 .hint{
@@ -149,7 +150,7 @@ h1{margin:10px 0 18px 0}
 }
 
 .trickBox{
-  min-height:110px;
+  min-height:90px;
   padding:10px;
   border:1px solid var(--line);
   border-radius:14px;
@@ -157,7 +158,7 @@ h1{margin:10px 0 18px 0}
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  align-items:flex-start;
+  align-items:center;
 }
 
 .handRow{
@@ -165,42 +166,47 @@ h1{margin:10px 0 18px 0}
   font-size:18px;
 }
 
-/* Phase chips */
-.phaseCard{ padding:14px; }
+/* ===== Phase bar (BIGGER + CLEAR) ===== */
+.phaseWrap{ padding:16px; }
 .phaseRow{
   display:flex;
-  gap:10px;
+  gap:12px;
   flex-wrap:wrap;
   align-items:center;
 }
 .phaseChip{
-  padding:6px 10px;
+  padding:10px 14px;
   border-radius:999px;
   border:1px solid var(--line);
-  background:var(--panel2);
+  background:#0f1320;
   color:var(--muted);
-  font-weight:800;
-  font-size:13px;
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.2px;
 }
-.phaseChip.activeChip{
-  border-color: rgba(212,178,84,.65);
-  color: var(--text);
-  box-shadow: 0 0 0 3px rgba(212,178,84,.12);
+.phaseArrow{
+  color:#52607a;
+  font-weight:900;
 }
-.phaseArrow{ color:#53607a; font-weight:900; }
+.activeChip{
+  border-color: rgba(212,178,84,.75);
+  background: rgba(212,178,84,.10);
+  color: #f3e6bf;
+  box-shadow: 0 0 0 2px rgba(212,178,84,.12) inset;
+}
 .phaseMeta{
-  margin-top:10px;
-  color:var(--muted);
+  margin-top:12px;
+  color:#a6b0c3;
+  font-size:14px;
 }
 
-/* Cards area */
+/* ===== Cards ===== */
 .hand{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
 }
 
-/* Fallback “drawn” cards */
 .cardFace{
   width:74px;
   height:104px;
@@ -218,6 +224,12 @@ h1{margin:10px 0 18px 0}
 }
 .cardFace:hover{ transform: translateY(-2px); }
 .cardFace:active{ transform: translateY(0px); }
+
+.cardFace.disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
 
 .corner{
   position:absolute;
@@ -259,4 +271,5 @@ h1{margin:10px 0 18px 0}
   border-top:1px solid var(--line);
   margin-top:18px;
 }
+
 .pluckPanel{ margin-top:14px; }
