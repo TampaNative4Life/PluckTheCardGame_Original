@@ -22,166 +22,146 @@
 
   <main class="container">
 
-    <div class="playLayout">
+    <!-- TOP STRIP: Initial Pick (row) + Trump (compact) -->
+    <div class="topStrip">
 
-      <!-- LEFT SIDE: compact row (Initial Pick + Trump) -->
-      <aside class="sidePanel">
+      <!-- Initial Pick -->
+      <div class="card">
+        <h3 style="margin-top:0;">Initial Pick (Choose Dealer)</h3>
+        <p class="hint">
+          Each player draws 1 card. Lowest card becomes Dealer. If tied for lowest, repack and pick again.
+        </p>
 
-        <div class="sideRow">
-          <!-- Initial Pick (small + row-style) -->
-          <div class="card cardTight">
-            <h3 class="h3tight">Initial Pick</h3>
-            <p class="hint" style="margin-top:6px;">
-              Each player draws 1 card. Lowest card deals. If tied for lowest, repack and pick again.
-            </p>
-
-            <div class="buttons" style="justify-content:flex-start;flex-wrap:wrap;margin-top:10px;">
-              <button class="btn" id="pickBtn">Pick Cards</button>
-              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK</button>
-              <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
-            </div>
-
-            <div class="pmeta" style="margin-top:10px;">
-              <strong>Status:</strong> <span id="pickStatus">Click “Pick Cards”.</span>
-            </div>
-
-            <!-- pick cards shown in a ROW -->
-            <div class="pickRow" style="margin-top:10px;">
-              <div class="pickSlot">
-                <div class="pickName">AI2</div>
-                <div id="pickAI2" class="pickCardSlot">(none)</div>
-              </div>
-              <div class="pickSlot">
-                <div class="pickName">AI3</div>
-                <div id="pickAI3" class="pickCardSlot">(none)</div>
-              </div>
-              <div class="pickSlot">
-                <div class="pickName">YOU</div>
-                <div id="pickYOU" class="pickCardSlot">(none)</div>
-              </div>
-            </div>
-
-            <div class="pmeta" style="margin-top:10px;">
-              <strong>Dealer:</strong> <span id="dealerLabel">(not set)</span>
-            </div>
-          </div>
-
-          <!-- Trump Suit (small + flush next to pick) -->
-          <div class="card cardTight">
-            <h3 class="h3tight">Trump</h3>
-            <div class="pmeta">
-              <strong>Suit:</strong> <span id="trumpLabel">(not picked)</span>
-              <br />
-              <strong>Open:</strong> <span id="trumpOpenLabel">No</span>
-            </div>
-
-            <div class="pmeta" style="margin-top:10px;"><strong>Ace of Trump:</strong></div>
-            <div id="trumpAceSlot" class="pickCardSlot">(none)</div>
-          </div>
+        <div class="buttons" style="justify-content:flex-start;">
+          <button class="btn" id="pickBtn">Pick Cards</button>
+          <button class="btn btn-secondary" id="pickOkBtn" disabled>OK (Start Game)</button>
+          <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
         </div>
 
-      </aside>
-
-      <!-- RIGHT SIDE: play -->
-      <section class="mainPlay">
-
-        <!-- PHASE TIMELINE (moved up) -->
-        <div class="card" style="padding:14px;">
-          <div class="phaseRow">
-            <div id="pDeal"  class="phaseChip">1) The Deal</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPluck" class="phaseChip">2) Pluck</div>
-            <div class="phaseArrow">→</div>
-            <div id="pTrump" class="phaseChip">3) Dealer Selects Trump</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPlay"  class="phaseChip">4) Play</div>
-          </div>
-
-          <div class="phaseMeta">
-            <div><strong>Current Phase:</strong> <span id="phaseLabel">PICK_DEALER</span></div>
-            <div><strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span></div>
-            <div><strong>Dealer:</strong> <span id="dealerBanner">(not set)</span></div>
-          </div>
-
-          <div id="turnBanner" class="turnBanner"></div>
+        <div class="pmeta" style="margin-top:10px;">
+          <strong>Status:</strong> <span id="pickStatus">Click “Pick Cards”.</span>
+          &nbsp;•&nbsp; <strong>Dealer:</strong> <span id="dealerLabel">(not set)</span>
         </div>
 
-        <!-- Horizontal quota/tricks -->
-        <div class="card" style="margin-top:12px;">
-          <div class="scoreGrid">
-            <div class="scoreMini">
-              <div class="pname">AI2</div>
-              <div class="pmeta">Quota: <span id="ai2Quota">7</span></div>
-              <div class="pmeta">Tricks: <span id="ai2Tricks">0</span></div>
-            </div>
-            <div class="scoreMini">
-              <div class="pname">AI3</div>
-              <div class="pmeta">Quota: <span id="ai3Quota">6</span></div>
-              <div class="pmeta">Tricks: <span id="ai3Tricks">0</span></div>
-            </div>
-            <div class="scoreMini">
-              <div class="pname">YOU</div>
-              <div class="pmeta">Quota: <span id="youQuota">4</span></div>
-              <div class="pmeta">Tricks: <span id="youTricks">0</span></div>
-            </div>
+        <div class="pickRow">
+          <div class="pickMini">
+            <div class="pickName">AI2</div>
+            <div id="pickAI2" class="pickCardSlot">(none)</div>
           </div>
-
-          <div class="buttons" style="margin-top:10px;">
-            <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
+          <div class="pickMini">
+            <div class="pickName">AI3</div>
+            <div id="pickAI3" class="pickCardSlot">(none)</div>
+          </div>
+          <div class="pickMini">
+            <div class="pickName">YOU</div>
+            <div id="pickYOU" class="pickCardSlot">(none)</div>
           </div>
         </div>
+      </div>
 
-        <!-- Hidden hands -->
-        <div class="grid" style="margin-top:12px;">
-          <div class="card">
-            <h3>AI2 (hidden hand)</h3>
-            <div id="ai2Hand" class="handRow"></div>
-          </div>
-
-          <div class="card">
-            <h3>AI3 (hidden hand)</h3>
-            <div id="ai3Hand" class="handRow"></div>
-          </div>
+      <!-- Trump Compact -->
+      <div class="card trumpMini">
+        <h3 style="margin-top:0;">Trump Suit</h3>
+        <div class="row pmeta">
+          <div><strong>Trump:</strong> <span id="trumpLabel">(not picked)</span></div>
+          <div><strong>Open:</strong> <span id="trumpOpenLabel">No</span></div>
         </div>
+        <div class="pmeta" style="margin-top:10px;"><strong>Ace of Trump:</strong></div>
+        <div id="trumpAceSlot" class="trumpAceSlot">(none)</div>
+      </div>
 
-        <!-- PLUCK PANEL -->
-        <div class="card pluckPanel" id="pluckPanel" style="display:none;">
-          <h3>Pluck Phase</h3>
-          <p id="pluckStatus" class="msg"></p>
-          <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
-          <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
-          <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
+    </div>
+
+    <!-- PHASE (moved up) -->
+    <div class="card" style="padding:14px;">
+      <div class="phaseRow">
+        <div id="pDeal"  class="phaseChip">1) The Deal</div>
+        <div class="phaseArrow">→</div>
+        <div id="pPluck" class="phaseChip">2) Pluck</div>
+        <div class="phaseArrow">→</div>
+        <div id="pTrump" class="phaseChip">3) Dealer Selects Trump</div>
+        <div class="phaseArrow">→</div>
+        <div id="pPlay"  class="phaseChip">4) Play</div>
+      </div>
+
+      <div class="pmeta" style="margin-top:10px;">
+        <strong>Current Phase:</strong> <span id="phaseLabel">PICK_DEALER</span>
+        &nbsp;•&nbsp; <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
+        &nbsp;•&nbsp; <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
+      </div>
+
+      <div id="turnBanner" class="turnBanner"></div>
+
+      <div class="buttons" style="justify-content:flex-start;margin-top:10px;">
+        <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
+      </div>
+    </div>
+
+    <!-- QUOTAS/TRICKS (horizontal) -->
+    <div class="scoreStrip">
+      <div class="scoreMini">
+        <div class="title">AI2</div>
+        <div class="meta">
+          <div>Quota: <span id="ai2Quota">7</span></div>
+          <div>Tricks: <span id="ai2Tricks">0</span></div>
         </div>
+        <div id="ai2Hand" class="handRow" style="margin-top:8px;"></div>
+      </div>
 
-        <!-- TRUMP PICK PANEL -->
-        <div class="card" id="trumpPanel" style="display:none;">
-          <h3>Dealer Selects Trump</h3>
-          <p id="trumpStatus" class="msg"></p>
-          <div class="buttons" style="flex-wrap:wrap;">
-            <button class="btn" data-trump="S">S (Spades)</button>
-            <button class="btn" data-trump="H">H (Hearts)</button>
-            <button class="btn" data-trump="D">D (Diamonds)</button>
-            <button class="btn" data-trump="C">C (Clubs)</button>
-          </div>
+      <div class="scoreMini">
+        <div class="title">AI3</div>
+        <div class="meta">
+          <div>Quota: <span id="ai3Quota">6</span></div>
+          <div>Tricks: <span id="ai3Tricks">0</span></div>
         </div>
+        <div id="ai3Hand" class="handRow" style="margin-top:8px;"></div>
+      </div>
 
-        <!-- MAIN PLAY AREA moved up by layout changes -->
-        <div class="grid" style="margin-top:12px;">
-          <div class="card">
-            <h3>Your Hand</h3>
-            <div id="hand" class="hand"></div>
-            <p id="msg" class="msg"></p>
-            <p class="hint">Click a card to play. Must follow suit if possible.</p>
-          </div>
-
-          <div class="card">
-            <h3>Trick</h3>
-            <div class="trickBox" id="trick">(empty)</div>
-            <p class="hint">Trick winner leads the next trick.</p>
-          </div>
+      <div class="scoreMini">
+        <div class="title">YOU</div>
+        <div class="meta">
+          <div>Quota: <span id="youQuota">4</span></div>
+          <div>Tricks: <span id="youTricks">0</span></div>
         </div>
+        <div class="pmeta" style="margin-top:8px;">Your cards are below.</div>
+      </div>
+    </div>
 
-      </section>
+    <!-- PLUCK PANEL -->
+    <div class="card" id="pluckPanel" style="display:none; margin-top:12px;">
+      <h3>Pluck Phase</h3>
+      <p id="pluckStatus" class="msg"></p>
+      <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
+      <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+      <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
+    </div>
+
+    <!-- TRUMP PICK PANEL -->
+    <div class="card" id="trumpPanel" style="display:none; margin-top:12px;">
+      <h3>Dealer Selects Trump</h3>
+      <p id="trumpStatus" class="msg"></p>
+      <div class="buttons" style="flex-wrap:wrap;">
+        <button class="btn" data-trump="S">S (Spades)</button>
+        <button class="btn" data-trump="H">H (Hearts)</button>
+        <button class="btn" data-trump="D">D (Diamonds)</button>
+        <button class="btn" data-trump="C">C (Clubs)</button>
+      </div>
+    </div>
+
+    <!-- GAMEPLAY (moved up / tight) -->
+    <div class="grid">
+      <div class="card">
+        <h3>Your Hand</h3>
+        <div id="hand" class="hand"></div>
+        <p id="msg" class="msg"></p>
+        <p class="hint">Click a card to play. Must follow suit if possible.</p>
+      </div>
+
+      <div class="card">
+        <h3>Trick</h3>
+        <div class="trickBox" id="trick">(empty)</div>
+        <p class="hint">Trick winner leads next trick.</p>
+      </div>
     </div>
 
   </main>
