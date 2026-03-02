@@ -1,331 +1,44 @@
-:root{
-  --bg:#15181f;          /* lighter than before */
-  --panel:#1b2030;
-  --panel2:#141a28;
-  --text:#e9eef6;
-  --muted:#a6b0c3;
-  --line:#2a3855;
-  --brand:#d4b254;
-}
+/* ===== Visibility upgrades: Trick + Trump Pick highlights ===== */
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
+/* Make trick cards pop */
+.trickBox .cardFace{
+  width: 82px;
+  height: 116px;
+  box-shadow: 0 12px 22px rgba(0,0,0,.35);
 }
-
-.nav{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:12px 18px;
-  border-bottom:1px solid var(--line);
-  background:#10131a;
-  flex-wrap:wrap;
-  gap:10px;
-}
-.brand{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  color:var(--text);
-  text-decoration:none;
-  font-weight:800;
-  letter-spacing:1px;
-}
-.brand img{ height:40px; width:auto; border-radius:8px; }
-.navlinks{ display:flex; flex-wrap:wrap; gap:10px; }
-.navlinks a{
-  color:var(--muted);
-  text-decoration:none;
-  margin-left:0;
-}
-.navlinks a:hover{color:var(--text)}
-
-.container{
-  max-width:1200px;
-  margin:0 auto;
-  padding:14px;
-}
-
-/* ===== Layout ===== */
-.playLayout{
-  display:grid;
-  grid-template-columns: 360px 1fr;
-  gap:14px;
-  align-items:start;
-}
-@media (max-width: 1000px){
-  .playLayout{ grid-template-columns: 1fr; }
-}
-
-.mainPlay{
-  margin-left: 56px; /* “about an inch” but a bit tighter */
-}
-@media (max-width: 1000px){
-  .mainPlay{ margin-left: 0; }
-}
-
-.card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-  box-shadow: 0 10px 22px rgba(0,0,0,.22);
-}
-.compactCard{ padding:12px; }
-
-.grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-  margin:12px 0;
-}
-@media (max-width: 980px){
-  .grid{grid-template-columns:1fr}
-}
-
-.metaRow{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  flex-wrap:wrap;
-  color:var(--muted);
-  margin:0;
-}
-
-.turnBanner{
-  margin-top:10px;
-  padding:10px 12px;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-  color:var(--muted);
-  font-size:13px;
-  min-height:40px;
-}
-
-.buttons{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-.btn{
-  border:1px solid var(--line);
-  background:#202a42;
-  color:var(--text);
-  padding:10px 12px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:800;
-  min-height:44px;
-}
-.btn:hover{filter:brightness(1.06)}
-.btn-secondary{ background:#171f31; }
-
-.msg{ color:#d7dbe5; margin-top:10px; min-height:22px; }
-.hint{ color:#97a2b9; margin:8px 0 0 0; font-size:13px; }
-
-.handRow{ color:#7f8aa3; font-size:18px; min-height:26px; }
-
-.trickBox{
-  min-height:110px;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--panel2);
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-  position:relative;
-  z-index:1;
-}
-
-/* ===== Phase chips ===== */
-.phaseRow{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.phaseChip{
-  padding:10px 14px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:var(--panel2);
-  color:var(--muted);
-  font-weight:900;
-  font-size:15px;
-}
-.phaseChip.activeChip{
-  background: rgba(212,178,84,.12);
-  border-color: rgba(212,178,84,.55);
-  color: var(--text);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.10) inset;
-}
-.phaseArrow{ color:#9aa6bf; font-weight:900; font-size:18px; }
-
-/* ===== Card faces (reliable clicks) ===== */
-.hand{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  position:relative;
-  z-index:1;
-}
-.cardFace{
-  width: clamp(56px, 8.5vw, 74px);
-  height: clamp(82px, 12vw, 104px);
-  background:#f7f7fb;
-  color:#111;
-  border-radius:10px;
-  border:1px solid rgba(0,0,0,.18);
-  position:relative;
-  box-shadow: 0 10px 16px rgba(0,0,0,.20);
-  cursor:pointer;
-  user-select:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: transform .08s ease;
-  pointer-events:auto;
-  touch-action: manipulation;
-}
-.cardFace:hover{ transform: translateY(-2px); }
-.cardFace:active{ transform: translateY(0px); }
-.cardFace.disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  transform:none;
-}
-
-.corner{
-  position:absolute;
-  line-height:1.05;
-  font-weight:900;
-  font-size:14px;
-}
-.corner.tl{top:6px; left:7px;}
-.corner.br{bottom:6px; right:7px; transform:rotate(180deg);}
-.suitBig{
-  font-size:34px;
-  font-weight:900;
-  margin-top:6px;
-}
-.red{ color:#c0152a; }
-.black{ color:#111; }
-
-.joker{
-  background: linear-gradient(135deg, #f7f7fb, #efe9ff);
-  border:1px solid rgba(90,50,160,.35);
-}
-.joker .suitBig{ font-size:22px; }
-.jokerTag{
-  position:absolute;
-  bottom:8px;
-  left:8px;
-  right:8px;
-  text-align:center;
-  font-size:11px;
-  font-weight:900;
-  color:#3b2a7a;
-  opacity:.95;
-}
-
-/* ===== Left panel: compact pick + trump/quotas row ===== */
-.rowHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.pickRowCompact{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-.pickSlotCompact{
-  flex:1;
-  min-width:92px;
-}
-.pickName{
-  font-weight:900;
-  color:var(--muted);
-  font-size:12px;
-}
-.pickCardSlotCompact{
-  min-height:96px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-  margin-top:8px;
-  padding:8px;
-}
-
-/* Trump + Quotas flush row */
-.sideRow{
-  display:grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap:12px;
-  margin-top:12px;
-}
-@media (max-width: 1000px){
-  .sideRow{ grid-template-columns:1fr; }
-}
-
-.trumpMiniCard{ padding:12px; }
-.trumpAceMini{ margin-top:6px; }
-.aceSlotMini{
-  margin-top:6px;
-  min-height:92px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-  padding:8px;
-}
-
-.quotaMiniCard{ padding:12px; }
-.quotaRow{
+.trickWrap{
   display:flex;
   flex-direction:column;
-  gap:10px;
-}
-.qItem{
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-  display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:10px;
+  gap:6px;
+  padding:6px;
+  border-radius:12px;
 }
-.qName{ font-weight:900; }
-.qMeta{ color:var(--muted); font-size:13px; }
-
-/* Prevent hidden panels from blocking taps */
-#pluckPanel[style*="display:none"],
-#trumpPanel[style*="display:none"]{
-  pointer-events:none;
+.trickWrap.activeTurn{
+  outline: 2px solid rgba(212,178,84,.55);
+  background: rgba(212,178,84,.10);
 }
 
-.footer{
-  padding:18px;
-  text-align:center;
-  color:#7f8aa3;
-  border-top:1px solid var(--line);
-  margin-top:18px;
+/* Trump pick buttons clearer */
+#trumpPanel .btn{
+  min-width: 120px;
+}
+#trumpPanel .btn.trumpSelected{
+  border-color: rgba(212,178,84,.75);
+  box-shadow: 0 0 0 2px rgba(212,178,84,.18) inset;
+  background: rgba(212,178,84,.12);
+}
+#trumpPanel .btn:hover{
+  filter: brightness(1.12);
+}
+
+/* Optional: when a card is clickable, give stronger hover */
+.cardFace:not(.disabled):hover{
+  outline: 2px solid rgba(212,178,84,.35);
+}
+
+/* Stronger “disabled” look */
+.cardFace.disabled{
+  opacity:.40;
+  filter: grayscale(.1);
 }
