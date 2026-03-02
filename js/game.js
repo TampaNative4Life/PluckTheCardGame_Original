@@ -144,26 +144,52 @@
 
   // ---------- UI card face ----------
   function makeCardFace(cardStr, disabled=false) {
-    const el = document.createElement("div");
-    el.className = "cardFace" + (disabled ? " disabled" : "");
+  const el = document.createElement("div");
+  el.className = "cardFace" + (disabled ? " disabled" : "");
 
-    if (cardStr === CARD_BIG_JOKER || cardStr === CARD_LITTLE_JOKER) {
-      el.classList.add("joker");
-      const tl = document.createElement("div");
-      tl.className = "corner tl";
-      tl.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
-      const br = document.createElement("div");
-      br.className = "corner br";
-      br.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
-      const mid = document.createElement("div");
-      mid.className = "suitBig";
-      mid.textContent = "🃏";
-      const tag = document.createElement("div");
-      tag.className = "jokerTag";
-      tag.textContent = (cardStr === CARD_BIG_JOKER ? "BIG JOKER" : "LITTLE JOKER");
-      el.appendChild(tl); el.appendChild(br); el.appendChild(mid); el.appendChild(tag);
-      return el;
-    }
+  // JOKERS
+  if (cardStr === CARD_BIG_JOKER || cardStr === CARD_LITTLE_JOKER) {
+    el.classList.add("joker");
+
+    const tl = document.createElement("div");
+    tl.className = "corner tl";
+    tl.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
+
+    const mid = document.createElement("div");
+    mid.className = "suitBig";
+    mid.textContent = "🃏";
+
+    // keep tag subtle (or remove if you want)
+    const tag = document.createElement("div");
+    tag.className = "jokerTag";
+    tag.textContent = (cardStr === CARD_BIG_JOKER ? "BIG JOKER" : "LITTLE JOKER");
+
+    el.appendChild(tl);
+    el.appendChild(mid);
+    el.appendChild(tag);
+    return el;
+  }
+
+  // NORMAL CARDS
+  const suit = cardStr.slice(-1);
+  const rank = cardStr.slice(0, cardStr.length - 1);
+  const colorClass = isRedSuit(suit) ? "red" : "black";
+  const sym = suitSymbol(suit);
+
+  // top-left only
+  const tl = document.createElement("div");
+  tl.className = `corner tl ${colorClass}`;
+  tl.innerHTML = `${rank}<br>${sym}`;
+
+  // center suit only
+  const mid = document.createElement("div");
+  mid.className = `suitBig ${colorClass}`;
+  mid.textContent = sym;
+
+  el.appendChild(tl);
+  el.appendChild(mid);
+  return el;
+}
 
     const suit = cardStr.slice(-1);
     const rank = cardStr.slice(0, cardStr.length-1);
