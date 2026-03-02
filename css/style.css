@@ -1,29 +1,35 @@
 :root{
-  --bg:#f3f6fb;
-  --panel:#ffffff;
-  --panel2:#f7f9fd;
-  --text:#121826;
-  --muted:#5b667a;
-  --line:#d7dff0;
+  /* Lightened a bit (still “Pluck night vibe”, but readable) */
+  --bg:#141822;
+  --panel:#1a2030;
+  --panel2:#151a28;
+  --text:#eef3fb;
+  --muted:#b5c0d6;
+  --line:#2a3550;
   --brand:#d4b254;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:var(--bg);
+  background: radial-gradient(1200px 600px at 20% 0%, rgba(212,178,84,.10), transparent 60%),
+              radial-gradient(1000px 600px at 100% 30%, rgba(120,170,255,.10), transparent 65%),
+              var(--bg);
   color:var(--text);
 }
 
-/* NAV */
 .nav{
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:12px 18px;
   border-bottom:1px solid var(--line);
-  background:#ffffff;
+  background: rgba(10,12,18,.70);
+  backdrop-filter: blur(6px);
+  flex-wrap:wrap;
+  gap:10px;
 }
 .brand{
   display:flex;
@@ -37,8 +43,7 @@ body{
 .brand img{
   height:40px;
   width:auto;
-  border-radius:10px;
-  border:1px solid var(--line);
+  border-radius:8px;
 }
 .navlinks{
   display:flex;
@@ -49,33 +54,49 @@ body{
   color:var(--muted);
   text-decoration:none;
   margin-left:0;
-  font-weight:700;
 }
 .navlinks a:hover{color:var(--text)}
 
 .container{
   max-width:1200px;
   margin:0 auto;
-  padding:16px;
+  padding:14px;
 }
 
-/* TOP ROW (Pick + Trump) */
-.topRow{
+/* ===== Layout ===== */
+.playLayout{
   display:grid;
-  grid-template-columns: 1.2fr .8fr;
+  grid-template-columns: 430px 1fr;
   gap:14px;
   align-items:start;
 }
-@media (max-width: 1000px){
-  .topRow{ grid-template-columns:1fr; }
+@media (max-width: 1100px){
+  .playLayout{ grid-template-columns:1fr; }
+}
+.mainPlay{
+  margin-left: 72px; /* ~1 inch */
+}
+@media (max-width: 1100px){
+  .mainPlay{ margin-left:0; }
 }
 
+/* ===== Cards & Panels ===== */
 .card{
-  background:var(--panel);
+  background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 35%), var(--panel);
   border:1px solid var(--line);
   border-radius:14px;
   padding:14px;
-  box-shadow: 0 10px 24px rgba(22,34,56,.08);
+  box-shadow: 0 10px 20px rgba(0,0,0,.20);
+}
+
+.cardTight{
+  padding:12px;
+}
+
+.h3tight{
+  margin:0;
+  font-size:16px;
+  letter-spacing:.2px;
 }
 
 .grid{
@@ -84,55 +105,10 @@ body{
   gap:14px;
   margin:14px 0;
 }
-@media (max-width: 900px){
+@media (max-width: 980px){
   .grid{grid-template-columns:1fr}
 }
 
-.topbar{
-  display:grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap:14px;
-  margin:14px 0 6px 0;
-}
-@media (max-width: 900px){
-  .topbar{grid-template-columns:1fr}
-}
-
-.metaRow{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  flex-wrap:wrap;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-
-.turnBanner{
-  margin-top:10px;
-  padding:12px;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-  color:var(--muted);
-  font-size:14px;
-  min-height:44px;
-}
-
-.scoreBox{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--panel2);
-}
-.scoreRow{
-  display:grid;
-  grid-template-columns: 60px 1fr 1fr;
-  gap:10px;
-  align-items:center;
-}
 .pname{font-weight:900}
 .pmeta{color:var(--muted); font-size:13px}
 
@@ -144,8 +120,8 @@ body{
 }
 .btn{
   border:1px solid var(--line);
-  background:#1b2336;
-  color:#ffffff;
+  background:#23304a;
+  color:var(--text);
   padding:10px 12px;
   border-radius:12px;
   cursor:pointer;
@@ -153,41 +129,31 @@ body{
   min-height:44px;
 }
 .btn:hover{filter:brightness(1.06)}
-.btn-secondary{
-  background:#2a344a;
-}
+.btn-secondary{ background:#1b2438; }
 
 .msg{
-  color:#2a344a;
+  color:#e7edf9;
   margin-top:10px;
   min-height:22px;
-  font-weight:700;
 }
 .hint{
-  color:#6b758a;
+  color:#a7b3ca;
   margin:8px 0 0 0;
   font-size:13px;
 }
 
-.trickBox{
-  min-height:120px;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--panel2);
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
+.turnBanner{
+  margin-top:10px;
+  padding:12px;
+  border:1px dashed rgba(212,178,84,.35);
+  border-radius:12px;
+  background: rgba(21,26,40,.75);
+  color:var(--muted);
+  font-size:14px;
+  min-height:42px;
 }
 
-.handRow{
-  color:#6b758a;
-  font-size:18px;
-  min-height:26px;
-}
-
-/* PHASES */
+/* ===== Phase chips bigger + highlight ===== */
 .phaseRow{
   display:flex;
   gap:10px;
@@ -204,63 +170,74 @@ body{
   font-size:15px;
 }
 .phaseChip.activeChip{
-  background: rgba(212,178,84,.16);
-  border-color: rgba(212,178,84,.60);
+  background: rgba(212,178,84,.14);
+  border-color: rgba(212,178,84,.55);
   color: var(--text);
+  box-shadow: 0 0 0 2px rgba(212,178,84,.12) inset;
 }
 .phaseArrow{
-  color:var(--muted);
+  color:rgba(181,192,214,.75);
   font-weight:900;
   font-size:18px;
 }
-
-/* PICK ROW */
-.pickRow{
+.phaseMeta{
+  margin-top:10px;
   display:flex;
   gap:14px;
   flex-wrap:wrap;
-}
-.pickSlot{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  min-width:120px;
-}
-.pickName{
-  font-weight:900;
   color:var(--muted);
-  font-size:12px;
 }
 
-.pickCardSlot{
-  min-height:120px;
-  min-width:120px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:var(--panel2);
+/* ===== Horizontal quota/tricks ===== */
+.scoreGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+}
+@media (max-width: 980px){
+  .scoreGrid{ grid-template-columns:1fr; }
+}
+.scoreMini{
   padding:10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background: rgba(21,26,40,.55);
 }
 
-/* CARD FACES */
+/* ===== Trick + hands ===== */
+.trickBox{
+  min-height:110px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background: rgba(21,26,40,.55);
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+.handRow{
+  color:#a9b6d2;
+  font-size:18px;
+  min-height:26px;
+}
+
 .hand{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
 }
 
+/* ===== Real-looking card faces (no images; reliable taps) ===== */
 .cardFace{
   width:74px;
   height:104px;
-  background:#ffffff;
+  background:#f7f7fb;
   color:#111;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,.14);
+  border-radius:10px;
+  border:1px solid rgba(0,0,0,.18);
   position:relative;
-  box-shadow: 0 10px 16px rgba(22,34,56,.12);
+  box-shadow: 0 10px 16px rgba(0,0,0,.22);
   cursor:pointer;
   user-select:none;
   display:flex;
@@ -295,8 +272,8 @@ body{
 .black{ color:#111; }
 
 .joker{
-  background: linear-gradient(135deg, #ffffff, #f2ecff);
-  border:1px solid rgba(90,50,160,.30);
+  background: linear-gradient(135deg, #f7f7fb, #efe9ff);
+  border:1px solid rgba(90,50,160,.35);
 }
 .joker .suitBig{ font-size:22px; }
 .jokerTag{
@@ -311,16 +288,58 @@ body{
   opacity:.95;
 }
 
-.footer{
-  padding:18px;
-  text-align:center;
-  color:#6b758a;
-  border-top:1px solid var(--line);
-  margin-top:18px;
+/* ===== Sidebar row: pick + trump ===== */
+.sideRow{
+  display:grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap:14px;
+  align-items:start;
+}
+@media (max-width: 1100px){
+  .sideRow{ grid-template-columns:1fr; }
 }
 
-/* Responsive card sizing */
+.pickRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.pickSlot{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  min-width:92px;
+}
+.pickName{
+  font-weight:900;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.pickCardSlot{
+  min-height:88px;
+  width:92px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px dashed rgba(181,192,214,.35);
+  border-radius:12px;
+  background: rgba(21,26,40,.35);
+  padding:8px;
+}
+
+/* responsive card scaling */
 .cardFace{
   width: clamp(56px, 8.5vw, 74px);
   height: clamp(82px, 12vw, 104px);
+}
+
+/* footer */
+.footer{
+  padding:18px;
+  text-align:center;
+  color:#a7b3ca;
+  border-top:1px solid var(--line);
+  margin-top:18px;
 }
