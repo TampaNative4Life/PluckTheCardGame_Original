@@ -121,17 +121,64 @@
           </div>
         </div>
 
-        <div class="grid">
-          <div class="card compactCard">
-            <h3 style="margin-top:0;">AI2 (hidden hand)</h3>
-            <div id="ai2Hand" class="handRow"></div>
-          </div>
+        <!-- ===== TABLE AREA (Spades-style) ===== -->
+<div class="tableCard">
 
-          <div class="card compactCard">
-            <h3 style="margin-top:0;">AI3 (hidden hand)</h3>
-            <div id="ai3Hand" class="handRow"></div>
-          </div>
-        </div>
+  <!-- Top row (we are NOT using an “across” player) -->
+  <div class="tableTopNote">3-Player Table • AI left + AI right • You bottom</div>
+
+  <div class="tableGrid">
+
+    <!-- LEFT AI -->
+    <div class="seat seatLeft">
+      <div class="seatName">AI2</div>
+      <div id="ai2Hand" class="handRow"></div>
+    </div>
+
+    <!-- CENTER (TRICK) -->
+    <div class="seat seatCenter">
+      <div class="centerLabel">Trick</div>
+      <div class="trickBox tableTrick" id="trick">(empty)</div>
+      <div class="centerHint">Winner leads next</div>
+    </div>
+
+    <!-- RIGHT AI -->
+    <div class="seat seatRight">
+      <div class="seatName">AI3</div>
+      <div id="ai3Hand" class="handRow"></div>
+    </div>
+
+    <!-- BOTTOM YOU -->
+    <div class="seat seatBottom">
+      <div class="seatName">YOU</div>
+      <div id="hand" class="hand tableHand"></div>
+      <p id="msg" class="msg"></p>
+      <p class="hint">Tap a card to play. Must follow suit if possible.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- PLUCK PANEL -->
+<div class="card pluckPanel" id="pluckPanel" style="display:none;">
+  <h3>Pluck Phase</h3>
+  <p id="pluckStatus" class="msg"></p>
+  <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
+  <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
+  <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
+</div>
+
+<!-- TRUMP PICK PANEL -->
+<div class="card" id="trumpPanel" style="display:none;">
+  <h3>Dealer Selects Trump</h3>
+  <p id="trumpStatus" class="msg"></p>
+  <div class="buttons" style="flex-wrap:wrap;">
+    <button class="btn" data-trump="S">S (Spades)</button>
+    <button class="btn" data-trump="H">H (Hearts)</button>
+    <button class="btn" data-trump="D">D (Diamonds)</button>
+    <button class="btn" data-trump="C">C (Clubs)</button>
+  </div>
+</div>
 
         <!-- PLUCK PANEL -->
         <div class="card pluckPanel" id="pluckPanel" style="display:none;">
@@ -177,3 +224,4 @@
   <script src="js/game.js"></script>
 </body>
 </html>
+
