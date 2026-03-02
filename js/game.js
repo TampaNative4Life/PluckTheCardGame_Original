@@ -1,195 +1,1099 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Pluck Demo</title>
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
+// Pluck Web Demo v21 (full replacement)
+// Fixes & features:
+// - No undefined suit-order references
+// - Stable click mapping: no indexOf() during rendering
+// - Card faces (no images) only
+// - Hand sorting: Jokers -> Trump suit -> remaining suits alternating Black/Red/Black/Red
+// - First hand: NO pluck (DEAL -> TRUMP_PICK -> PLAY)
+// - Later hands: DEAL -> PLUCK -> TRUMP_PICK -> PLAY
+// - Auto-advance to next hand after Trick 17
+// - Spades-like rule: cannot lead trump until opened unless only trump
 
-  <header class="nav">
-    <a class="brand" href="index.html">
-      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
-      <span>PLUCK</span>
-    </a>
-    <nav class="navlinks">
-      <a href="game.html">Play Demo</a>
-      <a href="rules.html">Rules</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+(function () {
+  "use strict";
 
-  <main class="container">
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const on = (el, evt, fn, opts) => el && el.addEventListener(evt, fn, opts);
 
-    <div class="playLayout">
+  function setText(el, txt) { if (el) el.textContent = txt; }
+  function msg(txt) { setText($("msg"), txt); }
+  function err(txt) { setText($("msg"), "ERROR: " + txt); console.error("[Pluck]", txt); }
 
-      <!-- LEFT PANEL -->
-      <aside class="sidePanel">
-        <div class="card">
-          <h3 style="margin-top:0;">Initial Pick (Choose Dealer)</h3>
-          <p class="hint" style="margin-top:6px;">
-            Each player draws 1 card. Lowest card becomes Dealer. If tied for lowest, repack and pick again.
-          </p>
+  window.addEventListener("error", (e) => err(e?.message || "Unknown JS error"));
 
-          <div id="pickArea" style="margin-top:12px;">
-            <div class="buttons" style="justify-content:flex-start;flex-wrap:wrap;">
-              <button class="btn" id="pickBtn">Pick Cards</button>
-              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK (Start Game)</button>
-              <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
-            </div>
+  // ---------- required DOM ----------
+  const handEl = $("hand");
+  const trickEl = $("trick");
+  const resetBtn = $("resetBtn");
+  if (!handEl || !trickEl || !resetBtn) {
+    err("Missing required elements: hand, trick, resetBtn");
+    return;
+  }
 
-            <div style="margin-top:12px;">
-              <div class="pmeta"><strong>Status:</strong> <span id="pickStatus">Click “Pick Cards”.</span></div>
-            </div>
+  // ---------- optional DOM ----------
+  const ai2HandEl = $("ai2Hand");
+  const ai3HandEl = $("ai3Hand");
 
-            <div class="pickRowCompact" style="margin-top:12px;">
-              <div class="pickSlot">
-                <div class="pickName">AI2</div>
-                <div id="pickAI2" class="pickCardSlot smallSlot">(none)</div>
-              </div>
-              <div class="pickSlot">
-                <div class="pickName">AI3</div>
-                <div id="pickAI3" class="pickCardSlot smallSlot">(none)</div>
-              </div>
-              <div class="pickSlot">
-                <div class="pickName">YOU</div>
-                <div id="pickYOU" class="pickCardSlot smallSlot">(none)</div>
-              </div>
-            </div>
+  const phaseLabelEl = $("phaseLabel");
+  const trumpLabelEl = $("trumpLabel");
+  const trumpOpenLabelEl = $("trumpOpenLabel");
+  const turnBannerEl = $("turnBanner");
 
-            <div style="margin-top:12px;" class="pmeta">
-              <strong>Dealer:</strong> <span id="dealerLabel">(not set)</span>
-            </div>
-          </div>
-        </div>
+  const ai2TricksEl = $("ai2Tricks");
+  const ai3TricksEl = $("ai3Tricks");
+  const youTricksEl = $("youTricks");
 
-        <!-- Trump + Quotas FLUSH ROW -->
-        <div class="sideRow">
-          <div class="card trumpMini">
-            <h3 style="margin-top:0;">Trump</h3>
-            <div class="pmeta">
-              <strong>Suit:</strong> <span id="trumpLabel">(not picked)</span>
-              <span class="dotSep">•</span>
-              <strong>Open:</strong> <span id="trumpOpenLabel">No</span>
-            </div>
+  const ai2QuotaEl = $("ai2Quota");
+  const ai3QuotaEl = $("ai3Quota");
+  const youQuotaEl = $("youQuota");
 
-            <div class="trumpAceWrap">
-              <div class="pmeta"><strong>Ace:</strong></div>
-              <div id="trumpAceSlot" class="pickCardSlot miniSlot">(none)</div>
-            </div>
-          </div>
+  const trickNumEl = $("trickNum");
+  const trickMaxEl = $("trickMax");
 
-          <div class="card quotaMini">
-            <h3 style="margin-top:0;">Quotas</h3>
-            <div class="quotaRow">
-              <div class="qItem">
-                <div class="qName">AI2</div>
-                <div class="qNums">Q: <span id="ai2Quota">7</span> • T: <span id="ai2Tricks">0</span></div>
-              </div>
-              <div class="qItem">
-                <div class="qName">AI3</div>
-                <div class="qNums">Q: <span id="ai3Quota">6</span> • T: <span id="ai3Tricks">0</span></div>
-              </div>
-              <div class="qItem">
-                <div class="qName">YOU</div>
-                <div class="qNums">Q: <span id="youQuota">4</span> • T: <span id="youTricks">0</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
+  const dealerLabelEl = $("dealerLabel");
+  const dealerBannerEl = $("dealerBanner");
 
-      <!-- RIGHT PANEL -->
-      <section class="mainPlay">
+  const pDeal = $("pDeal");
+  const pPluck = $("pPluck");
+  const pTrump = $("pTrump");
+  const pPlay = $("pPlay");
 
-        <div class="card phaseCard">
-          <div class="phaseRow">
-            <div id="pDeal"  class="phaseChip">1) The Deal</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPluck" class="phaseChip">2) Pluck</div>
-            <div class="phaseArrow">→</div>
-            <div id="pTrump" class="phaseChip">3) Dealer Selects Trump</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPlay"  class="phaseChip">4) Play</div>
-          </div>
+  const pluckPanelEl = $("pluckPanel");
+  const pluckStatusEl = $("pluckStatus");
+  const pluckChoicesEl = $("pluckChoices");
+  const pluckNextBtn = $("pluckNextBtn");
 
-          <div class="phaseMeta">
-            <div>
-              <strong>Current Phase:</strong> <span id="phaseLabel">PICK_DEALER</span>
-              <span class="dotSep">•</span>
-              <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
-              <span class="dotSep">•</span>
-              <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
-            </div>
-          </div>
+  const trumpPanelEl = $("trumpPanel");
+  const trumpStatusEl = $("trumpStatus");
 
-          <div id="turnBanner" class="turnBanner"></div>
-        </div>
+  // Initial pick UI
+  const pickBtn = $("pickBtn");
+  const pickOkBtn = $("pickOkBtn");
+  const pickReBtn = $("pickReBtn");
+  const pickStatusEl = $("pickStatus");
+  const pickAI2El = $("pickAI2");
+  const pickAI3El = $("pickAI3");
+  const pickYOUEl = $("pickYOU");
 
-        <div class="topbar" style="margin-top:12px;">
-          <div class="topbar-left">
-            <div class="metaRow"></div>
-          </div>
-          <div class="topbar-right">
-            <div class="buttons">
-              <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
-            </div>
-          </div>
-        </div>
+  const trumpAceSlotEl = $("trumpAceSlot");
 
-        <div class="grid">
-          <div class="card">
-            <h3>AI2 (hidden hand)</h3>
-            <div id="ai2Hand" class="handRow"></div>
-          </div>
-          <div class="card">
-            <h3>AI3 (hidden hand)</h3>
-            <div id="ai3Hand" class="handRow"></div>
-          </div>
-        </div>
+  // ---------- constants ----------
+  const TOTAL_TRICKS = 17;
+  const SUITS = ["S", "H", "D", "C"];
+  const RANKS_NO_2 = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
+  const RANK_VALUE = { "3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14, "2":2 };
 
-        <div class="card pluckPanel" id="pluckPanel" style="display:none;">
-          <h3>Pluck Phase</h3>
-          <p id="pluckStatus" class="msg"></p>
-          <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
-          <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
-          <p class="hint">Wrong suit attempt = pluck LOST (no re-pick).</p>
-        </div>
+  const CARD_BIG_JOKER = "BJ";
+  const CARD_LITTLE_JOKER = "LJ";
+  const CARD_OPEN_LEAD = "2C";
 
-        <div class="card" id="trumpPanel" style="display:none;">
-          <h3>Dealer Selects Trump</h3>
-          <p id="trumpStatus" class="msg"></p>
-          <div class="buttons" style="flex-wrap:wrap;">
-            <button class="btn" data-trump="S">S (Spades)</button>
-            <button class="btn" data-trump="H">H (Hearts)</button>
-            <button class="btn" data-trump="D">D (Diamonds)</button>
-            <button class="btn" data-trump="C">C (Clubs)</button>
-          </div>
-        </div>
+  const AI_DELAY = 260;
+  const RESOLVE_DELAY = 260;
+  const BETWEEN_TRICKS = 220;
 
-        <div class="grid">
-          <div class="card">
-            <h3>Your Hand</h3>
-            <div id="hand" class="hand"></div>
-            <p id="msg" class="msg"></p>
-            <p class="hint">Tap/click a card to play. Must follow suit if possible. No leading trump until opened (unless you only have trump).</p>
-          </div>
+  // ---------- card utils ----------
+  function suitName(s) { return s==="S"?"Spades":s==="H"?"Hearts":s==="D"?"Diamonds":"Clubs"; }
+  function suitSymbol(s){ return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣"; }
+  function isRedSuit(s){ return s==="H" || s==="D"; }
+  function isBlackSuit(s){ return s==="S" || s==="C"; }
+  function isJoker(cs) { return cs === CARD_BIG_JOKER || cs === CARD_LITTLE_JOKER; }
 
-          <div class="card">
-            <h3>Trick</h3>
-            <div class="trickBox" id="trick">(empty)</div>
-            <p class="hint">Trick winner leads next trick.</p>
-          </div>
-        </div>
+  function makeDeck51() {
+    const deck = [];
+    for (const s of SUITS) for (const r of RANKS_NO_2) deck.push(r + s);
+    deck.push("2C");
+    deck.push(CARD_BIG_JOKER);
+    deck.push(CARD_LITTLE_JOKER);
+    return deck;
+  }
+  function shuffle(a) {
+    for (let i=a.length-1;i>0;i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
 
-      </section>
-    </div>
+  function parseCard(cs) {
+    if (cs === CARD_BIG_JOKER) return { kind:"JOKER", rank:"BJ", suit:null, value: 1000 };
+    if (cs === CARD_LITTLE_JOKER) return { kind:"JOKER", rank:"LJ", suit:null, value: 900 };
+    const suit = cs.slice(-1);
+    const rank = cs.slice(0, cs.length-1);
+    return { kind:"NORMAL", rank, suit, value: RANK_VALUE[rank] || 0 };
+  }
 
-  </main>
+  function cardSuitForFollow(cs, trumpSuit) {
+    if (isJoker(cs)) return trumpSuit || null;
+    return cs.slice(-1);
+  }
 
-  <footer class="footer">© 2026 Pluck The Card Game</footer>
+  function isTrumpCard(cs, trumpSuit) {
+    if (!trumpSuit) return false;
+    if (isJoker(cs)) return true;
+    return cs.slice(-1) === trumpSuit;
+  }
 
-  <script src="js/game.js"></script>
-</body>
-</html>
+  // ---------- UI card face ----------
+  function makeCardFace(cardStr, disabled=false) {
+    const el = document.createElement("div");
+    el.className = "cardFace" + (disabled ? " disabled" : "");
+
+    if (cardStr === CARD_BIG_JOKER || cardStr === CARD_LITTLE_JOKER) {
+      el.classList.add("joker");
+      const tl = document.createElement("div");
+      tl.className = "corner tl";
+      tl.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
+      const br = document.createElement("div");
+      br.className = "corner br";
+      br.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
+      const mid = document.createElement("div");
+      mid.className = "suitBig";
+      mid.textContent = "🃏";
+      const tag = document.createElement("div");
+      tag.className = "jokerTag";
+      tag.textContent = (cardStr === CARD_BIG_JOKER ? "BIG JOKER" : "LITTLE JOKER");
+      el.appendChild(tl); el.appendChild(br); el.appendChild(mid); el.appendChild(tag);
+      return el;
+    }
+
+    const suit = cardStr.slice(-1);
+    const rank = cardStr.slice(0, cardStr.length-1);
+    const colorClass = isRedSuit(suit) ? "red" : "black";
+    const sym = suitSymbol(suit);
+
+    const tl = document.createElement("div");
+    tl.className = `corner tl ${colorClass}`;
+    tl.innerHTML = `${rank}<br>${sym}`;
+
+    const br = document.createElement("div");
+    br.className = `corner br ${colorClass}`;
+    br.innerHTML = `${rank}<br>${sym}`;
+
+    const mid = document.createElement("div");
+    mid.className = `suitBig ${colorClass}`;
+    mid.textContent = sym;
+
+    el.appendChild(tl); el.appendChild(br); el.appendChild(mid);
+    return el;
+  }
+
+  // ---------- game model ----------
+  // 0=AI2, 1=AI3, 2=YOU
+  const players = [
+    { id:"AI2", hand:[], tricks:0, quota:7, plucksEarned:0, plucksSuffered:0 },
+    { id:"AI3", hand:[], tricks:0, quota:6, plucksEarned:0, plucksSuffered:0 },
+    { id:"YOU", hand:[], tricks:0, quota:4, plucksEarned:0, plucksSuffered:0 }
+  ];
+
+  function leftOf(i){ return (i+1)%3; }
+  function rightOf(i){ return (i+2)%3; }
+
+  let dealerIndex = null;
+  let firstHandDone = false;
+
+  // phases
+  let phase = "PICK_DEALER";
+
+  // play state
+  let trumpSuit = null;
+  let trumpOpen = false;
+
+  let trick = [];         // {playerIndex, cardStr}
+  let leadSuit = null;
+  let trickNumber = 0;
+
+  let leaderIndex = 0;
+  let turnIndex = 0;
+
+  // pluck state
+  let pendingPlucks = null; // computed at end of hand; applied at start of next hand
+  let pluckQueue = [];
+  let activePluck = null;
+  let pluckSuitUsedByPair = new Map(); // "plucker-pluckee" -> Set(suits)
+
+  // engine lock
+  let engineBusy = false;
+
+  // suit ordering pivot if trump not selected yet
+  let calledSuitForSort = "S";
+
+  function setPhase(newPhase){
+    phase = newPhase;
+    setText(phaseLabelEl, newPhase);
+
+    [pDeal,pPluck,pTrump,pPlay].forEach(x => x && x.classList.remove("activeChip"));
+    if (newPhase === "DEAL") pDeal && pDeal.classList.add("activeChip");
+    if (newPhase === "PLUCK") pPluck && pPluck.classList.add("activeChip");
+    if (newPhase === "TRUMP_PICK") pTrump && pTrump.classList.add("activeChip");
+    if (newPhase === "PLAY") pPlay && pPlay.classList.add("activeChip");
+
+    if (pluckPanelEl) pluckPanelEl.style.display = (newPhase === "PLUCK") ? "block" : "none";
+    if (trumpPanelEl) trumpPanelEl.style.display = (newPhase === "TRUMP_PICK") ? "block" : "none";
+  }
+
+  function updateDealerLabels(){
+    const txt = (dealerIndex === null) ? "(not set)" : players[dealerIndex].id;
+    setText(dealerLabelEl, txt);
+    setText(dealerBannerEl, txt);
+  }
+
+  function applyQuotasForDealer(){
+    // dealer=7, left=6, right=4
+    players[dealerIndex].quota = 7;
+    players[leftOf(dealerIndex)].quota = 6;
+    players[rightOf(dealerIndex)].quota = 4;
+  }
+
+  function rotateDealerRight(){
+    dealerIndex = rightOf(dealerIndex);
+    applyQuotasForDealer();
+    updateDealerLabels();
+  }
+
+  // ---------- hand sorting (YOUR RULES) ----------
+  function buildSuitOrderAlternating(pivotSuit){
+    // Alternates color starting from pivotSuit, then opposite color, etc.
+    // Black suits: S,C  Red suits: H,D
+    const blacks = ["S","C"];
+    const reds = ["H","D"];
+
+    const used = new Set();
+    const out = [];
+
+    function colorList(s){ return isBlackSuit(s) ? blacks : reds; }
+    function otherList(s){ return isBlackSuit(s) ? reds : blacks; }
+
+    // start with pivot
+    if (SUITS.includes(pivotSuit)) {
+      out.push(pivotSuit);
+      used.add(pivotSuit);
+    } else {
+      out.push("S");
+      used.add("S");
+      pivotSuit = "S";
+    }
+
+    let last = pivotSuit;
+    while (out.length < 4){
+      const want = otherList(last);
+      let next = want.find(s => !used.has(s));
+      if (!next) {
+        // fallback: any remaining
+        next = SUITS.find(s => !used.has(s));
+      }
+      out.push(next);
+      used.add(next);
+      last = next;
+    }
+    return out;
+  }
+
+  function renderTrumpAce(){
+    if (!trumpAceSlotEl) return;
+    trumpAceSlotEl.innerHTML = "";
+    if (!trumpSuit) { trumpAceSlotEl.textContent = "(none)"; return; }
+    trumpAceSlotEl.appendChild(makeCardFace("A" + trumpSuit, true));
+  }
+
+  // ---------- rendering ----------
+  function render(){
+    setText(trumpLabelEl, trumpSuit ? `${trumpSuit} (${suitName(trumpSuit)})` : "(not picked)");
+    setText(trumpOpenLabelEl, trumpOpen ? "Yes" : "No");
+
+    setText(ai2QuotaEl, String(players[0].quota));
+    setText(ai3QuotaEl, String(players[1].quota));
+    setText(youQuotaEl, String(players[2].quota));
+
+    setText(ai2TricksEl, String(players[0].tricks));
+    setText(ai3TricksEl, String(players[1].tricks));
+    setText(youTricksEl, String(players[2].tricks));
+
+    setText(trickNumEl, String(trickNumber));
+    setText(trickMaxEl, String(TOTAL_TRICKS));
+
+    if (ai2HandEl) ai2HandEl.textContent = players[0].hand.map(()=> "🂠").join(" ");
+    if (ai3HandEl) ai3HandEl.textContent = players[1].hand.map(()=> "🂠").join(" ");
+
+    const whoTurn = (phase === "PLAY") ? (turnIndex === 2 ? "YOUR TURN" : `${players[turnIndex].id} TURN`) : "—";
+    const leadTxt = leadSuit ? `${leadSuit} (${suitName(leadSuit)})` : "(none)";
+    setText(turnBannerEl, `Phase: ${phase} • ${whoTurn} • Lead: ${leadTxt} • Trump: ${trumpSuit || "(none)"} • Dealer: ${dealerIndex===null?"(none)":players[dealerIndex].id}`);
+
+    // YOUR HAND (stable indices)
+    handEl.innerHTML = "";
+    const hand = players[2].hand;
+
+    const pivot = trumpSuit || calledSuitForSort || "S";
+    const suitOrder = buildSuitOrderAlternating(pivot);
+
+    const rankOrder = { "A":14,"K":13,"Q":12,"J":11,"10":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2 };
+
+    const items = hand.map((cardStr, idx) => ({ cardStr, idx }));
+
+    items.sort((a,b)=>{
+      const A = a.cardStr, B = b.cardStr;
+
+      // jokers first
+      if (A === CARD_BIG_JOKER) return -1;
+      if (B === CARD_BIG_JOKER) return 1;
+      if (A === CARD_LITTLE_JOKER) return -1;
+      if (B === CARD_LITTLE_JOKER) return 1;
+
+      const sa = A.slice(-1), sb = B.slice(-1);
+
+      // trump suit immediately after jokers (when chosen)
+      if (trumpSuit){
+        const aTrump = (sa === trumpSuit);
+        const bTrump = (sb === trumpSuit);
+        if (aTrump !== bTrump) return aTrump ? -1 : 1;
+      }
+
+      // remaining suits in alternating order based on pivot
+      const ia = suitOrder.indexOf(sa);
+      const ib = suitOrder.indexOf(sb);
+      if (ia !== ib) return ia - ib;
+
+      // ranks high -> low within suit
+      const ra = A.slice(0,-1), rb = B.slice(0,-1);
+      return (rankOrder[rb]||0) - (rankOrder[ra]||0);
+    });
+
+    const legal = (phase === "PLAY" && turnIndex === 2) ? legalCardsFor(2) : [];
+
+    for (const it of items){
+      const disabled = !(phase === "PLAY" && turnIndex === 2 && legal.includes(it.idx));
+      const face = makeCardFace(it.cardStr, disabled);
+
+      on(face, "pointerdown", (e) => {
+        e.preventDefault();
+        if (disabled) return;
+
+        // re-check legality right now
+        if (!(phase === "PLAY" && turnIndex === 2)) return;
+        const legalNow = legalCardsFor(2);
+        if (!legalNow.includes(it.idx)) { msg(illegalReason(2, it.cardStr)); return; }
+
+        playCard(2, it.idx);
+        engineKick();
+      }, { passive:false });
+
+      handEl.appendChild(face);
+    }
+
+    // TRICK
+    trickEl.innerHTML = "";
+    if (!trick.length) {
+      trickEl.textContent = "(empty)";
+    } else {
+      for (const t of trick) {
+        const wrap = document.createElement("div");
+        wrap.style.display = "flex";
+        wrap.style.flexDirection = "column";
+        wrap.style.alignItems = "center";
+        wrap.style.gap = "6px";
+
+        const label = document.createElement("div");
+        label.style.fontSize = "12px";
+        label.style.color = "#c2cbe0";
+        label.textContent = players[t.playerIndex].id;
+
+        const face = makeCardFace(t.cardStr, true);
+        face.style.cursor = "default";
+
+        wrap.appendChild(label);
+        wrap.appendChild(face);
+        trickEl.appendChild(wrap);
+      }
+    }
+
+    renderTrumpAce();
+
+    if (phase === "PLUCK") renderPluckStatus();
+    if (phase === "TRUMP_PICK") renderTrumpStatus();
+  }
+
+  // ---------- initial pick ----------
+  function pickOneCard(){
+    const d = shuffle(makeDeck51());
+    return d.pop();
+  }
+
+  function pickRankValue(cardStr){
+    if (cardStr === CARD_BIG_JOKER) return 100;
+    if (cardStr === CARD_LITTLE_JOKER) return 99;
+    const p = parseCard(cardStr);
+    if (p.rank === "2") return 2;
+    return p.value;
+  }
+
+  function clearPickUI(){
+    if (pickAI2El) pickAI2El.textContent = "(none)";
+    if (pickAI3El) pickAI3El.textContent = "(none)";
+    if (pickYOUEl) pickYOUEl.textContent = "(none)";
+    setText(pickStatusEl, "Click “Pick Cards”.");
+    if (pickOkBtn) pickOkBtn.disabled = true;
+    if (pickReBtn) pickReBtn.disabled = true;
+    if (pickBtn) pickBtn.disabled = false;
+    dealerIndex = null;
+    updateDealerLabels();
+  }
+
+  function doPick(){
+    const cards = { ai2: pickOneCard(), ai3: pickOneCard(), you: pickOneCard() };
+
+    if (pickAI2El){ pickAI2El.innerHTML = ""; pickAI2El.appendChild(makeCardFace(cards.ai2, true)); }
+    if (pickAI3El){ pickAI3El.innerHTML = ""; pickAI3El.appendChild(makeCardFace(cards.ai3, true)); }
+    if (pickYOUEl){ pickYOUEl.innerHTML = ""; pickYOUEl.appendChild(makeCardFace(cards.you, true)); }
+
+    const vals = [
+      { pi:0, v: pickRankValue(cards.ai2) },
+      { pi:1, v: pickRankValue(cards.ai3) },
+      { pi:2, v: pickRankValue(cards.you) }
+    ].sort((a,b)=>a.v-b.v);
+
+    const lowest = vals[0].v;
+    const tied = vals.filter(x => x.v === lowest);
+
+    if (tied.length > 1){
+      setText(pickStatusEl, "Tie for lowest. Click Re-Pick.");
+      if (pickOkBtn) pickOkBtn.disabled = true;
+      if (pickReBtn) pickReBtn.disabled = false;
+      dealerIndex = null;
+      updateDealerLabels();
+      return;
+    }
+
+    dealerIndex = vals[0].pi;
+    updateDealerLabels();
+    setText(pickStatusEl, `Dealer will be ${players[dealerIndex].id}. Click OK to start.`);
+    if (pickOkBtn) pickOkBtn.disabled = false;
+    if (pickReBtn) pickReBtn.disabled = true;
+  }
+
+  // ---------- deal / hand setup ----------
+  function resetHandState(){
+    trick = [];
+    leadSuit = null;
+    trickNumber = 0;
+
+    trumpSuit = null;
+    trumpOpen = false;
+
+    leaderIndex = 0;
+    turnIndex = 0;
+
+    players.forEach(p => { p.hand = []; p.tricks = 0; p.plucksEarned = 0; p.plucksSuffered = 0; });
+    pluckQueue = [];
+    activePluck = null;
+    pluckSuitUsedByPair = new Map();
+  }
+
+  function dealHand(){
+    resetHandState();
+    applyQuotasForDealer();
+
+    const deck = shuffle(makeDeck51());
+    for (let i=0; i<TOTAL_TRICKS; i++){
+      players[0].hand.push(deck.pop());
+      players[1].hand.push(deck.pop());
+      players[2].hand.push(deck.pop());
+    }
+  }
+
+  // ---------- plucks ----------
+  function computePlucksEarnedSuffered(){
+    for (const p of players) {
+      p.plucksEarned = Math.max(0, p.tricks - p.quota);
+      p.plucksSuffered = Math.max(0, p.quota - p.tricks);
+    }
+  }
+
+  function pluckerOrder(){
+    const tie = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
+    return [0,1,2].slice().sort((a,b)=>{
+      const da = players[a].plucksEarned, db = players[b].plucksEarned;
+      if (db !== da) return db - da;
+      return tie.indexOf(a) - tie.indexOf(b);
+    }).filter(i => players[i].plucksEarned > 0);
+  }
+
+  function victimOrder(){
+    const tie = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
+    return [0,1,2].slice().sort((a,b)=>{
+      const da = players[a].plucksSuffered, db = players[b].plucksSuffered;
+      if (db !== da) return db - da;
+      return tie.indexOf(a) - tie.indexOf(b);
+    }).filter(i => players[i].plucksSuffered > 0);
+  }
+
+  function buildPluckQueue(){
+    const q = [];
+    const pluckers = pluckerOrder();
+    const victims = victimOrder();
+    const earned = new Map(pluckers.map(i=>[i, players[i].plucksEarned]));
+    const suffered = new Map(victims.map(i=>[i, players[i].plucksSuffered]));
+
+    for (const plucker of pluckers){
+      while ((earned.get(plucker)||0) > 0){
+        const victim = victims
+          .filter(v => (suffered.get(v)||0) > 0)
+          .sort((a,b)=> (suffered.get(b)||0) - (suffered.get(a)||0))[0];
+        if (victim === undefined) break;
+
+        q.push({ pluckerIndex: plucker, pluckeeIndex: victim });
+        earned.set(plucker, (earned.get(plucker)||0) - 1);
+        suffered.set(victim, (suffered.get(victim)||0) - 1);
+      }
+    }
+    return q;
+  }
+
+  function pairKey(a,b){ return `${a}-${b}`; }
+
+  function lowestOfSuitNonJoker(pi, suit){
+    const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
+    if (!cards.length) return null;
+    cards.sort((a,b)=> (RANK_VALUE[a.slice(0,-1)]||99) - (RANK_VALUE[b.slice(0,-1)]||99));
+    return cards[0];
+  }
+  function highestOfSuitNonJoker(pi, suit){
+    const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
+    if (!cards.length) return null;
+    cards.sort((a,b)=> (RANK_VALUE[b.slice(0,-1)]||0) - (RANK_VALUE[a.slice(0,-1)]||0));
+    return cards[0];
+  }
+  function removeFromHand(pi, cardStr){
+    const idx = players[pi].hand.indexOf(cardStr);
+    if (idx >= 0) players[pi].hand.splice(idx, 1);
+  }
+
+  function usedSuitSet(pluckerI, pluckeeI){
+    const k = pairKey(pluckerI, pluckeeI);
+    if (!pluckSuitUsedByPair.has(k)) pluckSuitUsedByPair.set(k, new Set());
+    return pluckSuitUsedByPair.get(k);
+  }
+
+  function availablePluckSuits(pluckerI, pluckeeI){
+    const used = usedSuitSet(pluckerI, pluckeeI);
+    const suits = [];
+    for (const s of SUITS){
+      if (used.has(s)) continue;
+      if (!lowestOfSuitNonJoker(pluckerI, s)) continue;
+      suits.push(s);
+    }
+    return suits;
+  }
+
+  function attemptPluck(pluckerI, pluckeeI, suit){
+    const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
+    if (!giveLow) return { ok:false, reason:`Plucker has no ${suit}.` };
+
+    const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
+    if (!takeHigh) return { ok:false, reason:`Victim has no ${suit} to return.` };
+
+    removeFromHand(pluckerI, giveLow);
+    removeFromHand(pluckeeI, takeHigh);
+
+    players[pluckerI].hand.push(takeHigh);
+    players[pluckeeI].hand.push(giveLow);
+
+    usedSuitSet(pluckerI, pluckeeI).add(suit);
+    return { ok:true, giveLow, takeHigh };
+  }
+
+  function renderPluckStatus(){
+    if (!pluckStatusEl || !pluckChoicesEl || !pluckNextBtn) return;
+    pluckChoicesEl.innerHTML = "";
+
+    if (!pluckQueue.length){
+      pluckStatusEl.textContent = "No plucks to process.";
+      pluckNextBtn.disabled = true;
+      return;
+    }
+
+    if (!activePluck) activePluck = pluckQueue[0];
+
+    const pluckerI = activePluck.pluckerIndex;
+    const pluckeeI = activePluck.pluckeeIndex;
+    const suits = availablePluckSuits(pluckerI, pluckeeI);
+
+    if (pluckerI === 2){
+      pluckNextBtn.disabled = true;
+      pluckStatusEl.textContent = `You are plucking ${players[pluckeeI].id}. Choose a suit. Wrong/failed suit = pluck LOST.`;
+
+      if (!suits.length){
+        const b = document.createElement("button");
+        b.className = "btn";
+        b.textContent = "No suit available (Skip)";
+        b.onclick = () => {
+          pluckQueue.shift();
+          activePluck = null;
+          if (!pluckQueue.length) toTrumpPick();
+          render();
+        };
+        pluckChoicesEl.appendChild(b);
+        return;
+      }
+
+      for (const s of suits){
+        const give = lowestOfSuitNonJoker(pluckerI, s);
+        const b = document.createElement("button");
+        b.className = "btn";
+        b.textContent = `${s} (${suitName(s)}) • Give: ${give}`;
+        b.onclick = () => {
+          const res = attemptPluck(pluckerI, pluckeeI, s);
+          if (!res.ok){
+            usedSuitSet(pluckerI, pluckeeI).add(s);
+            pluckStatusEl.textContent = `FAILED pluck in ${s} (${res.reason}). LOST.`;
+          } else {
+            pluckStatusEl.textContent = `Plucked ${s}: gave ${res.giveLow}, received ${res.takeHigh}.`;
+          }
+          pluckQueue.shift();
+          activePluck = null;
+          if (!pluckQueue.length) toTrumpPick();
+          render();
+        };
+        pluckChoicesEl.appendChild(b);
+      }
+      return;
+    }
+
+    pluckNextBtn.disabled = false;
+    pluckStatusEl.textContent = `${players[pluckerI].id} is plucking ${players[pluckeeI].id}. Click “Run Next Pluck”.`;
+  }
+
+  function runOnePluck(){
+    if (phase !== "PLUCK") return;
+    if (!pluckQueue.length) return;
+    if (!activePluck) activePluck = pluckQueue[0];
+
+    const pluckerI = activePluck.pluckerIndex;
+    const pluckeeI = activePluck.pluckeeIndex;
+    const suits = availablePluckSuits(pluckerI, pluckeeI);
+
+    if (pluckerI === 2){ render(); return; }
+
+    if (!suits.length){
+      pluckQueue.shift();
+      activePluck = null;
+      if (!pluckQueue.length) toTrumpPick();
+      render();
+      return;
+    }
+
+    // AI picks suit with cheapest give card
+    let bestSuit = suits[0], bestVal = 999;
+    for (const s of suits){
+      const give = lowestOfSuitNonJoker(pluckerI, s);
+      const v = give ? (RANK_VALUE[give.slice(0,-1)]||99) : 99;
+      if (v < bestVal){ bestVal = v; bestSuit = s; }
+    }
+
+    const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
+    if (!res.ok){
+      usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
+      if (pluckStatusEl) pluckStatusEl.textContent = `${players[pluckerI].id} FAILED ${bestSuit}. LOST.`;
+    } else {
+      if (pluckStatusEl) pluckStatusEl.textContent = `${players[pluckerI].id} plucked ${bestSuit}.`;
+    }
+
+    pluckQueue.shift();
+    activePluck = null;
+    if (!pluckQueue.length) toTrumpPick();
+    render();
+  }
+
+  // ---------- trump pick ----------
+  function trumpCallerIndex(){
+    return dealerIndex; // dealer selects trump
+  }
+
+  function chooseTrumpFromOwnHand(pi){
+    const suitScore = { S:0, H:0, D:0, C:0 };
+    for (const c of players[pi].hand){
+      if (isJoker(c)){ suitScore.S+=6; suitScore.H+=6; suitScore.D+=6; suitScore.C+=6; continue; }
+      const suit = c.slice(-1);
+      const rank = c.slice(0,-1);
+      const v = RANK_VALUE[rank] || 0;
+      suitScore[suit] += 2;
+      if (v >= 11) suitScore[suit] += (v-10)*2;
+      else suitScore[suit] += Math.max(0, v-6)*0.5;
+    }
+    let best = "S", bestS = -999;
+    for (const s of SUITS){
+      if (suitScore[s] > bestS){ bestS = suitScore[s]; best = s; }
+    }
+    return best;
+  }
+
+  function setTrump(suit){
+    trumpSuit = suit;
+    calledSuitForSort = suit; // so sorting matches “called suit” immediately
+    trumpOpen = (trumpSuit === "C"); // keep your existing behavior
+    renderTrumpAce();
+  }
+
+  function renderTrumpStatus(){
+    if (!trumpStatusEl) return;
+    if (trumpSuit){
+      trumpStatusEl.textContent = `Trump set: ${trumpSuit} (${suitName(trumpSuit)}).`;
+      return;
+    }
+    trumpStatusEl.textContent = `Dealer (${players[dealerIndex].id}) selects trump.`;
+  }
+
+  function wireTrumpButtons(){
+    if (!trumpPanelEl) return;
+    const btns = trumpPanelEl.querySelectorAll("button[data-trump]");
+    btns.forEach(b => {
+      b.onclick = () => {
+        if (phase !== "TRUMP_PICK") return;
+        if (trumpSuit) return;
+        if (dealerIndex !== 2) return; // only YOU clicks when you are dealer
+        const suit = b.getAttribute("data-trump");
+        if (!SUITS.includes(suit)) return;
+        setTrump(suit);
+        msg(`You selected trump: ${suit} (${suitName(suit)}).`);
+        toPlay();
+        render();
+        engineKick();
+      };
+    });
+  }
+
+  // ---------- play rules ----------
+  function hasNonTrump(pi){
+    return players[pi].hand.some(c => !isTrumpCard(c, trumpSuit));
+  }
+
+  function illegalReason(pi, cardStr){
+    if (trickNumber === 1 && trick.length === 0 && players[pi].hand.includes(CARD_OPEN_LEAD)){
+      if (cardStr !== CARD_OPEN_LEAD) return "First lead must be 2C.";
+    }
+
+    if (trick.length === 0 && !trumpOpen && trumpSuit){
+      if (isTrumpCard(cardStr, trumpSuit) && hasNonTrump(pi)) return "Trump is not open. Lead non-trump.";
+    }
+
+    if (trick.length > 0){
+      const must = leadSuit;
+      const hasSuit = players[pi].hand.some(c => cardSuitForFollow(c, trumpSuit) === must);
+      if (hasSuit && cardSuitForFollow(cardStr, trumpSuit) !== must) return `You must follow suit: ${must}.`;
+    }
+    return "That play is not allowed.";
+  }
+
+  function legalCardsFor(pi){
+    const hand = players[pi].hand;
+
+    if (trickNumber === 1 && trick.length === 0 && hand.includes(CARD_OPEN_LEAD)){
+      return hand.map((c,i)=>({c,i})).filter(x=>x.c===CARD_OPEN_LEAD).map(x=>x.i);
+    }
+
+    if (trick.length === 0 && !trumpOpen && trumpSuit){
+      const nonTrumpIdx = hand.map((c,i)=>({c,i})).filter(x=>!isTrumpCard(x.c,trumpSuit)).map(x=>x.i);
+      if (nonTrumpIdx.length) return nonTrumpIdx;
+      return hand.map((_,i)=>i);
+    }
+
+    if (trick.length > 0){
+      const suited = hand.map((c,i)=>({c,i})).filter(x=>cardSuitForFollow(x.c,trumpSuit)===leadSuit).map(x=>x.i);
+      return suited.length ? suited : hand.map((_,i)=>i);
+    }
+
+    return hand.map((_,i)=>i);
+  }
+
+  function setLeadSuitFromFirst(cardStr){
+    leadSuit = cardSuitForFollow(cardStr, trumpSuit);
+  }
+
+  function updateTrumpOpen(cardStr){
+    if (!trumpOpen && isTrumpCard(cardStr, trumpSuit)) trumpOpen = true;
+  }
+
+  function cardPower(cardStr){
+    if (cardStr === CARD_BIG_JOKER) return 1000000;
+    if (cardStr === CARD_LITTLE_JOKER) return 900000;
+    const c = parseCard(cardStr);
+    if (isTrumpCard(cardStr, trumpSuit)) return 10000 + c.value;
+    return c.value;
+  }
+
+  function evaluateTrickWinner(){
+    const anyTrump = trick.some(t => isTrumpCard(t.cardStr, trumpSuit));
+    if (anyTrump){
+      let bestPi = trick[0].playerIndex;
+      let bestP = -1;
+      for (const t of trick){
+        if (!isTrumpCard(t.cardStr, trumpSuit)) continue;
+        const p = cardPower(t.cardStr);
+        if (p > bestP){ bestP = p; bestPi = t.playerIndex; }
+      }
+      return bestPi;
+    }
+
+    let bestPi = trick[0].playerIndex;
+    let bestV = -1;
+    for (const t of trick){
+      if (cardSuitForFollow(t.cardStr, trumpSuit) !== leadSuit) continue;
+      const v = parseCard(t.cardStr).value;
+      if (v > bestV){ bestV = v; bestPi = t.playerIndex; }
+    }
+    return bestPi;
+  }
+
+  function playCard(pi, handIdx){
+    const cardStr = players[pi].hand.splice(handIdx, 1)[0];
+    if (!cardStr) return;
+
+    if (trick.length === 0) setLeadSuitFromFirst(cardStr);
+    trick.push({ playerIndex: pi, cardStr });
+    updateTrumpOpen(cardStr);
+
+    turnIndex = (turnIndex + 1) % 3;
+    render();
+  }
+
+  function aiChooseIndex(pi){
+    const legal = legalCardsFor(pi);
+    const hand = players[pi].hand;
+    const need = players[pi].quota - players[pi].tricks;
+
+    // lead
+    if (trick.length === 0){
+      // if needing tricks, lead strong; else dump low
+      let best = legal[0], bestScore = -999999;
+      for (const idx of legal){
+        const p = cardPower(hand[idx]);
+        const s = (need > 0) ? p : -p;
+        if (s > bestScore){ bestScore = s; best = idx; }
+      }
+      return best;
+    }
+
+    // follow: try to win if need > 0, else avoid winning
+    let winBest = null, winBestP = -1;
+    for (const idx of legal){
+      const c = hand[idx];
+      const temp = trick.concat([{ playerIndex: pi, cardStr: c }]);
+
+      const anyTrump = temp.some(t=>isTrumpCard(t.cardStr,trumpSuit));
+      let wouldWin = false;
+
+      if (anyTrump){
+        let bestPi = temp[0].playerIndex, bestP=-1;
+        for (const t of temp){
+          if (!isTrumpCard(t.cardStr,trumpSuit)) continue;
+          const pow = cardPower(t.cardStr);
+          if (pow>bestP){ bestP=pow; bestPi=t.playerIndex; }
+        }
+        wouldWin = (bestPi===pi);
+      } else {
+        let bestPi = temp[0].playerIndex, bestV=-1;
+        for (const t of temp){
+          if (cardSuitForFollow(t.cardStr,trumpSuit)!==leadSuit) continue;
+          const v = parseCard(t.cardStr).value;
+          if (v>bestV){ bestV=v; bestPi=t.playerIndex; }
+        }
+        wouldWin = (bestPi===pi);
+      }
+
+      if (wouldWin){
+        const pow = cardPower(c);
+        if (pow > winBestP){ winBestP = pow; winBest = idx; }
+      }
+    }
+
+    if (need > 0 && winBest !== null) return winBest;
+
+    // dump lowest
+    let low = legal[0], lowP = 99999999;
+    for (const idx of legal){
+      const p = cardPower(hand[idx]);
+      if (p < lowP){ lowP = p; low = idx; }
+    }
+    return low;
+  }
+
+  // ---------- engine ----------
+  function toDeal(){
+    setPhase("DEAL");
+    msg("Dealing...");
+    dealHand();
+
+    if (firstHandDone && pendingPlucks && pendingPlucks.length){
+      pluckQueue = pendingPlucks.slice();
+      pendingPlucks = null;
+      activePluck = null;
+      setTimeout(() => { toPluck(); render(); }, 60);
+    } else {
+      pendingPlucks = null;
+      setTimeout(() => { toTrumpPick(); render(); }, 60);
+    }
+    render();
+  }
+
+  function toPluck(){
+    setPhase("PLUCK");
+    msg("Pluck phase.");
+    render();
+  }
+
+  function toTrumpPick(){
+    setPhase("TRUMP_PICK");
+    const caller = trumpCallerIndex();
+
+    if (caller !== 2){
+      const suit = chooseTrumpFromOwnHand(caller);
+      setTrump(suit);
+      msg(`${players[caller].id} selected trump: ${suit} (${suitName(suit)}).`);
+      setTimeout(() => { toPlay(); render(); engineKick(); }, 120);
+    } else {
+      msg("You are dealer. Pick trump.");
+    }
+    render();
+  }
+
+  function toPlay(){
+    setPhase("PLAY");
+    trick = [];
+    leadSuit = null;
+    trickNumber = 1;
+
+    // Trick 1 leader is whoever has 2C
+    let whoHas2C = 0;
+    for (let pi=0; pi<3; pi++){
+      if (players[pi].hand.includes(CARD_OPEN_LEAD)){ whoHas2C = pi; break; }
+    }
+    leaderIndex = whoHas2C;
+    turnIndex = whoHas2C;
+
+    msg("Play begins.");
+    render();
+  }
+
+  function endOfHand(){
+    computePlucksEarnedSuffered();
+    pendingPlucks = buildPluckQueue();
+    firstHandDone = true;
+
+    rotateDealerRight();
+
+    msg("Hand complete. Dealing next hand...");
+    render();
+
+    setTimeout(() => { toDeal(); engineKick(); }, 550);
+  }
+
+  function resolveTrick(){
+    const winner = evaluateTrickWinner();
+    players[winner].tricks += 1;
+
+    msg(`${players[winner].id} wins the trick.`);
+    render();
+
+    setTimeout(() => {
+      trick = [];
+      leadSuit = null;
+      leaderIndex = winner;
+      turnIndex = winner;
+      trickNumber += 1;
+
+      if (players.every(p => p.hand.length === 0)) {
+        endOfHand();
+        return;
+      }
+
+      render();
+      engineKick();
+    }, BETWEEN_TRICKS);
+  }
+
+  function engineStep(){
+    if (engineBusy) return;
+    engineBusy = true;
+
+    try {
+      if (phase !== "PLAY"){ engineBusy = false; return; }
+
+      if (trick.length === 3){
+        setTimeout(() => { resolveTrick(); engineBusy = false; }, RESOLVE_DELAY);
+        return;
+      }
+
+      if (turnIndex !== 2){
+        const pi = turnIndex;
+        setTimeout(() => {
+          if (phase !== "PLAY"){ engineBusy = false; return; }
+          const idx = aiChooseIndex(pi);
+          playCard(pi, idx);
+          engineBusy = false;
+          engineKick();
+        }, AI_DELAY);
+        return;
+      }
+
+      engineBusy = false; // YOUR TURN: wait
+    } catch (e){
+      engineBusy = false;
+      err("Engine crashed: " + (e?.message || e));
+    }
+  }
+
+  function engineKick(){ setTimeout(engineStep, 0); }
+
+  // ---------- events ----------
+  on(resetBtn, "click", () => {
+    firstHandDone = false;
+    pendingPlucks = null;
+    pluckQueue = [];
+    activePluck = null;
+
+    trumpSuit = null;
+    trumpOpen = false;
+
+    players.forEach(p => { p.hand=[]; p.tricks=0; });
+
+    dealerIndex = null;
+    updateDealerLabels();
+    clearPickUI();
+
+    setPhase("PICK_DEALER");
+    msg("Reset. Pick dealer to begin.");
+    render();
+  });
+
+  on(pluckNextBtn, "click", () => runOnePluck());
+
+  if (pickBtn) pickBtn.onclick = () => { setPhase("PICK_DEALER"); doPick(); render(); };
+  if (pickReBtn) pickReBtn.onclick = () => { doPick(); render(); };
+
+  if (pickOkBtn) {
+    pickOkBtn.onclick = () => {
+      if (dealerIndex === null){ setText(pickStatusEl, "No dealer set. Pick again."); return; }
+
+      applyQuotasForDealer();
+      updateDealerLabels();
+
+      pickOkBtn.disabled = true;
+      if (pickReBtn) pickReBtn.disabled = true;
+      if (pickBtn) pickBtn.disabled = true;
+
+      msg(`Dealer set to ${players[dealerIndex].id}. Starting hand 1 (no pluck).`);
+      render();
+
+      toDeal();
+      engineKick();
+    };
+  }
+
+  wireTrumpButtons();
+
+  // ---------- boot ----------
+  clearPickUI();
+  setPhase("PICK_DEALER");
+  msg("Pick dealer to begin.");
+  render();
+
+})();
