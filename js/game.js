@@ -1079,5 +1079,9 @@
   setPhase("PICK_DEALER");
   msg("Pick dealer to begin.");
   render();
+  clearPickUI();
+setPhase("PICK_DEALER");
+msg("Pick dealer to begin.");
+render(); 
 
 })();
