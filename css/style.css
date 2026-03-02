@@ -225,3 +225,10 @@ h3{
   margin-top:var(--space-5);
   color:var(--muted);
 }
+/* --- FIX: stop “double” look on cards --- */
+.corner.br{ display:none !important; }   /* hides the 2nd corner */
+
+.suitBig{
+  font-size:28px;         /* slightly smaller center */
+  margin-top:0;
+}
