@@ -1,1 +1,3 @@
 
+/* v21: we no longer use the bottom-right mirrored corner */
+.corner.br { display: none !important; }
