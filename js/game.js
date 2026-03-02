@@ -279,13 +279,14 @@
       if (isTrumpCard(cardStr, trumpSuit) && hasNonTrump(pi)) return "Trump not open. Lead a non-trump card.";
     }
 
-    // Must follow suit if possible
-    if (trick.length > 0 && leadSuit) {
-      const hasSuit = players[pi].hand.some(c => cardSuitForFollow(c, trumpSuit) === leadSuit);
-      if (hasSuit && cardSuitForFollow(cardStr, trumpSuit) !== leadSuit) {
-        return `You must follow suit: ${leadSuit}.`;
-      }
-    }
+    // If leading and trump not open, you cannot lead trump
+// UNLESS all remaining cards are trump
+if (trick.length === 0 && !trumpOpen && trumpSuit) {
+  const nonTrumpExists = players[pi].hand.some(c => !isTrumpCard(c, trumpSuit));
+  if (nonTrumpExists && isTrumpCard(cardStr, trumpSuit)) {
+    return "Trump not open. Lead a non-trump card.";
+  }
+}
     return null;
   }
 
