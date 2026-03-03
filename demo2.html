@@ -1,98 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pluck Demo 2</title>
+
+  <!-- keep your existing site styles -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
 
-  <header class="nav">
-    <a class="brand" href="index.html">
-      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
-      <span>PLUCK</span>
-    </a>
-    <nav class="navlinks">
+<body>
+  <!-- Header / Nav (match your existing look) -->
+  <header class="topbar">
+    <div class="brand">
+      <img class="brandLogo" src="assets/logo.png" alt="Pluck" onerror="this.style.display='none'">
+      <div class="brandText">PLUCK</div>
+    </div>
+
+    <nav class="topnav">
       <a href="game.html">Play Demo</a>
-      <a href="demo2.html" class="active">Demo 2</a>
-      <a href="rules.html">Rules</a>
+      <a class="active" href="demo2.html">Demo 2</a>
+      <a href="docs/rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
-  <main class="container">
+  <main class="page">
+    <!-- 3-seat felt table -->
+    <section class="tableWrap">
+      <div class="table3d">
 
-    <!-- DEMO 2: Table-only layout (no logic yet) -->
-    <section class="tableStage">
-
-      <div class="feltTable">
-
-        <!-- LEFT SEAT (AI2) -->
-        <div class="seat seat-left">
-          <div class="avatarWrap">
-            <div class="avatar" aria-label="AI2"></div>
-            <div class="seatLabel">
-              <div class="seatName">AI2</div>
-              <div class="seatSub">Hidden Hand</div>
+        <!-- LEFT AI -->
+        <div class="seat seatLeft">
+          <div class="avatar">
+            <div class="head"></div>
+            <div class="label">
+              <div class="name">AI2</div>
+              <div class="sub">Hidden hand</div>
             </div>
+          </div>
+
+          <div class="cardFan cardFanLeft" aria-label="AI2 hidden cards">
+            <!-- purely decorative backs for now -->
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
           </div>
         </div>
 
-        <!-- RIGHT SEAT (AI3) -->
-        <div class="seat seat-right">
-          <div class="avatarWrap">
-            <div class="avatar" aria-label="AI3"></div>
-            <div class="seatLabel">
-              <div class="seatName">AI3</div>
-              <div class="seatSub">Hidden Hand</div>
+        <!-- RIGHT AI -->
+        <div class="seat seatRight">
+          <div class="avatar">
+            <div class="head"></div>
+            <div class="label">
+              <div class="name">AI3</div>
+              <div class="sub">Hidden hand</div>
             </div>
+          </div>
+
+          <div class="cardFan cardFanRight" aria-label="AI3 hidden cards">
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
+            <div class="cardBack"></div>
           </div>
         </div>
 
-        <!-- CENTER TRICK AREA -->
+        <!-- CENTER TRICK -->
         <div class="trickCenter">
-          <div class="trickInner">
-            <div class="trickTitle">Trick Area</div>
+          <div class="trickBox">
+            <div class="trickTitle">Trick</div>
 
-            <!-- Later, your game.js can render trick cards into this -->
-            <div id="demo2Trick" class="trickSlots">
-              <div class="slotHint">Center play cards go here</div>
+            <div class="trickCards">
+              <div class="trickSlot">AI2 play</div>
+              <div class="trickSlot">AI3 play</div>
+              <div class="trickSlot">YOU play</div>
             </div>
+
+            <div class="trickHint">Center play cards go here.</div>
           </div>
         </div>
 
-        <!-- YOU (BOTTOM SEAT) -->
-        <div class="seat seat-bottom">
-          <div class="youPanel">
-            <div class="youTop">
-              <div class="avatarWrap">
-                <div class="avatar avatar-you" aria-label="YOU"></div>
-                <div class="seatLabel">
-                  <div class="seatName">YOU</div>
-                  <div class="seatSub">Your Hand</div>
-                </div>
-              </div>
-
-              <div class="youMeta">
-                <span class="pill">Tap a card to play</span>
-                <span class="pill pill-secondary">Must follow suit</span>
+        <!-- YOU (BOTTOM) -->
+        <div class="seat seatBottom">
+          <div class="youBanner">
+            <div class="avatar avatarYou">
+              <div class="head"></div>
+              <div class="label">
+                <div class="name">YOU</div>
+                <div class="sub">Your hand</div>
               </div>
             </div>
 
-            <!-- Later, your game.js can render hand cards into this -->
-            <div id="demo2Hand" class="handDock">
-              <div class="handHint">Your cards will appear here (front of you)</div>
-            </div>
+            <div class="youHint">Tap a card to play. Must follow suit.</div>
+          </div>
+
+          <!-- Your visible cards (front of you) -->
+          <div class="yourHandRow" id="demo2YourHand">
+            <!-- placeholder cards (swap later with real cards from game.js) -->
+            <div class="cardFaceMini red">A♥</div>
+            <div class="cardFaceMini black">K♠</div>
+            <div class="cardFaceMini red">Q♦</div>
+            <div class="cardFaceMini black">J♣</div>
+            <div class="cardFaceMini black">10♠</div>
+            <div class="cardFaceMini red">9♥</div>
+            <div class="cardFaceMini red">8♦</div>
           </div>
         </div>
 
       </div>
     </section>
 
+    <footer class="footer">
+      © 2026 Pluck The Card Game
+    </footer>
   </main>
-
-  <footer class="footer">© 2026 Pluck The Card Game</footer>
-
 </body>
 </html>
