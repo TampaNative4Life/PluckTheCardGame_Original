@@ -2,519 +2,347 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pluck Demo 2</title>
 
-  <!-- Keep your existing site styles if you have them -->
+  <!-- Keep your existing site CSS (optional) -->
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/cards.css" />
 
-  <!-- Demo2 is self-contained visually (so you don't chase snippets) -->
   <style>
+    /* =========================
+       DEMO 2: Always-centered table stage
+       ========================= */
+
     :root{
-      --bg1:#070b12;
-      --bg2:#0b1222;
-      --ink:#e8eefc;
-      --muted:#b7c3dc;
-      --line:rgba(255,255,255,.10);
-      --shadow:rgba(0,0,0,.55);
+      --bg1:#070b14;
+      --bg2:#0c1325;
+      --panel:#0f1728cc;
+      --line:#263556;
+      --text:#e9eefc;
+      --muted:#aab6d4;
 
-      --felt1:#0f5c2d;
-      --felt2:#0a3f1d;
-      --feltEdge:rgba(255,255,255,.08);
-      --feltStitch:rgba(255,255,255,.24);
+      --felt1:#0b4e2b;
+      --felt2:#0a3f25;
+      --feltGlow:rgba(46, 255, 136, .12);
 
-      --cardW:72px;
-      --cardH:96px;
-      --cardR:12px;
+      --cardW: 74px;
+      --cardH: 104px;
     }
 
-    /* Page bg */
     body{
       margin:0;
-      color:var(--ink);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(1200px 600px at 30% 10%, rgba(98,142,255,.16), transparent 55%),
-        radial-gradient(1000px 520px at 75% 35%, rgba(255,193,98,.10), transparent 60%),
+        radial-gradient(1200px 700px at 50% 20%, rgba(255,255,255,.06), transparent 55%),
+        radial-gradient(900px 600px at 20% 80%, rgba(255,255,255,.04), transparent 55%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
       min-height:100vh;
     }
 
-    /* Simple top bar that won’t fight your existing CSS */
-    .topbar{
+    /* If your global CSS already styles header/nav, this won’t fight it */
+    .demo2-wrap{
+      width:min(1200px, 96vw);
+      margin: 0 auto;
+      padding: 14px 0 28px;
+    }
+
+    /* STAGE = the part that must always center */
+    .demo2-stage{
+      /* Full viewport height minus whatever header you have above it.
+         If your header is taller, bump 110px. */
+      min-height: calc(100vh - 110px);
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding:14px 18px;
-      border-bottom:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter: blur(8px);
+      justify-content:center;
+      padding: 18px 0 28px;
     }
 
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800;
-      letter-spacing:.6px;
-    }
-    .brand .logo{
-      width:44px;height:44px;border-radius:12px;
-      background: rgba(255,255,255,.06);
-      border:1px solid var(--line);
-      display:grid;place-items:center;
-      box-shadow: 0 12px 26px var(--shadow);
-      overflow:hidden;
-    }
-    .brand .logo img{ width:100%; height:100%; object-fit:cover; }
-
-    .nav{
-      display:flex; gap:16px; flex-wrap:wrap;
-      font-weight:600;
-    }
-    .nav a{
-      color:var(--muted);
-      text-decoration:none;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid transparent;
-    }
-    .nav a:hover{
-      color:var(--ink);
-      border-color:var(--line);
-      background:rgba(255,255,255,.04);
-    }
-    .nav a.active{
-      color:#ffd27d;
-      border-color:rgba(255,210,125,.22);
-      background:rgba(255,210,125,.06);
+    /* Two-column: centered table + side note panel */
+    .demo2-grid{
+      width:100%;
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap: 18px;
+      align-items:center;
+      justify-items:center;
     }
 
-    .wrap{
-      max-width:1200px;
-      margin:18px auto 40px;
-      padding:0 16px;
+    /* On smaller screens, stack note under table but KEEP TABLE CENTERED */
+    @media (max-width: 980px){
+      .demo2-grid{
+        grid-template-columns: 1fr;
+      }
     }
 
-    /* 3D TABLE */
-    .tableStage{
-      margin-top:14px;
+    /* TABLE BOX that scales with orientation */
+    .table-frame{
+      width: min(980px, 92vw);
+      height: min(560px, 72vh);
+      position: relative;
+      border-radius: 34px;
+      overflow: visible;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       perspective: 1000px;
     }
 
-    .feltTable{
-      position:relative;
-      width:min(1100px, 100%);
-      height: min(640px, 72vh);
-      margin: 0 auto;
+    /* 3D angle (you said “3d angle”) */
+    .felt{
+      width: 100%;
+      height: 100%;
       border-radius: 34px;
-      transform: rotateX(12deg);
-      transform-origin: center top;
-      box-shadow:
-        0 44px 110px rgba(0,0,0,.55),
-        inset 0 0 0 2px rgba(255,255,255,.06);
+      position: relative;
       background:
-        radial-gradient(120% 100% at 50% 20%, rgba(255,255,255,.10), transparent 48%),
-        radial-gradient(120% 100% at 50% 80%, rgba(0,0,0,.22), transparent 58%),
+        radial-gradient(900px 420px at 55% 35%, rgba(255,255,255,.10), transparent 55%),
         linear-gradient(180deg, var(--felt1), var(--felt2));
-      overflow:hidden;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.55),
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        inset 0 0 0 10px rgba(0,0,0,.18),
+        0 0 0 1px rgba(64, 255, 145, .10);
+      transform: rotateX(10deg);
     }
 
-    /* Subtle felt noise */
-    .feltTable::before{
+    .felt::after{
       content:"";
-      position:absolute; inset:0;
-      background-image:
-        radial-gradient(circle at 20% 25%, rgba(255,255,255,.05) 0 2px, transparent 2px),
-        radial-gradient(circle at 70% 40%, rgba(0,0,0,.07) 0 2px, transparent 2px),
-        radial-gradient(circle at 45% 70%, rgba(255,255,255,.04) 0 2px, transparent 2px);
-      opacity:.35;
-      pointer-events:none;
-      mix-blend-mode: overlay;
-    }
-
-    /* Table edge + stitching */
-    .feltEdge{
-      position:absolute; inset:14px;
-      border-radius: 28px;
-      border:1px solid var(--feltEdge);
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
-      pointer-events:none;
-    }
-    .feltStitch{
-      position:absolute; inset:56px;
-      border-radius: 22px;
-      border:2px dashed var(--feltStitch);
-      opacity:.55;
-      pointer-events:none;
-    }
-
-    /* Center trick zone */
-    .trickZone{
       position:absolute;
-      left:50%; top:50%;
-      transform: translate(-50%,-50%);
-      width: min(520px, 70%);
-      height: min(260px, 44%);
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 18px 45px rgba(0,0,0,.25);
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:16px;
-    }
-    .trickTitle{
-      font-weight:800;
-      letter-spacing:.4px;
-      margin-bottom:8px;
-    }
-    .trickHint{
-      color:rgba(255,255,255,.75);
-      font-size:14px;
-      margin-bottom:14px;
-    }
-    .trickCards{
-      display:flex;
-      gap:14px;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
+      inset: 12%;
+      border-radius: 22px;
+      border: 2px dashed rgba(255,255,255,.18);
+      pointer-events:none;
     }
 
-    /* Player seats */
+    /* Seats */
     .seat{
       position:absolute;
       display:flex;
+      gap:10px;
       align-items:center;
-      gap:12px;
-      padding:12px 14px;
-      border-radius: 18px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      box-shadow: 0 16px 40px rgba(0,0,0,.28);
+      color: var(--text);
       user-select:none;
     }
-    .seat .who{
-      display:flex; flex-direction:column; gap:2px;
-      min-width:120px;
-    }
-    .seat .name{ font-weight:900; }
-    .seat .sub{ color:rgba(255,255,255,.75); font-size:13px; }
 
-    /* Head silhouette */
     .avatar{
-      width:44px;height:44px;border-radius:50%;
+      width:44px;
+      height:44px;
+      border-radius: 999px;
       background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.12), transparent 45%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.18));
-      border:1px solid rgba(255,255,255,.10);
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.12));
+      border: 1px solid rgba(255,255,255,.16);
       box-shadow: 0 10px 24px rgba(0,0,0,.35);
-      position:relative;
-      overflow:hidden;
-    }
-    .avatar::after{
-      /* simple “head+shoulders” */
-      content:"";
-      position:absolute;
-      left:50%; top:54%;
-      width:32px; height:32px;
-      transform: translate(-50%,-50%);
-      border-radius: 50%;
-      background: rgba(0,0,0,.38);
-      box-shadow:
-        0 22px 0 8px rgba(0,0,0,.38);
     }
 
-    .seat.left{ left:22px; top:52%; transform: translateY(-50%); }
-    .seat.right{ right:22px; top:52%; transform: translateY(-50%); }
-
-    /* Human seat bottom */
-    .seat.you{
-      left:50%;
-      bottom:18px;
-      transform: translateX(-50%);
-      width: min(900px, 92%);
-      justify-content:space-between;
-      padding:14px 16px;
-    }
-    .youLeft{
-      display:flex; align-items:center; gap:12px;
-      min-width:160px;
-    }
-    .yourHandRow{
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-      align-items:flex-end;
-      flex-wrap:nowrap;
-      overflow:auto;
-      padding-bottom:6px;
-      scrollbar-width: thin;
-    }
-
-    /* Card faces (simple but clean; matches your v21 “face” style) */
-    .cardFace{
-      width: var(--cardW);
-      height: var(--cardH);
-      border-radius: var(--cardR);
-      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.94));
-      border:1px solid rgba(0,0,0,.12);
-      box-shadow: 0 10px 18px rgba(0,0,0,.30);
-      position:relative;
-      display:block;
-      flex:0 0 auto;
-      cursor:pointer;
-      transition: transform .10s ease, box-shadow .10s ease, outline .10s ease;
-    }
-    .cardFace:hover{
-      transform: translateY(-3px);
-      box-shadow: 0 14px 24px rgba(0,0,0,.34);
-    }
-    .cardFace.disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      filter:saturate(.7);
-    }
-    .corner{
-      position:absolute;
-      font-weight:900;
-      font-size:14px;
-      line-height:14px;
-      padding:8px;
-    }
-    .corner.tl{ left:0; top:0; text-align:left; }
-    .corner.br{ right:0; bottom:0; text-align:right; transform: rotate(180deg); }
-    .suitBig{
-      position:absolute;
-      left:50%; top:52%;
-      transform: translate(-50%,-50%);
-      font-size:32px;
-      font-weight:900;
-      opacity:.9;
-    }
-    .red{ color:#c0132b; }
-    .black{ color:#111827; }
-
-    .joker{
-      background: linear-gradient(180deg, rgba(20,25,40,.95), rgba(10,12,20,.96));
-      color:#e7ecff;
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .joker .corner{ color:#e7ecff; }
-    .joker .suitBig{ font-size:30px; opacity:1; }
-    .jokerTag{
-      position:absolute;
-      left:50%; bottom:8px;
-      transform: translateX(-50%);
-      font-size:10px;
-      letter-spacing:.6px;
-      opacity:.85;
-    }
-
-    /* Trick highlight */
-    .trickCard{
-      outline: 3px solid rgba(255,210,125,.45);
-      box-shadow: 0 18px 28px rgba(0,0,0,.38);
-      cursor:default;
-    }
-
-    /* Small status strip under table */
-    .statusBar{
-      max-width:1100px;
-      margin: 14px auto 0;
+    .seatTag{
       padding: 10px 12px;
       border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.82);
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(6px);
+      line-height: 1.15;
+    }
+
+    .seatTag .name{ font-weight: 700; }
+    .seatTag .sub{ color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    /* Place seats: left, right, bottom */
+    .seat.left{ left: 18px; top: 50%; transform: translateY(-50%); }
+    .seat.right{ right: 18px; top: 50%; transform: translateY(-50%); flex-direction: row-reverse; text-align:right; }
+    .seat.you{ left: 22px; bottom: 18px; }
+
+    /* Trick center */
+    .trickCenter{
+      position:absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(520px, 60%);
+      height: min(240px, 42%);
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:space-between;
-    }
-    .statusBar b{ color:#fff; }
-
-    footer{
-      opacity:.75;
+      align-items:center;
+      justify-content:center;
       text-align:center;
-      padding:24px 10px 40px;
+      color: var(--muted);
+      padding: 12px;
     }
 
-    /* Mobile tune */
-    @media (max-width: 780px){
-      :root{ --cardW:64px; --cardH:88px; }
-      .seat.left, .seat.right{
-        top:46%;
-        padding:10px 12px;
-      }
-      .seat .who{ min-width:90px; }
-      .feltTable{ height: min(620px, 74vh); }
-      .seat.you{ bottom:10px; }
+    .trickCenter .title{
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
     }
+
+    /* Player hand area in front of YOU */
+    .youHand{
+      position:absolute;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-10%);
+      display:flex;
+      align-items:flex-end;
+      gap: 0;
+      pointer-events:none; /* demo only; remove when you wire gameplay */
+    }
+
+    .demoCard{
+      width: var(--cardW);
+      height: var(--cardH);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(245,245,245,.86));
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: 0 16px 30px rgba(0,0,0,.35);
+      position:relative;
+      margin-left:-44px; /* fan overlap */
+      transform-origin: bottom center;
+    }
+
+    .demoCard:nth-child(1){ transform: rotate(-10deg) translateY(4px); }
+    .demoCard:nth-child(2){ transform: rotate(-3deg) translateY(0); }
+    .demoCard:nth-child(3){ transform: rotate(6deg) translateY(4px); }
+    .demoCard:nth-child(4){ transform: rotate(12deg) translateY(10px); }
+
+    /* Simple suit/rank for demo */
+    .demoCard .tl{
+      position:absolute; left:10px; top:8px;
+      font-weight:800; font-size:14px; line-height: 1.05;
+    }
+    .demoCard .br{
+      position:absolute; right:10px; bottom:8px;
+      font-weight:800; font-size:14px; line-height: 1.05;
+      transform: rotate(180deg);
+    }
+    .red{ color:#c8192e; }
+    .black{ color:#111; }
+
+    /* Side note panel */
+    .note{
+      width: min(380px, 92vw);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 14px 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+    .note .h{
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .note .b{
+      color: var(--muted);
+      line-height:1.35;
+      font-size: 14px;
+    }
+
+    /* Make sure footer doesn’t shove layout on short screens */
+    footer{ opacity:.75; text-align:center; padding: 14px 0 18px; }
   </style>
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">
-        <!-- If you have an actual logo file, set src to it (optional) -->
-        <!-- <img src="assets/logo.png" alt="Pluck"> -->
-        ♠
+  <!-- Keep your existing header/nav as you have it on other pages -->
+  <div class="demo2-wrap">
+    <!-- If your site already injects header/nav from style.css, you can remove this block -->
+    <header style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 8px 2px 14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:#0b0f1a;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;">
+          <span style="font-weight:900;">♠</span>
+        </div>
+        <div style="font-weight:900; letter-spacing:.5px;">PLUCK</div>
       </div>
-      <div>PLUCK</div>
-    </div>
 
-    <nav class="nav">
-      <a href="game.html">Play Demo</a>
-      <a class="active" href="demo2.html">Demo 2</a>
-      <a href="docs/rules.md">Rules</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+      <nav style="display:flex; gap:16px; align-items:center;">
+        <a href="game.html" style="color:var(--text); text-decoration:none; opacity:.85;">Play Demo</a>
+        <a href="demo2.html" style="color:var(--text); text-decoration:none; font-weight:800;">Demo 2</a>
+        <a href="rules.html" style="color:var(--text); text-decoration:none; opacity:.85;">Rules</a>
+        <a href="about.html" style="color:var(--text); text-decoration:none; opacity:.85;">About</a>
+      </nav>
+    </header>
 
-  <main class="wrap">
-    <div class="tableStage">
-      <section class="feltTable" aria-label="3 player table">
-        <div class="feltEdge"></div>
-        <div class="feltStitch"></div>
+    <section class="demo2-stage">
+      <div class="demo2-grid">
 
-        <!-- AI Left -->
-        <div class="seat left" role="group" aria-label="AI2 seat">
-          <div class="avatar" aria-hidden="true"></div>
-          <div class="who">
-            <div class="name">AI2 (Left)</div>
-            <div class="sub">Hidden hand</div>
-          </div>
-        </div>
-
-        <!-- AI Right -->
-        <div class="seat right" role="group" aria-label="AI3 seat">
-          <div class="avatar" aria-hidden="true"></div>
-          <div class="who" style="text-align:right">
-            <div class="name">AI3 (Right)</div>
-            <div class="sub">Hidden hand</div>
-          </div>
-        </div>
-
-        <!-- Trick Center -->
-        <div class="trickZone" role="group" aria-label="Trick area">
-          <div>
-            <div class="trickTitle">Trick Area</div>
-            <div class="trickHint">Center play cards go here</div>
-            <div id="trickCards" class="trickCards"></div>
-          </div>
-        </div>
-
-        <!-- YOU (Bottom seat) -->
-        <div class="seat you" role="group" aria-label="Your seat">
-          <div class="youLeft">
-            <div class="avatar" aria-hidden="true"></div>
-            <div class="who">
-              <div class="name">YOU</div>
-              <div class="sub">Your cards are in front of you</div>
+        <!-- CENTERED TABLE -->
+        <div class="table-frame">
+          <div class="felt">
+            <div class="trickCenter">
+              <div>
+                <div class="title">Trick Area</div>
+                <div>Center play cards go here</div>
+              </div>
             </div>
+
+            <!-- Seats -->
+            <div class="seat left">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="seatTag">
+                <div class="name">AI2 (Left)</div>
+                <div class="sub">Hidden hand</div>
+              </div>
+            </div>
+
+            <div class="seat right">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="seatTag">
+                <div class="name">AI3 (Right)</div>
+                <div class="sub">Hidden hand</div>
+              </div>
+            </div>
+
+            <div class="seat you">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="seatTag">
+                <div class="name">YOU</div>
+                <div class="sub">Your cards are in front of you</div>
+              </div>
+            </div>
+
+            <!-- Your visible hand (demo fan) -->
+            <div class="youHand" aria-hidden="true">
+              <div class="demoCard">
+                <div class="tl red">3<br>♦</div>
+                <div class="br red">3<br>♦</div>
+              </div>
+              <div class="demoCard">
+                <div class="tl black">J<br>♠</div>
+                <div class="br black">J<br>♠</div>
+              </div>
+              <div class="demoCard">
+                <div class="tl red">A<br>♥</div>
+                <div class="br red">A<br>♥</div>
+              </div>
+              <div class="demoCard">
+                <div class="tl black">K<br>♣</div>
+                <div class="br black">K<br>♣</div>
+              </div>
+            </div>
+
           </div>
-
-          <div id="yourHandRow" class="yourHandRow" aria-label="Your hand"></div>
         </div>
-      </section>
 
-      <div class="statusBar" aria-label="demo status">
-        <div><b>Demo 2 Goal:</b> Table layout + “you at the table” view (no gameplay wiring yet)</div>
-        <div><b>Next:</b> plug Demo 1 engine into these containers</div>
+        <!-- SIDE NOTE -->
+        <aside class="note">
+          <div class="h">Demo 2 Goal</div>
+          <div class="b">
+            Table layout + “you at the table” view (no gameplay wiring yet).<br><br>
+            Next: plug Demo 1 engine into these containers:
+            <ul>
+              <li><b>#trickArea</b> (center)</li>
+              <li><b>#youHand</b> (bottom/front)</li>
+              <li><b>AI seats</b> (left/right)</li>
+            </ul>
+          </div>
+        </aside>
+
       </div>
-    </div>
-  </main>
+    </section>
 
-  <footer>© 2026 Pluck The Card Game</footer>
-
-  <script>
-    // Demo 2 is VISUAL FIRST. This is just a mock hand + mock trick
-    // so you can see the look immediately. We'll wire real game state next.
-
-    const CARD_BIG_JOKER = "BJ";
-    const CARD_LITTLE_JOKER = "LJ";
-
-    function suitSymbol(s){ return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣"; }
-    function isRedSuit(s){ return s==="H" || s==="D"; }
-
-    function makeCardFace(cardStr, disabled=false, extraClass=""){
-      const el = document.createElement("div");
-      el.className = "cardFace" + (disabled ? " disabled" : "") + (extraClass ? (" " + extraClass) : "");
-
-      if (cardStr === CARD_BIG_JOKER || cardStr === CARD_LITTLE_JOKER){
-        el.classList.add("joker");
-        const tl = document.createElement("div");
-        tl.className = "corner tl";
-        tl.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
-        const br = document.createElement("div");
-        br.className = "corner br";
-        br.textContent = (cardStr === CARD_BIG_JOKER ? "BJ" : "LJ");
-        const mid = document.createElement("div");
-        mid.className = "suitBig";
-        mid.textContent = "🃏";
-        const tag = document.createElement("div");
-        tag.className = "jokerTag";
-        tag.textContent = (cardStr === CARD_BIG_JOKER ? "BIG JOKER" : "LITTLE JOKER");
-        el.appendChild(tl); el.appendChild(br); el.appendChild(mid); el.appendChild(tag);
-        return el;
-      }
-
-      const suit = cardStr.slice(-1);
-      const rank = cardStr.slice(0, cardStr.length-1);
-      const colorClass = isRedSuit(suit) ? "red" : "black";
-      const sym = suitSymbol(suit);
-
-      const tl = document.createElement("div");
-      tl.className = `corner tl ${colorClass}`;
-      tl.innerHTML = `${rank}<br>${sym}`;
-
-      const br = document.createElement("div");
-      br.className = `corner br ${colorClass}`;
-      br.innerHTML = `${rank}<br>${sym}`;
-
-      const mid = document.createElement("div");
-      mid.className = `suitBig ${colorClass}`;
-      mid.textContent = sym;
-
-      el.appendChild(tl); el.appendChild(br); el.appendChild(mid);
-      return el;
-    }
-
-    // Mock demo data (replace with real game state later)
-    const mockHand = ["LJ","AS","KS","QS","10H","9H","8D","7C","6C","5S","4H","3D"];
-    const mockTrick = ["10S","AH","KD"]; // just to show center display
-
-    function renderHand(){
-      const row = document.getElementById("yourHandRow");
-      row.innerHTML = "";
-      mockHand.forEach((c)=>{
-        const card = makeCardFace(c, false);
-        card.addEventListener("click", ()=>{
-          // Visual “select” only (Demo 2)
-          [...row.children].forEach(x=>x.style.outline="none");
-          card.style.outline = "3px solid rgba(255,210,125,.55)";
-        });
-        row.appendChild(card);
-      });
-    }
-
-    function renderTrick(){
-      const zone = document.getElementById("trickCards");
-      zone.innerHTML = "";
-      mockTrick.forEach((c)=>{
-        const card = makeCardFace(c, true, "trickCard");
-        zone.appendChild(card);
-      });
-    }
-
-    renderHand();
-    renderTrick();
-  </script>
+    <footer>© 2026 Pluck The Card Game</footer>
+  </div>
 </body>
 </html>
