@@ -94,32 +94,43 @@
       </aside>
 
       <!-- RIGHT -->
-      <section class="mainPlay">
+<div class="tableCard">
 
-        <!-- Phase box (moved up / compact) -->
-        <div class="card compactCard">
-          <div class="phaseRow">
-            <div id="pDeal"  class="phaseChip">1) The Deal</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPluck" class="phaseChip">2) Pluck</div>
-            <div class="phaseArrow">→</div>
-            <div id="pTrump" class="phaseChip">3) Dealer Selects Trump</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPlay"  class="phaseChip">4) Play</div>
-          </div>
+  <div class="tableTopNote">
+    3-Player Table • AI left • AI right • You bottom
+  </div>
 
-          <div class="metaRow" style="margin-top:10px;">
-            <div><strong>Phase:</strong> <span id="phaseLabel">PICK_DEALER</span></div>
-            <div><strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span></div>
-            <div><strong>Dealer:</strong> <span id="dealerBanner">(not set)</span></div>
-          </div>
+  <div class="tableGrid">
 
-          <div id="turnBanner" class="turnBanner"></div>
+    <!-- LEFT AI -->
+    <div class="seat seatLeft">
+      <div class="seatName">AI2</div>
+      <div id="ai2Hand" class="handRow"></div>
+    </div>
 
-          <div class="buttons" style="margin-top:10px;">
-            <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
-          </div>
-        </div>
+    <!-- CENTER (TRICK AREA) -->
+    <div class="seat seatCenter">
+      <div class="centerLabel">Trick</div>
+      <div id="trick" class="trickBox tableTrick">(empty)</div>
+      <div class="centerHint">Winner leads next trick</div>
+    </div>
+
+    <!-- RIGHT AI -->
+    <div class="seat seatRight">
+      <div class="seatName">AI3</div>
+      <div id="ai3Hand" class="handRow"></div>
+    </div>
+
+    <!-- BOTTOM YOU -->
+    <div class="seat seatBottom">
+      <div class="seatName">YOU</div>
+      <div id="hand" class="hand tableHand"></div>
+      <p id="msg" class="msg"></p>
+      <p class="hint">Tap a card to play. Must follow suit if possible.</p>
+    </div>
+
+  </div>
+</div>
 
         <!-- ===== TABLE AREA (Spades-style) ===== -->
 <div class="tableCard">
@@ -224,4 +235,5 @@
   <script src="js/game.js"></script>
 </body>
 </html>
+
 
