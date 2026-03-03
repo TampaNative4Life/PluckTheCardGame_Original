@@ -1,128 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pluck Demo 2</title>
-<link rel="stylesheet" href="css/style.css">
-
-<style>
-.tableWrap{
-  max-width:1200px;
-  margin:0 auto;
-  padding:20px;
-}
-
-.feltStage{
-  perspective:1200px;
-  margin-top:20px;
-}
-
-.feltTable{
-  position:relative;
-  height:650px;
-  border-radius:30px;
-  background:
-    radial-gradient(900px 500px at 50% 35%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(135deg, #0c5b2e, #063b1f);
-  box-shadow:0 40px 90px rgba(0,0,0,.55);
-  transform: rotateX(14deg);
-  overflow:hidden;
-}
-
-.seat{
-  position:absolute;
-  padding:12px;
-  border-radius:16px;
-  background:rgba(0,0,0,.35);
-  border:1px solid rgba(255,255,255,.15);
-  color:white;
-}
-
-.seat.left{
-  left:30px;
-  top:50%;
-  transform:translateY(-50%);
-}
-
-.seat.right{
-  right:30px;
-  top:50%;
-  transform:translateY(-50%);
-}
-
-.seat.bottom{
-  left:50%;
-  bottom:30px;
-  transform:translateX(-50%);
-  width:600px;
-}
-
-.centerTrick{
-  position:absolute;
-  left:50%;
-  top:45%;
-  transform:translate(-50%, -50%);
-  width:500px;
-  height:250px;
-  border-radius:20px;
-  border:2px dashed rgba(255,255,255,.4);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  font-size:18px;
-}
-</style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Pluck Demo 2</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<header class="nav">
-  <a class="brand" href="index.html">
-    <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
-    <span>PLUCK</span>
-  </a>
-  <nav class="navlinks">
-    <a href="game.html">Play Demo</a>
-    <a href="demo2.html">Demo 2</a>
-    <a href="rules.html">Rules</a>
-    <a href="about.html">About</a>
-  </nav>
-</header>
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
+      <span>PLUCK</span>
+    </a>
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html" class="active">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-<main class="tableWrap">
+  <main class="container">
 
-  <div class="feltStage">
-    <div class="feltTable">
+    <!-- DEMO 2: Table-only layout (no logic yet) -->
+    <section class="tableStage">
 
-      <div class="seat left">
-        <strong>AI2 (Left)</strong><br>
-        Hidden Hand
+      <div class="feltTable">
+
+        <!-- LEFT SEAT (AI2) -->
+        <div class="seat seat-left">
+          <div class="avatarWrap">
+            <div class="avatar" aria-label="AI2"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI2</div>
+              <div class="seatSub">Hidden Hand</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT SEAT (AI3) -->
+        <div class="seat seat-right">
+          <div class="avatarWrap">
+            <div class="avatar" aria-label="AI3"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI3</div>
+              <div class="seatSub">Hidden Hand</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER TRICK AREA -->
+        <div class="trickCenter">
+          <div class="trickInner">
+            <div class="trickTitle">Trick Area</div>
+
+            <!-- Later, your game.js can render trick cards into this -->
+            <div id="demo2Trick" class="trickSlots">
+              <div class="slotHint">Center play cards go here</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YOU (BOTTOM SEAT) -->
+        <div class="seat seat-bottom">
+          <div class="youPanel">
+            <div class="youTop">
+              <div class="avatarWrap">
+                <div class="avatar avatar-you" aria-label="YOU"></div>
+                <div class="seatLabel">
+                  <div class="seatName">YOU</div>
+                  <div class="seatSub">Your Hand</div>
+                </div>
+              </div>
+
+              <div class="youMeta">
+                <span class="pill">Tap a card to play</span>
+                <span class="pill pill-secondary">Must follow suit</span>
+              </div>
+            </div>
+
+            <!-- Later, your game.js can render hand cards into this -->
+            <div id="demo2Hand" class="handDock">
+              <div class="handHint">Your cards will appear here (front of you)</div>
+            </div>
+          </div>
+        </div>
+
       </div>
+    </section>
 
-      <div class="seat right">
-        <strong>AI3 (Right)</strong><br>
-        Hidden Hand
-      </div>
+  </main>
 
-      <div class="centerTrick">
-        Trick Area
-      </div>
-
-      <div class="seat bottom">
-        <strong>YOU (Bottom)</strong><br>
-        Your cards will render here.
-      </div>
-
-    </div>
-  </div>
-
-</main>
-
-<footer class="footer">
-© 2026 Pluck The Card Game
-</footer>
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
 
 </body>
 </html>
