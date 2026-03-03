@@ -1,40 +1,32 @@
 :root{
-  /* Lightened, more “professional” dark theme */
-  --bg:#0b1220;
-  --panel:#121a2b;
-  --panel2:#0f1728;
-  --text:#eef3ff;
-  --muted:#a8b3cc;
-  --line:rgba(180,200,255,.14);
+  --bg:#0d0f12;
+  --panel:#141a26;
+  --panel2:#0f1422;
+  --text:#e9eef6;
+  --muted:#a6b0c3;
+  --line:#26324a;
   --brand:#d4b254;
-
-  --shadow: 0 10px 26px rgba(0,0,0,.32);
+  --good:#38b56a;
 }
 
 *{box-sizing:border-box}
-html,body{height:100%}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(1200px 600px at 25% 0%, rgba(212,178,84,.10), transparent 60%),
-    radial-gradient(900px 500px at 90% 20%, rgba(120,160,255,.10), transparent 55%),
-    var(--bg);
+  background: radial-gradient(1200px 800px at 30% 20%, rgba(70,90,140,.18), transparent 60%),
+              radial-gradient(900px 600px at 80% 65%, rgba(212,178,84,.08), transparent 60%),
+              var(--bg);
   color:var(--text);
 }
 
-/* NAV */
+/* ===== Nav ===== */
 .nav{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:12px 16px;
+  padding:12px 18px;
   border-bottom:1px solid var(--line);
-  background: rgba(9,14,26,.75);
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  background:#0b0d10;
 }
 .brand{
   display:flex;
@@ -42,58 +34,57 @@ body{
   align-items:center;
   color:var(--text);
   text-decoration:none;
-  font-weight:900;
+  font-weight:800;
   letter-spacing:1px;
 }
 .brand img{
   height:40px;
   width:auto;
-  border-radius:10px;
-  box-shadow: 0 6px 16px rgba(0,0,0,.35);
+  border-radius:8px;
 }
 .navlinks{
   display:flex;
   flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
+  gap:12px;
 }
 .navlinks a{
   color:var(--muted);
   text-decoration:none;
-  padding:8px 10px;
-  border-radius:10px;
 }
-.navlinks a:hover{
-  color:var(--text);
-  background: rgba(180,200,255,.08);
-}
+.navlinks a:hover{color:var(--text)}
+.navlinks .activeLink{ color: var(--brand); }
 
-/* PAGE CONTAINER */
 .container{
   max-width:1200px;
   margin:0 auto;
-  padding:14px;
+  padding:16px;
 }
 
-/* MAIN LAYOUT */
+/* ===== Layout ===== */
 .playLayout{
   display:grid;
   grid-template-columns: 360px 1fr;
   gap:14px;
   align-items:start;
 }
-@media (max-width: 1000px){
-  .playLayout{ grid-template-columns: 1fr; }
+@media (max-width: 1050px){
+  .playLayout{ grid-template-columns:1fr; }
 }
 
-/* Cards / panels */
+.sidePanel{ height: fit-content; }
+.mainPlay{}
+
+/* ===== Cards & Panels ===== */
 .card{
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  background: rgba(20,26,38,.92);
   border:1px solid var(--line);
-  border-radius:16px;
+  border-radius:14px;
   padding:14px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(6px);
 }
+
+.cardTight{ padding:12px; }
 
 .grid{
   display:grid;
@@ -101,19 +92,8 @@ body{
   gap:14px;
   margin:14px 0;
 }
-@media (max-width: 980px){
-  .grid{ grid-template-columns:1fr; }
-}
-
-/* Topbar */
-.topbar{
-  display:grid;
-  grid-template-columns: 1.2fr .8fr;
-  gap:14px;
-  margin:14px 0 6px 0;
-}
-@media (max-width: 980px){
-  .topbar{ grid-template-columns:1fr; }
+@media (max-width: 900px){
+  .grid{grid-template-columns:1fr}
 }
 
 .metaRow{
@@ -125,36 +105,125 @@ body{
   margin-bottom:8px;
 }
 
-.pname{font-weight:900}
-.pmeta{color:var(--muted); font-size:13px}
+.turnBanner{
+  margin-top:10px;
+  padding:12px;
+  border:1px dashed rgba(212,178,84,.45);
+  border-radius:12px;
+  background: rgba(15,20,34,.85);
+  color:#c9d2e6;
+  font-size:14px;
+  min-height:42px;
+}
 
-/* Buttons */
 .buttons{
   display:flex;
   gap:10px;
-  margin-top:12px;
   flex-wrap:wrap;
+  margin-top:12px;
 }
 .btn{
   border:1px solid var(--line);
-  background: rgba(180,200,255,.08);
+  background:#1b2336;
   color:var(--text);
   padding:10px 12px;
   border-radius:12px;
   cursor:pointer;
-  font-weight:800;
+  font-weight:700;
   min-height:44px;
 }
 .btn:hover{filter:brightness(1.08)}
-.btn:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-}
-.btn-secondary{
-  background: rgba(180,200,255,.05);
+.btn-secondary{ background:#141b2a; color: var(--muted); }
+
+.btn.selected{
+  outline: 2px solid rgba(212,178,84,.55);
+  border-color: rgba(212,178,84,.55);
 }
 
-/* Phase row */
+.msg{ color:#d2dbef; margin-top:10px; min-height:22px; }
+.hint{ color:#8a96ad; margin:8px 0 0 0; font-size:13px; }
+
+.trickBox{
+  min-height:140px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background: rgba(15,20,34,.85);
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+}
+
+.handRow{ color:#91a0bd; font-size:18px; min-height:26px; }
+
+/* ===== Pick row ===== */
+.pickRowWide{
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+.pickSlot{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  min-width:100px;
+}
+.pickName{
+  font-weight:900;
+  color:#b9c4de;
+  font-size:12px;
+}
+.pickCardSlot{
+  min-height:120px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px dashed rgba(212,178,84,.4);
+  border-radius:12px;
+  background: rgba(15,20,34,.65);
+  padding:10px;
+}
+
+/* Trump + Quotas in one row (flush) */
+.sideRow{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  margin-top:14px;
+}
+@media (max-width: 1050px){
+  .sideRow{ grid-template-columns:1fr; }
+}
+
+/* Quota pills horizontal */
+.quotaRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.quotaRow2{ margin-top:10px; }
+.quotaPill{
+  flex:1;
+  min-width:96px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: rgba(15,20,34,.85);
+}
+.quotaPill.faint{ opacity:.9; }
+.quotaName{ color:#b9c4de; font-weight:800; font-size:12px; }
+.quotaVal{ color: var(--text); font-weight:900; }
+
+/* ===== Phase chips ===== */
 .phaseRow{
   display:flex;
   gap:10px;
@@ -165,126 +234,45 @@ body{
   padding:10px 14px;
   border-radius:14px;
   border:1px solid var(--line);
-  background: rgba(180,200,255,.06);
+  background: rgba(15,20,34,.75);
   color:var(--muted);
   font-weight:900;
-  font-size:14px;
+  font-size:15px;
 }
 .phaseChip.activeChip{
-  background: rgba(212,178,84,.12);
+  background: rgba(212,178,84,.14);
   border-color: rgba(212,178,84,.55);
   color: var(--text);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.12) inset;
 }
 .phaseArrow{
-  color:rgba(180,200,255,.35);
+  color:#7f8db0;
   font-weight:900;
   font-size:18px;
 }
 
-/* Status / banners */
-.turnBanner{
-  margin-top:10px;
-  padding:12px;
-  border:1px dashed rgba(212,178,84,.45);
-  border-radius:12px;
-  background: rgba(15,23,40,.75);
-  color: rgba(240,245,255,.82);
-  font-size:13px;
-  min-height:42px;
-}
-
-/* Score (tricks) row look */
-.scoreBox{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:16px;
-  background: rgba(15,23,40,.75);
-}
-.scoreRow{
-  display:grid;
-  grid-template-columns: 60px 1fr 1fr;
-  gap:10px;
-  align-items:center;
-}
-
-/* Messages / hints */
-.msg{
-  color:rgba(240,245,255,.86);
-  margin-top:10px;
-  min-height:22px;
-}
-.hint{
-  color:rgba(168,179,204,.80);
-  margin:8px 0 0 0;
-  font-size:13px;
-}
-
-/* Trick box */
-.trickBox{
-  min-height:120px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:16px;
-  background: rgba(15,23,40,.75);
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:flex-start;
-}
-.trickCard{
-  box-shadow: 0 0 0 2px rgba(212,178,84,.18) inset, 0 14px 22px rgba(0,0,0,.25);
-  border-color: rgba(212,178,84,.55) !important;
-}
-
-/* Hidden hands */
-.handRow{
-  color:rgba(168,179,204,.75);
-  font-size:18px;
-  min-height:26px;
-}
-
-/* Hand area */
+/* ===== Cards (faces) ===== */
 .hand{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
 }
 
-/* Pick slots */
-.pickCardSlot{
-  min-height:120px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px dashed rgba(212,178,84,.40);
-  border-radius:14px;
-  background: rgba(15,23,40,.75);
-  margin-top:8px;
-  padding:10px;
-}
-
-/* ===== Card Faces (THIS is what prevents “double text”) ===== */
 .cardFace{
   width:74px;
   height:104px;
-  background:#f8f9ff;
+  background:#f7f7fb;
   color:#111;
-  border-radius:12px;
+  border-radius:10px;
   border:1px solid rgba(0,0,0,.18);
-  position:relative;           /* required */
+  position:relative;
   box-shadow: 0 10px 16px rgba(0,0,0,.25);
   cursor:pointer;
   user-select:none;
   display:flex;
   align-items:center;
   justify-content:center;
-  transition: transform .08s ease, box-shadow .12s ease;
+  transition: transform .08s ease;
   touch-action: manipulation;
-  pointer-events:auto;
 }
 .cardFace:hover{ transform: translateY(-2px); }
 .cardFace:active{ transform: translateY(0px); }
@@ -293,23 +281,16 @@ body{
   opacity:.45;
   cursor:not-allowed;
   transform:none;
-  box-shadow: 0 8px 14px rgba(0,0,0,.18);
-}
-
-.cardFace.legalGlow{
-  box-shadow: 0 0 0 2px rgba(120,160,255,.28) inset, 0 12px 18px rgba(0,0,0,.25);
-  border-color: rgba(120,160,255,.55);
 }
 
 .corner{
-  position:absolute;           /* required */
+  position:absolute;
   line-height:1.05;
   font-weight:900;
   font-size:14px;
 }
 .corner.tl{top:6px; left:7px;}
 .corner.br{bottom:6px; right:7px; transform:rotate(180deg);}
-
 .suitBig{
   font-size:34px;
   font-weight:900;
@@ -318,9 +299,8 @@ body{
 .red{ color:#c0152a; }
 .black{ color:#111; }
 
-/* Joker */
 .joker{
-  background: linear-gradient(135deg, #f8f9ff, #efe9ff);
+  background: linear-gradient(135deg, #f7f7fb, #efe9ff);
   border:1px solid rgba(90,50,160,.35);
 }
 .joker .suitBig{ font-size:22px; }
@@ -336,320 +316,28 @@ body{
   opacity:.95;
 }
 
-/* Make sure images never steal taps if you later add them */
-.cardFace img{
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
+/* Trick highlight */
+.trickSeat{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
 }
-
-/* Trump selection highlight */
-#trumpPanel button.selected{
-  border-color: rgba(212,178,84,.75);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.14) inset;
-  background: rgba(212,178,84,.12);
+.trickLabel{
+  font-size:12px;
+  color:#cdd6ea;
+  font-weight:900;
+}
+.trickCard{
+  outline: 2px solid rgba(212,178,84,.45);
+  box-shadow: 0 16px 22px rgba(0,0,0,.35);
 }
 
 /* Footer */
 .footer{
   padding:18px;
   text-align:center;
-  color:rgba(168,179,204,.70);
+  color:#6e7a93;
   border-top:1px solid var(--line);
   margin-top:18px;
-}
-
-/* Small screen tightening */
-@media (max-width: 520px){
-  .card{ box-shadow: 0 6px 14px rgba(0,0,0,.22); }
-  .turnBanner{ font-size: 12px; }
-  .cardFace{
-    width: clamp(56px, 9vw, 74px);
-    height: clamp(82px, 13vw, 104px);
-  }
-  /* Highlight cards shown in the Trick area */
-.trickCard{
-  outline: 2px solid rgba(212,178,84,.75);
-  box-shadow: 0 0 0 4px rgba(212,178,84,.12), 0 10px 18px rgba(0,0,0,.35);
-}
-
-/* Highlight the trump button you selected */
-#trumpPanel .btn.selected{
-  border-color: rgba(212,178,84,.8);
-  box-shadow: 0 0 0 3px rgba(212,178,84,.18) inset;
-  background: rgba(212,178,84,.10);
-}
-  /* ===== Spades-style green table ===== */
-.tableCard{
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.08);
-  padding: 14px;
-  background: radial-gradient(1200px 500px at 50% 30%, rgba(255,255,255,.10), rgba(0,0,0,0)),
-              linear-gradient(180deg, #0b3f2a, #062a1c);
-  box-shadow: 0 18px 40px rgba(0,0,0,.35);
-  position: relative;
-  overflow: hidden;
-}
-
-/* subtle felt texture */
-.tableCard::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    repeating-linear-gradient(45deg,
-      rgba(255,255,255,.03) 0px,
-      rgba(255,255,255,.03) 2px,
-      rgba(0,0,0,.00) 2px,
-      rgba(0,0,0,.00) 6px);
-  opacity:.25;
-  pointer-events:none;
-}
-
-.tableTopNote{
-  position: relative;
-  z-index: 1;
-  color: rgba(255,255,255,.75);
-  font-weight: 800;
-  letter-spacing: .2px;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-
-.tableGrid{
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 240px 1fr 240px;
-  grid-template-rows: auto auto;
-  gap: 12px;
-  align-items: stretch;
-}
-
-.seat{
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 16px;
-  background: rgba(0,0,0,.18);
-  padding: 12px;
-}
-
-.seatName{
-  font-weight: 900;
-  color: rgba(255,255,255,.90);
-  margin-bottom: 8px;
-  letter-spacing: .3px;
-}
-
-.seatLeft{ grid-column: 1; grid-row: 1; }
-.seatCenter{ grid-column: 2; grid-row: 1; }
-.seatRight{ grid-column: 3; grid-row: 1; }
-.seatBottom{ grid-column: 1 / 4; grid-row: 2; }
-
-.centerLabel{
-  font-weight: 900;
-  color: rgba(255,255,255,.9);
-  margin-bottom: 8px;
-}
-
-.centerHint{
-  margin-top: 10px;
-  color: rgba(255,255,255,.70);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.tableTrick{
-  background: rgba(0,0,0,.22);
-  border-color: rgba(255,255,255,.12);
-  min-height: 140px;
-}
-
-.tableHand{
-  background: rgba(0,0,0,.14);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 14px;
-  padding: 10px;
-}
-
-/* Responsive: stack seats on tablets/phones */
-@media (max-width: 980px){
-  .tableGrid{
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-  }
-  .seatLeft, .seatCenter, .seatRight, .seatBottom{
-    grid-column: 1;
-    grid-row: auto;
-  }
-}
-  /* ===== Demo 2: Spades-style green table ===== */
-
-.demo2Top{
-  display:grid;
-  grid-template-columns: 1.2fr .9fr;
-  gap:14px;
-  align-items:start;
-  margin-bottom:14px;
-}
-@media (max-width: 980px){
-  .demo2Top{ grid-template-columns: 1fr; }
-}
-
-.demo2Pick .pickCardSlot{
-  min-height: 92px;
-}
-
-.demo2HeaderRow{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-.demo2PickRow{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-.demo2PickSlot{
-  min-width: 150px;
-  flex: 1;
-}
-
-.demo2RightStack{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-}
-@media (max-width: 980px){
-  .demo2RightStack{ grid-template-columns:1fr; }
-}
-
-.demo2Trump{ padding:12px; }
-.demo2TrumpInner{ margin-top:10px; }
-.demo2AceSlot{
-  min-height: 86px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  padding:8px;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-}
-
-.demo2Quotas{ padding:12px; }
-
-.quotaPills{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-.quotaPill{
-  flex:1;
-  min-width: 140px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:10px 12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--panel2);
-  font-weight:800;
-}
-.quotaPill span{
-  font-weight:900;
-  color: var(--brand);
-}
-
-.demo2Phase{ grid-column: 1 / -1; }
-
-.demo2Table{
-  padding:14px;
-}
-
-.tableFelt{
-  border-radius: 18px;
-  border: 1px solid rgba(0,0,0,.35);
-  background:
-    radial-gradient(1200px 600px at 50% 30%, rgba(255,255,255,.12), rgba(0,0,0,0) 60%),
-    radial-gradient(900px 420px at 50% 70%, rgba(0,0,0,.18), rgba(0,0,0,0) 60%),
-    linear-gradient(135deg, #0d3b21, #0a2f1b);
-  box-shadow: inset 0 0 0 2px rgba(212,178,84,.10), 0 20px 50px rgba(0,0,0,.35);
-  padding: 16px;
-  min-height: 520px;
-
-  display:grid;
-  grid-template-columns: 1fr 1.25fr 1fr;
-  grid-template-rows: auto 1fr auto;
-  gap: 14px;
-}
-
-.seat{
-  border-radius: 16px;
-  background: rgba(13,15,18,.35);
-  border: 1px solid rgba(255,255,255,.06);
-  padding: 12px;
-  backdrop-filter: blur(6px);
-}
-
-.seatName{
-  font-weight: 900;
-  letter-spacing: .4px;
-  color: rgba(233,238,246,.92);
-  text-align:center;
-  margin-bottom: 8px;
-}
-
-.seatTop{ grid-column: 2; grid-row: 1; }
-.seatLeft{ grid-column: 1; grid-row: 2; }
-.seatCenter{ grid-column: 2; grid-row: 2; }
-.seatBottom{ grid-column: 2; grid-row: 3; }
-
-.aiBackRow{
-  text-align:center;
-  color: rgba(233,238,246,.7);
-  font-size: 20px;
-  letter-spacing: 4px;
-  min-height: 32px;
-}
-.aiBackCol{
-  color: rgba(233,238,246,.7);
-  font-size: 20px;
-  line-height: 1.4;
-  min-height: 120px;
-}
-
-.trickCenter{
-  min-height: 160px;
-  border-radius: 14px;
-  border: 1px dashed rgba(212,178,84,.35);
-  background: rgba(15,19,32,.55);
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:center;
-  gap: 12px;
-  padding: 12px;
-}
-
-.tableHand{
-  justify-content:center;
-}
-
-/* Make trick cards pop more */
-.trickCard{
-  outline: 2px solid rgba(212,178,84,.45);
-  box-shadow: 0 10px 22px rgba(0,0,0,.35);
-}
-
-/* Highlight selected trump button if your JS toggles .selected */
-#trumpPanel button.selected{
-  border-color: rgba(212,178,84,.65);
-  box-shadow: 0 0 0 2px rgba(212,178,84,.18) inset;
-}
 }
