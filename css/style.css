@@ -556,3 +556,234 @@ body{
 
 .pill{
   font-size: 12
+
+  /* =========================
+   Demo2: 3-seat Green Felt Table
+   ========================= */
+
+.tableWrap{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 18px 44px;
+}
+
+.table3d{
+  position: relative;
+  width: 100%;
+  height: min(66vh, 620px);
+  border-radius: 44px;
+  overflow: hidden;
+
+  /* “felt” */
+  background: radial-gradient(1200px 520px at 50% 45%, rgba(255,255,255,.08), rgba(0,0,0,0) 55%),
+              linear-gradient(180deg, #0d5b2f 0%, #0a4b26 55%, #083b1f 100%);
+
+  /* depth */
+  box-shadow: 0 30px 80px rgba(0,0,0,.55);
+  transform: perspective(1100px) rotateX(10deg);
+  transform-origin: center;
+}
+
+.table3d::before{
+  content:"";
+  position:absolute;
+  inset: 14px;
+  border-radius: 34px;
+  border: 2px solid rgba(255,255,255,.10);
+  pointer-events:none;
+}
+
+.seat{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
+}
+
+.seatLeft{
+  left: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  align-items:flex-start;
+}
+
+.seatRight{
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  align-items:flex-end;
+}
+
+.seatBottom{
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: min(980px, 92%);
+  align-items:center;
+}
+
+.avatar{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(10px);
+}
+
+.avatar .head{
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.30), rgba(0,0,0,0) 52%),
+              linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.25));
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.avatar .label .name{
+  font-weight: 800;
+  letter-spacing: .4px;
+  color: rgba(255,255,255,.92);
+}
+
+.avatar .label .sub{
+  font-size: 12px;
+  color: rgba(255,255,255,.75);
+  margin-top: 2px;
+}
+
+.avatarYou .head{
+  width: 50px;
+  height: 50px;
+  border: 1px solid rgba(255,208,98,.35);
+  box-shadow: 0 0 0 3px rgba(255,208,98,.10);
+}
+
+.trickCenter{
+  position:absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: min(520px, 70%);
+}
+
+.trickBox{
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.22);
+  border: 1px dashed rgba(255,255,255,.28);
+  backdrop-filter: blur(10px);
+}
+
+.trickTitle{
+  font-weight: 800;
+  color: rgba(255,255,255,.92);
+  margin-bottom: 10px;
+}
+
+.trickCards{
+  display:flex;
+  gap: 10px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap: wrap;
+  min-height: 64px;
+}
+
+.trickSlot{
+  width: 120px;
+  height: 56px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  font-weight: 700;
+}
+
+.trickHint{
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+  text-align:center;
+}
+
+/* Card backs for AIs */
+.cardFan{
+  display:flex;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+.cardBack{
+  width: 28px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(0,0,0,.25));
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.cardFanLeft .cardBack{ transform: rotate(-8deg); }
+.cardFanRight .cardBack{ transform: rotate(8deg); }
+
+/* Your visible hand */
+.youBanner{
+  width: 100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+  padding: 0 6px 6px;
+}
+
+.youHint{
+  color: rgba(255,255,255,.78);
+  font-weight: 600;
+  font-size: 13px;
+  text-align:right;
+}
+
+.yourHandRow{
+  width: 100%;
+  display:flex;
+  justify-content:center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+  overflow-x:auto;
+}
+
+.cardFaceMini{
+  min-width: 44px;
+  height: 62px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  color: #0b1220;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  border: 1px solid rgba(0,0,0,.15);
+  user-select:none;
+}
+
+.cardFaceMini.red{ color: #b3122d; }
+.cardFaceMini.black{ color: #111827; }
+
+/* Mobile/tablet tweaks */
+@media (max-width: 860px){
+  .table3d{ height: 72vh; transform: perspective(900px) rotateX(8deg); }
+  .seatLeft{ left: 14px; }
+  .seatRight{ right: 14px; }
+  .trickSlot{ width: 96px; }
+}
