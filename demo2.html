@@ -4,345 +4,128 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pluck Demo 2</title>
-
-  <!-- Keep your existing site CSS (optional) -->
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/cards.css" />
-
-  <style>
-    /* =========================
-       DEMO 2: Always-centered table stage
-       ========================= */
-
-    :root{
-      --bg1:#070b14;
-      --bg2:#0c1325;
-      --panel:#0f1728cc;
-      --line:#263556;
-      --text:#e9eefc;
-      --muted:#aab6d4;
-
-      --felt1:#0b4e2b;
-      --felt2:#0a3f25;
-      --feltGlow:rgba(46, 255, 136, .12);
-
-      --cardW: 74px;
-      --cardH: 104px;
-    }
-
-    body{
-      margin:0;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 50% 20%, rgba(255,255,255,.06), transparent 55%),
-        radial-gradient(900px 600px at 20% 80%, rgba(255,255,255,.04), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-    }
-
-    /* If your global CSS already styles header/nav, this won’t fight it */
-    .demo2-wrap{
-      width:min(1200px, 96vw);
-      margin: 0 auto;
-      padding: 14px 0 28px;
-    }
-
-    /* STAGE = the part that must always center */
-    .demo2-stage{
-      /* Full viewport height minus whatever header you have above it.
-         If your header is taller, bump 110px. */
-      min-height: calc(100vh - 110px);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px 0 28px;
-    }
-
-    /* Two-column: centered table + side note panel */
-    .demo2-grid{
-      width:100%;
-      display:grid;
-      grid-template-columns: 1fr 380px;
-      gap: 18px;
-      align-items:center;
-      justify-items:center;
-    }
-
-    /* On smaller screens, stack note under table but KEEP TABLE CENTERED */
-    @media (max-width: 980px){
-      .demo2-grid{
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* TABLE BOX that scales with orientation */
-    .table-frame{
-      width: min(980px, 92vw);
-      height: min(560px, 72vh);
-      position: relative;
-      border-radius: 34px;
-      overflow: visible;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      perspective: 1000px;
-    }
-
-    /* 3D angle (you said “3d angle”) */
-    .felt{
-      width: 100%;
-      height: 100%;
-      border-radius: 34px;
-      position: relative;
-      background:
-        radial-gradient(900px 420px at 55% 35%, rgba(255,255,255,.10), transparent 55%),
-        linear-gradient(180deg, var(--felt1), var(--felt2));
-      box-shadow:
-        0 20px 60px rgba(0,0,0,.55),
-        inset 0 0 0 1px rgba(255,255,255,.08),
-        inset 0 0 0 10px rgba(0,0,0,.18),
-        0 0 0 1px rgba(64, 255, 145, .10);
-      transform: rotateX(10deg);
-    }
-
-    .felt::after{
-      content:"";
-      position:absolute;
-      inset: 12%;
-      border-radius: 22px;
-      border: 2px dashed rgba(255,255,255,.18);
-      pointer-events:none;
-    }
-
-    /* Seats */
-    .seat{
-      position:absolute;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      color: var(--text);
-      user-select:none;
-    }
-
-    .avatar{
-      width:44px;
-      height:44px;
-      border-radius: 999px;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), transparent 50%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.12));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 10px 24px rgba(0,0,0,.35);
-    }
-
-    .seatTag{
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.12);
-      backdrop-filter: blur(6px);
-      line-height: 1.15;
-    }
-
-    .seatTag .name{ font-weight: 700; }
-    .seatTag .sub{ color: var(--muted); font-size: 12px; margin-top: 2px; }
-
-    /* Place seats: left, right, bottom */
-    .seat.left{ left: 18px; top: 50%; transform: translateY(-50%); }
-    .seat.right{ right: 18px; top: 50%; transform: translateY(-50%); flex-direction: row-reverse; text-align:right; }
-    .seat.you{ left: 22px; bottom: 18px; }
-
-    /* Trick center */
-    .trickCenter{
-      position:absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(520px, 60%);
-      height: min(240px, 42%);
-      border-radius: 16px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.14);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      color: var(--muted);
-      padding: 12px;
-    }
-
-    .trickCenter .title{
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    /* Player hand area in front of YOU */
-    .youHand{
-      position:absolute;
-      left: 50%;
-      bottom: 20px;
-      transform: translateX(-10%);
-      display:flex;
-      align-items:flex-end;
-      gap: 0;
-      pointer-events:none; /* demo only; remove when you wire gameplay */
-    }
-
-    .demoCard{
-      width: var(--cardW);
-      height: var(--cardH);
-      border-radius: 12px;
-      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(245,245,245,.86));
-      border: 1px solid rgba(0,0,0,.12);
-      box-shadow: 0 16px 30px rgba(0,0,0,.35);
-      position:relative;
-      margin-left:-44px; /* fan overlap */
-      transform-origin: bottom center;
-    }
-
-    .demoCard:nth-child(1){ transform: rotate(-10deg) translateY(4px); }
-    .demoCard:nth-child(2){ transform: rotate(-3deg) translateY(0); }
-    .demoCard:nth-child(3){ transform: rotate(6deg) translateY(4px); }
-    .demoCard:nth-child(4){ transform: rotate(12deg) translateY(10px); }
-
-    /* Simple suit/rank for demo */
-    .demoCard .tl{
-      position:absolute; left:10px; top:8px;
-      font-weight:800; font-size:14px; line-height: 1.05;
-    }
-    .demoCard .br{
-      position:absolute; right:10px; bottom:8px;
-      font-weight:800; font-size:14px; line-height: 1.05;
-      transform: rotate(180deg);
-    }
-    .red{ color:#c8192e; }
-    .black{ color:#111; }
-
-    /* Side note panel */
-    .note{
-      width: min(380px, 92vw);
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      padding: 14px 14px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.35);
-      backdrop-filter: blur(8px);
-    }
-    .note .h{
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .note .b{
-      color: var(--muted);
-      line-height:1.35;
-      font-size: 14px;
-    }
-
-    /* Make sure footer doesn’t shove layout on short screens */
-    footer{ opacity:.75; text-align:center; padding: 14px 0 18px; }
-  </style>
 </head>
-
 <body>
-  <!-- Keep your existing header/nav as you have it on other pages -->
-  <div class="demo2-wrap">
-    <!-- If your site already injects header/nav from style.css, you can remove this block -->
-    <header style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 8px 2px 14px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:44px;height:44px;border-radius:10px;background:#0b0f1a;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;">
-          <span style="font-weight:900;">♠</span>
+
+  <!-- NAV (matches your site style) -->
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.png" alt="Pluck" onerror="this.style.display='none'">
+      <span>PLUCK</span>
+    </a>
+
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a class="activeLink" href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="demo2Stage">
+      <div class="demo2Table" role="img" aria-label="3-seat card table">
+
+        <!-- LEFT AI -->
+        <div class="demo2Seat seatLeft">
+          <div class="demo2Player">
+            <div class="demo2Avatar"></div>
+            <div class="demo2Label">
+              <div class="demo2Name">AI2</div>
+              <div class="demo2Sub">Hidden hand</div>
+            </div>
+          </div>
+
+          <div class="demo2BackFan" aria-hidden="true">
+            <span class="demo2Back"></span><span class="demo2Back"></span><span class="demo2Back"></span>
+            <span class="demo2Back"></span><span class="demo2Back"></span>
+          </div>
         </div>
-        <div style="font-weight:900; letter-spacing:.5px;">PLUCK</div>
+
+        <!-- RIGHT AI -->
+        <div class="demo2Seat seatRight">
+          <div class="demo2Player">
+            <div class="demo2Avatar"></div>
+            <div class="demo2Label">
+              <div class="demo2Name">AI3</div>
+              <div class="demo2Sub">Hidden hand</div>
+            </div>
+          </div>
+
+          <div class="demo2BackFan" aria-hidden="true">
+            <span class="demo2Back"></span><span class="demo2Back"></span><span class="demo2Back"></span>
+            <span class="demo2Back"></span><span class="demo2Back"></span>
+          </div>
+        </div>
+
+        <!-- CENTER TRICK -->
+        <div class="demo2Trick" id="trickArea">
+          <div class="demo2TrickInner">
+            <div class="demo2TrickTitle">Trick Area</div>
+
+            <div class="demo2TrickSlots">
+              <div class="demo2Slot">AI2 play</div>
+              <div class="demo2Slot">AI3 play</div>
+              <div class="demo2Slot">YOU play</div>
+            </div>
+
+            <div class="demo2TrickHint">Center play cards go here</div>
+          </div>
+        </div>
+
+        <!-- YOU (center-bottom seat, cards spread across table edge) -->
+        <div class="demo2Seat seatBottom">
+          <div class="demo2YouRow">
+            <div class="demo2Player demo2You">
+              <div class="demo2Avatar demo2AvatarYou"></div>
+              <div class="demo2Label">
+                <div class="demo2Name">YOU</div>
+                <div class="demo2Sub">Your cards are in front of you</div>
+              </div>
+            </div>
+
+            <!-- Your 17 cards (placeholder faces) -->
+            <div class="demo2Hand" id="youHand" aria-label="Your hand (17 cards)">
+              <!-- 17 cards -->
+              <div class="demo2Card red">A♦</div>
+              <div class="demo2Card black">K♠</div>
+              <div class="demo2Card red">Q♥</div>
+              <div class="demo2Card black">J♣</div>
+              <div class="demo2Card red">10♦</div>
+              <div class="demo2Card black">9♠</div>
+              <div class="demo2Card red">8♥</div>
+              <div class="demo2Card black">7♣</div>
+              <div class="demo2Card red">6♦</div>
+              <div class="demo2Card black">5♠</div>
+              <div class="demo2Card red">4♥</div>
+              <div class="demo2Card black">3♣</div>
+              <div class="demo2Card black">A♣</div>
+              <div class="demo2Card red">K♦</div>
+              <div class="demo2Card black">Q♠</div>
+              <div class="demo2Card red">J♥</div>
+              <div class="demo2Card black">10♣</div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <nav style="display:flex; gap:16px; align-items:center;">
-        <a href="game.html" style="color:var(--text); text-decoration:none; opacity:.85;">Play Demo</a>
-        <a href="demo2.html" style="color:var(--text); text-decoration:none; font-weight:800;">Demo 2</a>
-        <a href="rules.html" style="color:var(--text); text-decoration:none; opacity:.85;">Rules</a>
-        <a href="about.html" style="color:var(--text); text-decoration:none; opacity:.85;">About</a>
-      </nav>
-    </header>
-
-    <section class="demo2-stage">
-      <div class="demo2-grid">
-
-        <!-- CENTERED TABLE -->
-        <div class="table-frame">
-          <div class="felt">
-            <div class="trickCenter">
-              <div>
-                <div class="title">Trick Area</div>
-                <div>Center play cards go here</div>
-              </div>
-            </div>
-
-            <!-- Seats -->
-            <div class="seat left">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="seatTag">
-                <div class="name">AI2 (Left)</div>
-                <div class="sub">Hidden hand</div>
-              </div>
-            </div>
-
-            <div class="seat right">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="seatTag">
-                <div class="name">AI3 (Right)</div>
-                <div class="sub">Hidden hand</div>
-              </div>
-            </div>
-
-            <div class="seat you">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="seatTag">
-                <div class="name">YOU</div>
-                <div class="sub">Your cards are in front of you</div>
-              </div>
-            </div>
-
-            <!-- Your visible hand (demo fan) -->
-            <div class="youHand" aria-hidden="true">
-              <div class="demoCard">
-                <div class="tl red">3<br>♦</div>
-                <div class="br red">3<br>♦</div>
-              </div>
-              <div class="demoCard">
-                <div class="tl black">J<br>♠</div>
-                <div class="br black">J<br>♠</div>
-              </div>
-              <div class="demoCard">
-                <div class="tl red">A<br>♥</div>
-                <div class="br red">A<br>♥</div>
-              </div>
-              <div class="demoCard">
-                <div class="tl black">K<br>♣</div>
-                <div class="br black">K<br>♣</div>
-              </div>
-            </div>
-
-          </div>
+      <div class="card demo2Note">
+        <div style="font-weight:900; margin-bottom:6px;">Demo 2 Goal</div>
+        <div style="color:var(--muted); line-height:1.45;">
+          Table layout + “you at the table” view (no gameplay wiring yet).<br><br>
+          Next: plug Demo 1 engine output into:
+          <ul style="margin:10px 0 0 18px; color:var(--muted);">
+            <li><b>#trickArea</b> (center)</li>
+            <li><b>#youHand</b> (bottom/front)</li>
+            <li>AI seats (left/right)</li>
+          </ul>
         </div>
-
-        <!-- SIDE NOTE -->
-        <aside class="note">
-          <div class="h">Demo 2 Goal</div>
-          <div class="b">
-            Table layout + “you at the table” view (no gameplay wiring yet).<br><br>
-            Next: plug Demo 1 engine into these containers:
-            <ul>
-              <li><b>#trickArea</b> (center)</li>
-              <li><b>#youHand</b> (bottom/front)</li>
-              <li><b>AI seats</b> (left/right)</li>
-            </ul>
-          </div>
-        </aside>
-
       </div>
     </section>
+  </main>
 
-    <footer>© 2026 Pluck The Card Game</footer>
-  </div>
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
 </body>
 </html>
