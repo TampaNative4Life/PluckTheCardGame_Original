@@ -4,7 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Cache-bust so you SEE changes immediately -->
+  <link rel="stylesheet" href="css/style.css?v=22" />
 </head>
 
 <body class="demo2">
@@ -41,13 +43,15 @@
       </div>
     </section>
 
-    <!-- TABLE + RESET ABOVE IT -->
+    <!-- TABLE STAGE -->
     <section class="tableStage">
+      <!-- Reset ABOVE table, top-right -->
       <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
       </div>
 
       <div class="feltTable" aria-label="3-player table">
+        <div class="feltInset" aria-hidden="true"></div>
 
         <!-- LEFT AI -->
         <div class="seat seat-left">
@@ -90,7 +94,7 @@
           </div>
         </div>
 
-        <!-- YOU: centered at table -->
+        <!-- YOU -->
         <div class="seat seat-bottom">
           <div class="youDock">
             <div class="youRow">
@@ -107,7 +111,6 @@
             <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -120,17 +123,16 @@
 
     const params = new URLSearchParams(location.search);
     const trumpSuit = (params.get("trump") || "").toUpperCase();
+
     const SUITS = ["S","H","D","C"];
-    const BRBR = ["S","H","C","D"]; // black, red, black, red
+    const BRBR  = ["S","H","C","D"]; // black, red, black, red
     const isRed = s => (s==="H" || s==="D");
+
+    const books = { YOU: 0, AI2: 0, AI3: 0 };
 
     const CARD_BIG_JOKER = "BJ";
     const CARD_LITTLE_JOKER = "LJ";
-
-    // IMPORTANT: no jokers in initial pluck/deal
     const includeJokers = false;
-
-    const books = { YOU: 0, AI2: 0, AI3: 0 };
 
     function setHud(){
       const t = document.getElementById("trumpLabel");
@@ -182,7 +184,6 @@
       };
 
       return hand.slice().sort((a,b)=>{
-        // Jokers left (even though we're not including them)
         if (a===CARD_BIG_JOKER) return (b===CARD_BIG_JOKER)?0:-1;
         if (b===CARD_BIG_JOKER) return 1;
         if (a===CARD_LITTLE_JOKER) return (b===CARD_LITTLE_JOKER)?0:-1;
@@ -194,7 +195,6 @@
         const ga = sIndex(sa), gb = sIndex(sb);
         if (ga !== gb) return ga - gb;
 
-        // high to low
         return rankVal(rb) - rankVal(ra);
       });
     }
