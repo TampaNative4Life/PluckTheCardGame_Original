@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=999" />
 </head>
 
 <body class="demo2">
@@ -26,17 +26,24 @@
     <!-- TOP HUD -->
     <section class="topHud" aria-label="Game status">
       <div class="statusBar">
-        <div class="pillRow">
-          <div class="pill"><strong>Trump:</strong> <span id="trumpLabel" class="muted">(not set)</span></div>
-          <div class="pill"><strong>Books:</strong> <span id="booksSummary">YOU 0 • AI2 0 • AI3 0</span></div>
+        <div class="statusItem">
+          <span class="statusLabel">Trump</span>
+          <span class="statusValue muted" id="trumpLabel">(not set)</span>
+        </div>
+
+        <div class="statusDivider" aria-hidden="true"></div>
+
+        <div class="statusItem">
+          <span class="statusLabel">Books</span>
+          <span class="statusValue" id="booksSummary">YOU 0 • AI2 0 • AI3 0</span>
         </div>
       </div>
     </section>
 
     <section class="tableStage">
 
-      <!-- Reset goes ABOVE the table -->
-      <div class="tableActions">
+      <!-- Reset ABOVE table -->
+      <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
       </div>
 
@@ -78,8 +85,9 @@
           <div class="trickInner">
             <div class="trickTitle">Trick Area</div>
             <div class="trickSlots" id="trickSlots">
-              <div class="slotHint">(auto-resolves in demo2)</div>
+              <div class="slotHint">(empty)</div>
             </div>
+            <div class="slotHint">Center play cards go here</div>
           </div>
         </div>
 
@@ -91,7 +99,7 @@
                 <div class="avatar avatar-you" aria-hidden="true"></div>
                 <div class="seatLabel">
                   <div class="seatName">YOU</div>
-                  <div class="seatSub">Tap a card to “play” (demo)</div>
+                  <div class="seatSub">Your cards are in front of you</div>
                 </div>
               </div>
             </div>
@@ -106,8 +114,7 @@
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <!-- IMPORTANT: engine FIRST, then ui -->
-  <script src="js/engine.js"></script>
-  <script src="js/demo2.ui.js"></script>
+  <!-- IMPORTANT: module so UI can import engine -->
+  <script type="module" src="js/demo2.ui.js?v=999"></script>
 </body>
 </html>
