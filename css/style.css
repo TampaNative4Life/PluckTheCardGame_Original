@@ -7,16 +7,10 @@
   --line:#26324a;
   --brand:#d4b254;
   --good:#38b56a;
-
-  --felt1:#1f6b3b;
-  --felt2:#0f4d2a;
-  --felt3:#0a3a20;
-
-  --gold:#d7b04a;
 }
 
 *{box-sizing:border-box}
-html,body{height:100%}
+
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -54,7 +48,6 @@ body{
   display:flex;
   flex-wrap:wrap;
   gap:12px;
-  align-items:center;
 }
 .navlinks a{
   color:var(--muted);
@@ -63,11 +56,10 @@ body{
   border-radius:12px;
 }
 .navlinks a:hover{color:var(--text)}
-.navlinks a.activeLink,
-.navlinks a.active{
-  color: var(--gold);
-  background: rgba(215,176,74,.10);
-  border: 1px solid rgba(215,176,74,.28);
+.navlinks .activeLink{
+  color: var(--brand);
+  background: rgba(212,178,84,.10);
+  border: 1px solid rgba(212,178,84,.18);
 }
 
 .container{
@@ -76,20 +68,7 @@ body{
   padding:16px;
 }
 
-/* ===== Layout (Demo 1) ===== */
-.playLayout{
-  display:grid;
-  grid-template-columns: 360px 1fr;
-  gap:14px;
-  align-items:start;
-}
-@media (max-width: 1050px){
-  .playLayout{ grid-template-columns:1fr; }
-}
-.sidePanel{ height: fit-content; }
-.mainPlay{}
-
-/* ===== Panels (Demo 1) ===== */
+/* ===== Cards & Panels ===== */
 .card{
   background: rgba(20,26,38,.92);
   border:1px solid var(--line);
@@ -98,248 +77,7 @@ body{
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
   backdrop-filter: blur(6px);
 }
-.cardTight{ padding:12px; }
 
-.grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-  margin:14px 0;
-}
-@media (max-width: 900px){
-  .grid{grid-template-columns:1fr}
-}
-
-.metaRow{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  flex-wrap:wrap;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-
-.turnBanner{
-  margin-top:10px;
-  padding:12px;
-  border:1px dashed rgba(212,178,84,.45);
-  border-radius:12px;
-  background: rgba(15,20,34,.85);
-  color:#c9d2e6;
-  font-size:14px;
-  min-height:42px;
-}
-
-.buttons{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-.btn{
-  border:1px solid var(--line);
-  background:#1b2336;
-  color:var(--text);
-  padding:10px 12px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:700;
-  min-height:44px;
-}
-.btn:hover{filter:brightness(1.08)}
-.btn-secondary{ background:#141b2a; color: var(--muted); }
-
-.btn.selected{
-  outline: 2px solid rgba(212,178,84,.55);
-  border-color: rgba(212,178,84,.55);
-}
-
-.msg{ color:#d2dbef; margin-top:10px; min-height:22px; }
-.hint{ color:#8a96ad; margin:8px 0 0 0; font-size:13px; }
-
-.trickBox{
-  min-height:140px;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background: rgba(15,20,34,.85);
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-}
-.handRow{ color:#91a0bd; font-size:18px; min-height:26px; }
-
-/* ===== Pick row (Demo 1) ===== */
-.pickRowWide{
-  display:flex;
-  gap:12px;
-  justify-content:space-between;
-  flex-wrap:wrap;
-}
-.pickSlot{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  min-width:100px;
-}
-.pickName{
-  font-weight:900;
-  color:#b9c4de;
-  font-size:12px;
-}
-.pickCardSlot{
-  min-height:120px;
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px dashed rgba(212,178,84,.4);
-  border-radius:12px;
-  background: rgba(15,20,34,.65);
-  padding:10px;
-}
-
-/* Trump + Quotas (Demo 1) */
-.sideRow{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-  margin-top:14px;
-}
-@media (max-width: 1050px){
-  .sideRow{ grid-template-columns:1fr; }
-}
-.quotaRow{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-.quotaPill{
-  flex:1;
-  min-width:96px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background: rgba(15,20,34,.85);
-}
-.quotaName{ color:#b9c4de; font-weight:800; font-size:12px; }
-.quotaVal{ color: var(--text); font-weight:900; }
-
-/* ===== Phase chips (Demo 1) ===== */
-.phaseRow{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.phaseChip{
-  padding:10px 14px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: rgba(15,20,34,.75);
-  color:var(--muted);
-  font-weight:900;
-  font-size:15px;
-}
-.phaseChip.activeChip{
-  background: rgba(212,178,84,.14);
-  border-color: rgba(212,178,84,.55);
-  color: var(--text);
-}
-.phaseArrow{
-  color:#7f8db0;
-  font-weight:900;
-  font-size:18px;
-}
-
-/* ===== Cards (faces) (Demo 1) ===== */
-.hand{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-.cardFace{
-  width:74px;
-  height:104px;
-  background:#f7f7fb;
-  color:#111;
-  border-radius:10px;
-  border:1px solid rgba(0,0,0,.18);
-  position:relative;
-  box-shadow: 0 10px 16px rgba(0,0,0,.25);
-  cursor:pointer;
-  user-select:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: transform .08s ease;
-  touch-action: manipulation;
-}
-.cardFace:hover{ transform: translateY(-2px); }
-.cardFace:active{ transform: translateY(0px); }
-.cardFace.disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  transform:none;
-}
-.corner{
-  position:absolute;
-  line-height:1.05;
-  font-weight:900;
-  font-size:14px;
-}
-.corner.tl{top:6px; left:7px;}
-.corner.br{bottom:6px; right:7px; transform:rotate(180deg);}
-.suitBig{
-  font-size:34px;
-  font-weight:900;
-  margin-top:6px;
-}
-.red{ color:#c0152a; }
-.black{ color:#111; }
-
-.joker{
-  background: linear-gradient(135deg, #f7f7fb, #efe9ff);
-  border:1px solid rgba(90,50,160,.35);
-}
-.joker .suitBig{ font-size:22px; }
-.jokerTag{
-  position:absolute;
-  bottom:8px;
-  left:8px;
-  right:8px;
-  text-align:center;
-  font-size:11px;
-  font-weight:900;
-  color:#3b2a7a;
-  opacity:.95;
-}
-
-/* Trick highlight (Demo 1) */
-.trickSeat{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-}
-.trickLabel{
-  font-size:12px;
-  color:#cdd6ea;
-  font-weight:900;
-}
-.trickCard{
-  outline: 2px solid rgba(212,178,84,.45);
-  box-shadow: 0 16px 22px rgba(0,0,0,.35);
-}
-
-/* Footer */
 .footer{
   padding:18px;
   text-align:center;
@@ -349,30 +87,28 @@ body{
 }
 
 /* =========================
-   DEMO 2: 3-seat Green Felt Table (Centered always)
+   DEMO 2: Centered 3-seat Table
    ========================= */
 
-/* Stage centers table no matter rotation */
+/* Always center table no matter orientation */
 .tableStage{
   margin-top: 18px;
   min-height: calc(100vh - 160px);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding: 18px;
 }
 
+/* The felt table itself */
 .feltTable{
   width: min(1100px, 96vw);
-  aspect-ratio: 16 / 9;
-  height: auto;
-  max-height: 74vh;
+  height: min(640px, 74vh);
   position: relative;
 
   transform-style: preserve-3d;
   perspective: 1200px;
 
-  background: radial-gradient(120% 140% at 50% 35%, var(--felt1) 0%, var(--felt2) 55%, var(--felt3) 100%);
+  background: radial-gradient(120% 140% at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
   border-radius: 28px;
   box-shadow:
     0 22px 60px rgba(0,0,0,.55),
@@ -388,11 +124,11 @@ body{
   position:absolute;
   inset: 14px;
   border-radius: 22px;
-  border: 2px dashed rgba(255,255,255,.16);
+  border: 2px solid rgba(255,255,255,.10);
   pointer-events: none;
 }
 
-/* ===== Player seats ===== */
+/* Seats */
 .seat{
   position:absolute;
   z-index: 3;
@@ -403,110 +139,130 @@ body{
   text-shadow: 0 1px 2px rgba(0,0,0,.45);
 }
 
-/* left AI */
 .seat-left{
   left: 18px;
   top: 50%;
-  transform: translateY(-50%) translateZ(40px);
+  transform: translateY(-50%) translateZ(30px);
 }
 
-/* right AI */
 .seat-right{
   right: 18px;
   top: 50%;
-  transform: translateY(-50%) translateZ(40px);
+  transform: translateY(-50%) translateZ(30px);
 }
 
-/* YOU centered bottom */
 .seat-bottom{
   left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%) translateZ(70px);
-  width: min(980px, 94%);
-  justify-content:center;
-}
-
-/* ===== Full silhouette avatar (head + shoulders + arms) ===== */
-.avatarWrap{
+  bottom: 14px;
+  transform: translateX(-50%) translateZ(60px);
+  width: min(980px, 92%);
   display:flex;
+  flex-direction:column;
   align-items:center;
-  gap:12px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 18px;
-  padding: 10px 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.25);
-  backdrop-filter: blur(6px);
+  gap: 12px;
 }
 
-.avatarFull{
-  width: 74px;
-  height: 74px;
+/* Player “body” silhouette: head + shoulders + arms */
+.playerFigure, .youFigure{
+  width: 84px;
+  height: 96px;
+  position: relative;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.30));
+}
+
+.pf-head{
+  position:absolute;
+  left:50%;
+  top:0;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 46px;
   border-radius: 999px;
   background:
     radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 55%),
-    radial-gradient(70% 80% at 50% 45%, rgba(0,0,0,.60) 0%, rgba(0,0,0,.92) 72%);
+    radial-gradient(70% 80% at 50% 45%, rgba(0,0,0,.55) 0%, rgba(0,0,0,.92) 70%);
   box-shadow:
     inset 0 0 0 2px rgba(255,255,255,.10),
     0 10px 18px rgba(0,0,0,.35);
-  position: relative;
-  overflow:hidden;
 }
 
-/* head */
-.avatarFull::before{
-  content:"";
+.pf-shoulders{
   position:absolute;
   left:50%;
-  top:30%;
-  transform:translate(-50%,-50%);
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.14);
+  top:42px;
+  transform: translateX(-50%);
+  width: 74px;
+  height: 38px;
+  border-radius: 28px;
+  background: rgba(0,0,0,.40);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
 }
 
-/* shoulders + arms */
-.avatarFull::after{
-  content:"";
+.pf-arms{
   position:absolute;
   left:50%;
-  top:62%;
-  transform:translate(-50%,-50%);
-  width: 62px;
-  height: 44px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.10);
-  box-shadow:
-    -26px 8px 0 0 rgba(255,255,255,.08),
-     26px 8px 0 0 rgba(255,255,255,.08);
-  filter: blur(.2px);
+  top:54px;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 30px;
+  border-radius: 28px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.46), rgba(0,0,0,.28), rgba(0,0,0,.46));
+  opacity: .85;
 }
 
-.avatarFull.you{
-  box-shadow:
-    inset 0 0 0 2px rgba(215,176,74,.35),
-    0 10px 18px rgba(0,0,0,.35);
+/* Seat tags */
+.seatTag{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.20);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(6px);
 }
+.seatTag.right{ text-align:right; }
 
-.seatLabel .seatName{
+.seatName{
   font-weight: 900;
-  letter-spacing: .6px;
+  letter-spacing: .4px;
 }
-.seatLabel .seatSub{
+.seatSub{
   opacity: .85;
   font-size: 12px;
-  margin-top: 2px;
 }
 
-/* ===== Center trick zone ===== */
+/* YOU dock (label + body) */
+.youDock{
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 12px;
+}
+
+.youTag{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(215,176,74,.18);
+  box-shadow: 0 14px 34px rgba(0,0,0,.32);
+  backdrop-filter: blur(6px);
+}
+
+/* Center trick zone */
 .trickCenter{
   position:absolute;
   left: 50%;
-  top: 44%;
-  transform: translate(-50%,-50%) translateZ(30px);
-  width: min(560px, 78%);
-  height: min(260px, 40%);
+  top: 45%;
+  transform: translate(-50%,-50%) translateZ(20px);
+  width: min(560px, 74%);
+  height: 260px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -516,160 +272,121 @@ body{
   width: 100%;
   height: 100%;
   border-radius: 22px;
-  border: 2px solid rgba(255,255,255,.16);
-  background: rgba(0,0,0,.10);
+  border: 2px dashed rgba(255,255,255,.25);
+  background: rgba(0,0,0,.12);
   box-shadow: inset 0 0 40px rgba(0,0,0,.35);
   display:flex;
   flex-direction: column;
   align-items:center;
   justify-content:center;
-  gap: 10px;
-  padding: 14px;
+  gap: 12px;
+  padding: 16px;
 }
 
 .trickTitle{
   font-weight: 900;
   opacity: .95;
-  letter-spacing: .6px;
+  letter-spacing: .4px;
 }
+
 .trickSlots{
   width: 100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap: 10px;
+  gap: 12px;
   min-height: 120px;
   flex-wrap: wrap;
 }
+
+.trickSlot{
+  width: min(160px, 44%);
+  height: 52px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: rgba(255,255,255,.88);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  font-weight: 800;
+}
+
 .slotHint{
   opacity: .75;
   font-size: 13px;
   text-align:center;
 }
 
-/* ===== AI hidden hand hint (small fan of backs) ===== */
-.aiFan{
-  display:flex;
-  gap:6px;
-  padding: 8px 10px;
-  border-radius: 16px;
-  background: rgba(0,0,0,.14);
-  border: 1px solid rgba(255,255,255,.10);
-}
-.aiBack{
-  width: 18px;
-  height: 26px;
-  border-radius: 7px;
-  background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(0,0,0,.28));
-  border: 1px solid rgba(255,255,255,.16);
-}
-.seat-left .aiBack{ transform: rotate(-10deg); }
-.seat-right .aiBack{ transform: rotate(10deg); }
-
-/* ===== YOU hand: centered, 17-card fan that fits ===== */
-.youDock{
+/* 17-card spread: short cards, wide fan */
+.handSpreadWrap{
   width: 100%;
   display:flex;
-  align-items:center;
   justify-content:center;
-  gap: 14px;
+  align-items:flex-end;
+  padding-bottom: 4px;
 }
 
-/* The container you’ll render cards into (use id="youHand") */
-#youHand,
-.youHandFan{
+.handSpread{
   position: relative;
-  width: min(880px, 92%);
+  width: min(920px, 92%);
   height: 130px;
-  margin: 0 auto;
 }
 
-/* Smaller faces so 17 fit */
-.cardFaceMini{
-  width: 44px;
-  height: 64px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.94);
-  color: #0b1220;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight: 900;
-  box-shadow: 0 10px 18px rgba(0,0,0,.35);
-  border: 1px solid rgba(0,0,0,.15);
-  user-select:none;
-}
-
-/* If you are using your full cardFace in demo2, shrink it inside the fan */
-#youHand .cardFace{
-  width: 56px;
-  height: 80px;
-  border-radius: 10px;
-}
-
-/* Fan layout: cards should be absolutely positioned.
-   If your demo2 JS/HTML already places cards, this still helps.
-*/
-#youHand .cardFaceMini,
-.youHandFan .cardFaceMini,
-#youHand .cardFace,
-.youHandFan .cardFace{
+/* Shorter card faces so 17 fit */
+.miniCard{
   position:absolute;
-  left:50%;
   bottom: 0;
-  transform-origin: bottom center;
-  will-change: transform;
+  width: 52px;
+  height: 76px;         /* shorter */
+  border-radius: 12px;
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(0,0,0,.18);
+  box-shadow: 0 12px 18px rgba(0,0,0,.35);
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  padding: 8px 8px;
+  font-weight: 1000;
+  color: #0b1220;
+  user-select:none;
+  transform-origin: 50% 110%;
 }
 
-/* Provide default spacing if you just drop 17 divs in order (nth-child 1..17). */
-#youHand > :nth-child(1){  transform: translateX(-320px) rotate(-22deg); }
-#youHand > :nth-child(2){  transform: translateX(-280px) rotate(-19deg); }
-#youHand > :nth-child(3){  transform: translateX(-240px) rotate(-16deg); }
-#youHand > :nth-child(4){  transform: translateX(-200px) rotate(-13deg); }
-#youHand > :nth-child(5){  transform: translateX(-160px) rotate(-10deg); }
-#youHand > :nth-child(6){  transform: translateX(-120px) rotate(-7deg);  }
-#youHand > :nth-child(7){  transform: translateX(-80px)  rotate(-5deg);  }
-#youHand > :nth-child(8){  transform: translateX(-40px)  rotate(-3deg);  }
-#youHand > :nth-child(9){  transform: translateX(0px)    rotate(0deg);   }
-#youHand > :nth-child(10){ transform: translateX(40px)   rotate(3deg);   }
-#youHand > :nth-child(11){ transform: translateX(80px)   rotate(5deg);   }
-#youHand > :nth-child(12){ transform: translateX(120px)  rotate(7deg);   }
-#youHand > :nth-child(13){ transform: translateX(160px)  rotate(10deg);  }
-#youHand > :nth-child(14){ transform: translateX(200px)  rotate(13deg);  }
-#youHand > :nth-child(15){ transform: translateX(240px)  rotate(16deg);  }
-#youHand > :nth-child(16){ transform: translateX(280px)  rotate(19deg);  }
-#youHand > :nth-child(17){ transform: translateX(320px)  rotate(22deg);  }
+/* Fan math using CSS vars set by JS */
+.miniCard{
+  left: calc((var(--i) / (var(--n) - 1)) * (100% - 52px));
+  transform: rotate(calc(-18deg + (var(--i) / (var(--n) - 1)) * 36deg)) translateY(calc(8px + (abs(0.5 - (var(--i) / (var(--n) - 1))) * 26px)));
+}
 
-/* Make fan tighter on small screens */
-@media (max-width: 760px){
+.miniCard.red{ color:#b3122d; }
+.miniCard.black{ color:#111827; }
+
+/* Demo2 note panel */
+.demo2Note{
+  margin-top: 16px;
+  max-width: 860px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Mobile tweaks */
+@media (max-width: 860px){
   .feltTable{
-    max-height: 78vh;
+    height: min(720px, 78vh);
     transform: rotateX(10deg);
   }
-  #youHand .cardFace{ width: 50px; height: 72px; }
-  .cardFaceMini{ width: 40px; height: 58px; }
-  #youHand{ height: 118px; }
-
-  #youHand > :nth-child(1){  transform: translateX(-250px) rotate(-20deg); }
-  #youHand > :nth-child(2){  transform: translateX(-220px) rotate(-17deg); }
-  #youHand > :nth-child(3){  transform: translateX(-190px) rotate(-14deg); }
-  #youHand > :nth-child(4){  transform: translateX(-160px) rotate(-11deg); }
-  #youHand > :nth-child(5){  transform: translateX(-130px) rotate(-8deg); }
-  #youHand > :nth-child(6){  transform: translateX(-100px) rotate(-6deg); }
-  #youHand > :nth-child(7){  transform: translateX(-70px)  rotate(-4deg); }
-  #youHand > :nth-child(8){  transform: translateX(-35px)  rotate(-2deg); }
-  #youHand > :nth-child(9){  transform: translateX(0px)    rotate(0deg); }
-  #youHand > :nth-child(10){ transform: translateX(35px)   rotate(2deg); }
-  #youHand > :nth-child(11){ transform: translateX(70px)   rotate(4deg); }
-  #youHand > :nth-child(12){ transform: translateX(100px)  rotate(6deg); }
-  #youHand > :nth-child(13){ transform: translateX(130px)  rotate(8deg); }
-  #youHand > :nth-child(14){ transform: translateX(160px)  rotate(11deg); }
-  #youHand > :nth-child(15){ transform: translateX(190px)  rotate(14deg); }
-  #youHand > :nth-child(16){ transform: translateX(220px)  rotate(17deg); }
-  #youHand > :nth-child(17){ transform: translateX(250px)  rotate(20deg); }
-}
-
-/* Ultra-wide / desktop polish */
-@media (min-width: 1200px){
-  .feltTable{ transform: rotateX(13deg); }
+  .seat-left{ left: 12px; }
+  .seat-right{ right: 12px; }
+  .trickCenter{
+    top: 44%;
+    height: 240px;
+  }
+  .miniCard{
+    width: 48px;
+    height: 70px;
+  }
+  .handSpread{
+    height: 120px;
+  }
 }
