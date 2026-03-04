@@ -1,550 +1,236 @@
-:root{
-  --bg:#0d0f12;
-  --panel:#141a26;
-  --panel2:#0f1422;
-  --text:#e9eef6;
-  --muted:#a6b0c3;
-  --line:#26324a;
-  --brand:#d4b254;
-  --good:#38b56a;
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pluck Demo 2</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
 
-  --felt1:#1f6b3b;
-  --felt2:#0f4d2a;
-  --felt3:#0a3a20;
-}
+<body class="demo2">
+  <!-- NAV -->
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Pluck Home">
+      <img src="assets/QS.png" alt="Pluck" />
+      <span>PLUCK</span>
+    </a>
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html" class="activeLink">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-*{box-sizing:border-box}
-html,body{height:100%}
+  <main class="container">
+    <section class="tableStage">
+      <div class="feltTable" aria-label="3-player table">
 
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(1200px 800px at 30% 20%, rgba(70,90,140,.18), transparent 60%),
-    radial-gradient(900px 600px at 80% 65%, rgba(212,178,84,.08), transparent 60%),
-    var(--bg);
-  color:var(--text);
-}
+        <div class="feltInset"></div>
 
-/* ===== Nav ===== */
-.nav{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:12px 18px;
-  border-bottom:1px solid var(--line);
-  background:#0b0d10;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-.brand{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  color:var(--text);
-  text-decoration:none;
-  font-weight:800;
-  letter-spacing:1px;
-}
-.brand img{
-  height:40px;
-  width:auto;
-  border-radius:8px;
-}
-.navlinks{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-}
-.navlinks a{
-  color:var(--muted);
-  text-decoration:none;
-  padding: 8px 10px;
-  border-radius: 12px;
-}
-.navlinks a:hover{color:var(--text)}
-.navlinks .activeLink{
-  color: var(--brand);
-  border: 1px solid rgba(212,178,84,.35);
-  background: rgba(212,178,84,.10);
-}
+        <!-- LEFT AI -->
+        <div class="seat seat-left">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI2 (Left)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
+        </div>
 
-/* ===== General containers ===== */
-.container{
-  max-width:1200px;
-  margin:0 auto;
-  padding:16px;
-}
+        <!-- RIGHT AI -->
+        <div class="seat seat-right">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI3 (Right)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
+        </div>
 
-/* ===== Layout (Demo 1 pages) ===== */
-.playLayout{
-  display:grid;
-  grid-template-columns: 360px 1fr;
-  gap:14px;
-  align-items:start;
-}
-@media (max-width: 1050px){
-  .playLayout{ grid-template-columns:1fr; }
-}
-.sidePanel{ height: fit-content; }
-.mainPlay{}
+        <!-- CENTER TRICK -->
+        <div class="trickCenter" id="trickArea">
+          <div class="trickInner">
+            <div class="trickTitle">Trick Area</div>
+            <div class="trickSlots" id="trickSlots">
+              <div class="slotHint">(empty)</div>
+            </div>
+            <div class="slotHint">Center play cards go here</div>
+          </div>
+        </div>
 
-/* ===== Cards & Panels (Demo 1 UI) ===== */
-.card{
-  background: rgba(20,26,38,.92);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.25);
-  backdrop-filter: blur(6px);
-}
-.cardTight{ padding:12px; }
+        <!-- YOU: centered at table -->
+        <div class="seat seat-bottom">
+          <div class="youDock">
+            <div class="youRow">
+              <div class="avatarWrap">
+                <div class="avatar avatar-you" aria-hidden="true"></div>
+                <div class="seatLabel">
+                  <div class="seatName">YOU</div>
+                  <div class="seatSub">Your cards are in front of you</div>
+                </div>
+              </div>
+            </div>
 
-.grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-  margin:14px 0;
-}
-@media (max-width: 900px){
-  .grid{grid-template-columns:1fr}
-}
+            <!-- Hand -->
+            <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
+          </div>
+        </div>
 
-.metaRow{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  flex-wrap:wrap;
-  color:var(--muted);
-  margin-bottom:8px;
-}
+        <!-- Actions -->
+        <div class="tableActions">
+          <button class="btn" id="resetBtn">Reset (New Deal)</button>
+        </div>
+      </div>
+    </section>
 
-.turnBanner{
-  margin-top:10px;
-  padding:12px;
-  border:1px dashed rgba(212,178,84,.45);
-  border-radius:12px;
-  background: rgba(15,20,34,.85);
-  color:#c9d2e6;
-  font-size:14px;
-  min-height:42px;
-}
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
 
-.buttons{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-.btn{
-  border:1px solid var(--line);
-  background:#1b2336;
-  color:var(--text);
-  padding:10px 12px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:700;
-  min-height:44px;
-}
-.btn:hover{filter:brightness(1.08)}
-.btn-secondary{ background:#141b2a; color: var(--muted); }
+  <script>
+  (function(){
+    "use strict";
 
-.btn.selected{
-  outline: 2px solid rgba(212,178,84,.55);
-  border-color: rgba(212,178,84,.55);
-}
+    // Demo2 is visual-first, but we can still enforce your hand ordering.
+    // Optional trump in URL: demo2.html?trump=D
+    const params = new URLSearchParams(location.search);
+    const trumpSuit = (params.get("trump") || "").toUpperCase();
+    const SUITS = ["S","H","D","C"];
+    const BRBR = ["S","H","C","D"]; // black, red, black, red
+    const isRed = s => (s==="H" || s==="D");
 
-.msg{ color:#d2dbef; margin-top:10px; min-height:22px; }
-.hint{ color:#8a96ad; margin:8px 0 0 0; font-size:13px; }
+    const CARD_BIG_JOKER = "BJ";
+    const CARD_LITTLE_JOKER = "LJ";
 
-.trickBox{
-  min-height:140px;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background: rgba(15,20,34,.85);
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-}
+    // Build a 17-card sample hand (NO jokers by default in demo2 visual)
+    // You can flip includeJokers to true if you want them visible.
+    const includeJokers = false;
 
-.handRow{ color:#91a0bd; font-size:18px; min-height:26px; }
+    function makeDeckNo2(){
+      const ranks = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
+      const deck = [];
+      for (const s of SUITS) for (const r of ranks) deck.push(r+s);
+      deck.push("2C"); // the opener
+      return deck;
+    }
 
-.hand{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
+    function shuffle(a){
+      for (let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
 
-/* Demo 1 card faces */
-.cardFace{
-  width:74px;
-  height:104px;
-  background:#f7f7fb;
-  color:#111;
-  border-radius:10px;
-  border:1px solid rgba(0,0,0,.18);
-  position:relative;
-  box-shadow: 0 10px 16px rgba(0,0,0,.25);
-  cursor:pointer;
-  user-select:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: transform .08s ease;
-  touch-action: manipulation;
-}
-.cardFace:hover{ transform: translateY(-2px); }
-.cardFace:active{ transform: translateY(0px); }
+    function suitOrder(){
+      if (!SUITS.includes(trumpSuit)) return BRBR.slice();
+      return [trumpSuit, ...BRBR.filter(s => s !== trumpSuit)];
+    }
 
-.cardFace.disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  transform:none;
-}
-.corner{
-  position:absolute;
-  line-height:1.05;
-  font-weight:900;
-  font-size:14px;
-}
-.corner.tl{top:6px; left:7px;}
-.corner.br{bottom:6px; right:7px; transform:rotate(180deg);}
-.suitBig{
-  font-size:34px;
-  font-weight:900;
-  margin-top:6px;
-}
-.red{ color:#c0152a; }
-.black{ color:#111; }
+    function rankVal(r){
+      if (r==="A") return 14;
+      if (r==="K") return 13;
+      if (r==="Q") return 12;
+      if (r==="J") return 11;
+      if (r==="10") return 10;
+      return parseInt(r,10) || 0;
+    }
 
-.footer{
-  padding:18px;
-  text-align:center;
-  color:#6e7a93;
-  border-top:1px solid var(--line);
-  margin-top:18px;
-}
+    function sortHand(hand){
+      const sOrder = suitOrder();
+      const sIndex = s => {
+        const i = sOrder.indexOf(s);
+        return i<0 ? 99 : i;
+      };
 
-/* =========================================
-   DEMO 2: Centered 3-seat Felt Table (NEW)
-   ========================================= */
+      return hand.slice().sort((a,b)=>{
+        // Jokers left
+        if (a===CARD_BIG_JOKER) return (b===CARD_BIG_JOKER)?0:-1;
+        if (b===CARD_BIG_JOKER) return 1;
+        if (a===CARD_LITTLE_JOKER) return (b===CARD_LITTLE_JOKER)?0:-1;
+        if (b===CARD_LITTLE_JOKER) return 1;
 
-/* The stage that keeps table centered on any orientation */
-.tableStage{
-  min-height: calc(100svh - 140px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding: 18px 14px 28px;
-}
+        const sa = a.slice(-1), sb = b.slice(-1);
+        const ra = a.slice(0,-1), rb = b.slice(0,-1);
 
-/* The felt table itself */
-.feltTable{
-  width: min(1100px, 96vw);
-  height: min(660px, 76svh);
-  position: relative;
-  border-radius: 34px;
-  overflow: hidden;
+        const ga = sIndex(sa), gb = sIndex(sb);
+        if (ga !== gb) return ga - gb;
 
-  /* Felt look */
-  background:
-    radial-gradient(120% 140% at 50% 35%, var(--felt1) 0%, var(--felt2) 55%, var(--felt3) 100%);
-  box-shadow:
-    0 26px 70px rgba(0,0,0,.58),
-    inset 0 0 0 2px rgba(255,255,255,.06),
-    inset 0 0 50px rgba(0,0,0,.35);
+        // high to low within suit
+        return rankVal(rb) - rankVal(ra);
+      });
+    }
 
-  /* 3D perspective */
-  transform-style: preserve-3d;
-  perspective: 1200px;
-  transform: perspective(1200px) rotateX(10deg);
-}
+    function suitSymbol(s){
+      return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣";
+    }
 
-/* Inner rail */
-.feltTable::before{
-  content:"";
-  position:absolute;
-  inset: 14px;
-  border-radius: 26px;
-  border: 2px solid rgba(255,255,255,.10);
-  pointer-events: none;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
-}
+    function makeMiniFace(card){
+      const el = document.createElement("div");
+      el.className = "cardFaceMini";
 
-/* Center guide for trick area */
-.feltTable::after{
-  content:"";
-  position:absolute;
-  left: 50%;
-  top: 50%;
-  width: min(640px, 78%);
-  height: 320px;
-  transform: translate(-50%,-50%);
-  border-radius: 24px;
-  border: 2px dashed rgba(255,255,255,.18);
-  background: rgba(0,0,0,.08);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.25);
-  pointer-events:none;
-}
+      if (card===CARD_BIG_JOKER || card===CARD_LITTLE_JOKER){
+        el.textContent = card;
+        el.style.background = "rgba(255,255,255,.92)";
+        return el;
+      }
 
-/* Seats */
-.seat{
-  position:absolute;
-  z-index: 4;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  transform: translateZ(28px);
-}
+      const suit = card.slice(-1);
+      const rank = card.slice(0,-1);
+      const sym = suitSymbol(suit);
 
-/* AI seats pushed to edges */
-.seat-left{
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%) translateZ(28px);
-}
-.seat-right{
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%) translateZ(28px);
-}
+      el.classList.add(isRed(suit) ? "red" : "black");
+      el.textContent = rank + sym;
+      return el;
+    }
 
-/* YOU is “at the table” (inside bottom edge) */
-.seat-bottom{
-  left: 50%;
-  bottom: 62px; /* inside felt, above the hand row */
-  transform: translateX(-50%) translateZ(44px);
-  width: min(980px, 92%);
-  justify-content: space-between;
-}
+    function deal17(){
+      const deck = shuffle(makeDeckNo2());
+      const hand = [];
 
-/* Player badge */
-.playerBadge{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding: 10px 12px;
-  border-radius: 18px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.12);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 12px 26px rgba(0,0,0,.28);
-  min-width: 210px;
-}
+      if (includeJokers){
+        hand.push(CARD_BIG_JOKER, CARD_LITTLE_JOKER);
+      }
 
-/* Silhouette: head + shoulders + arms (NOT blacked out) */
-.avatar{
-  width: 60px;
-  height: 60px;
-  border-radius: 999px;
-  position: relative;
+      while (hand.length < 17){
+        hand.push(deck.pop());
+      }
+      return hand;
+    }
 
-  background:
-    radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 55%),
-    radial-gradient(90% 90% at 60% 70%, rgba(0,0,0,.10) 0%, rgba(0,0,0,0) 55%),
-    linear-gradient(180deg, rgba(255,255,255,.22), rgba(0,0,0,.10));
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.10),
-    0 10px 18px rgba(0,0,0,.30);
-}
+    function renderHand(){
+      const handEl = document.getElementById("youHand");
+      if (!handEl) return;
 
-/* shoulders + arms */
-.avatar::before{
-  content:"";
-  position:absolute;
-  left: 50%;
-  top: 64%;
-  transform: translate(-50%,-50%);
-  width: 56px;
-  height: 30px;
-  border-radius: 999px 999px 18px 18px;
-  background: rgba(255,255,255,.18);
-  border: 1px solid rgba(255,255,255,.16);
-  box-shadow: inset 0 -8px 18px rgba(0,0,0,.10);
-}
+      const hand = sortHand(deal17());
+      handEl.innerHTML = "";
 
-/* head */
-.avatar::after{
-  content:"";
-  position:absolute;
-  left: 50%;
-  top: 40%;
-  transform: translate(-50%,-50%);
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.26);
-  border: 1px solid rgba(255,255,255,.18);
-}
+      // if 17 cards, tighten sizing a bit
+      handEl.classList.toggle("tight", hand.length >= 14);
 
-.avatar-you{
-  border: 1px solid rgba(212,178,84,.45);
-  box-shadow:
-    inset 0 0 0 2px rgba(212,178,84,.18),
-    0 10px 18px rgba(0,0,0,.30);
-}
+      for (const c of hand){
+        handEl.appendChild(makeMiniFace(c));
+      }
+    }
 
-.playerText .name{
-  font-weight: 900;
-  letter-spacing: .4px;
-}
-.playerText .sub{
-  font-size: 12px;
-  color: rgba(233,238,246,.82);
-  margin-top: 2px;
-}
+    document.getElementById("resetBtn")?.addEventListener("click", () => {
+      renderHand();
+      const slots = document.getElementById("trickSlots");
+      if (slots) slots.innerHTML = '<div class="slotHint">(empty)</div>';
+    });
 
-/* AI hidden-hand mini backs (optional if your HTML has them) */
-.aiBacks{
-  display:flex;
-  gap:6px;
-  margin-left: 10px;
-}
-.aiBack{
-  width: 16px;
-  height: 22px;
-  border-radius: 6px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.16);
-  box-shadow: 0 6px 14px rgba(0,0,0,.22);
-}
-
-/* Trick area content container (center) */
-.trickCenter{
-  position:absolute;
-  left: 50%;
-  top: 48%;
-  transform: translate(-50%,-50%) translateZ(34px);
-  width: min(640px, 78%);
-  height: 320px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index: 3;
-}
-
-.trickInner{
-  width: 100%;
-  height: 100%;
-  border-radius: 22px;
-  background: rgba(0,0,0,.14);
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.25);
-  display:flex;
-  flex-direction: column;
-  align-items:center;
-  justify-content:center;
-  gap: 10px;
-  padding: 14px;
-}
-
-.trickTitle{
-  font-weight: 900;
-  letter-spacing: .3px;
-  opacity: .95;
-}
-.trickHint{
-  font-size: 13px;
-  opacity: .75;
-}
-
-/* Hand row: straight line, all visible */
-.handDock{
-  position:absolute;
-  left: 50%;
-  bottom: 14px;
-  transform: translateX(-50%) translateZ(46px);
-  width: min(1040px, 94%);
-  z-index: 6;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding: 10px 10px;
-  border-radius: 20px;
-  background: rgba(0,0,0,.16);
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 18px 40px rgba(0,0,0,.35);
-  backdrop-filter: blur(10px);
-
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-/* smaller “table-fit” card faces */
-.handDock .cardFace,
-.handDock .cardFaceMini{
-  flex: 0 0 auto;
-}
-
-/* If your Demo2 uses .cardFaceMini for hand */
-.cardFaceMini{
-  width: 44px;
-  height: 62px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.95);
-  color: #0b1220;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight: 900;
-  border: 1px solid rgba(0,0,0,.18);
-  box-shadow: 0 10px 18px rgba(0,0,0,.30);
-  user-select:none;
-}
-.cardFaceMini.red{ color:#b3122d; }
-.cardFaceMini.black{ color:#111827; }
-
-/* If your Demo2 uses .cardFace (big), shrink it inside handDock */
-.handDock .cardFace{
-  width: 44px;
-  height: 62px;
-  border-radius: 10px;
-}
-.handDock .cardFace .corner{ font-size: 10px; }
-.handDock .cardFace .suitBig{ font-size: 18px; margin-top: 0; }
-
-/* Reset button inside table (if you have it) */
-.tableReset{
-  position:absolute;
-  right: 16px;
-  bottom: 86px; /* above the hand dock */
-  z-index: 7;
-  transform: translateZ(44px);
-}
-
-/* Orientation tweaks */
-@media (max-width: 860px){
-  .feltTable{
-    height: min(720px, 78svh);
-    transform: perspective(1000px) rotateX(8deg);
-  }
-  .seat-bottom{
-    bottom: 70px;
-  }
-  .playerBadge{
-    min-width: 190px;
-    padding: 9px 10px;
-  }
-  .avatar{
-    width: 56px;
-    height: 56px;
-  }
-  .handDock{
-    gap: 6px;
-    padding: 10px 8px;
-  }
-  .tableReset{
-    bottom: 92px;
-  }
-}
+    renderHand();
+  })();
+  </script>
+</body>
+</html>
