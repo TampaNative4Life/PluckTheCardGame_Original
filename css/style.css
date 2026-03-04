@@ -1,12 +1,10 @@
 :root{
   --bg:#0d0f12;
   --panel:#141a26;
-  --panel2:#0f1422;
   --text:#e9eef6;
   --muted:#a6b0c3;
   --line:#26324a;
   --brand:#d4b254;
-  --good:#38b56a;
 }
 
 *{box-sizing:border-box}
@@ -44,23 +42,10 @@ body{
   width:auto;
   border-radius:8px;
 }
-.navlinks{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-}
-.navlinks a{
-  color:var(--muted);
-  text-decoration:none;
-  padding:8px 10px;
-  border-radius:12px;
-}
-.navlinks a:hover{color:var(--text); background:rgba(255,255,255,.04)}
-.navlinks .activeLink{
-  color: var(--brand);
-  background: rgba(212,178,84,.10);
-  border: 1px solid rgba(212,178,84,.25);
-}
+.navlinks{ display:flex; flex-wrap:wrap; gap:12px; }
+.navlinks a{ color:var(--muted); text-decoration:none; padding:8px 10px; border-radius:12px; }
+.navlinks a:hover{ color:var(--text); background:rgba(255,255,255,.04); }
+.navlinks .activeLink{ color: var(--brand); background:rgba(212,178,84,.08); border:1px solid rgba(212,178,84,.25); }
 
 .container{
   max-width:1200px;
@@ -79,117 +64,66 @@ body{
   font-weight:800;
   min-height:44px;
 }
-.btn:hover{filter:brightness(1.08)}
-
-/* Footer */
-.footer{
-  padding:18px;
-  text-align:center;
-  color:#6e7a93;
-  border-top:1px solid var(--line);
-  margin-top:18px;
-}
+.btn:hover{ filter:brightness(1.08); }
 
 /* =========================
-   DEMO 2: HUD + 3-seat Table
+   DEMO 2 LAYOUT
    ========================= */
-
 .tableStage{
-  margin-top: 16px;
-  min-height: calc(100vh - 180px);
+  margin-top: 14px;
+  min-height: calc(100vh - 170px);
   display:flex;
-  flex-direction:column;
-  gap:12px;
+  align-items:center;
+  justify-content:center;
 }
 
-/* HUD above table (Trump/Quotas + Reset) */
-.demo2Hud{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.hudLeft{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.hudRight{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-
-.hudPill{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.22);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 24px rgba(0,0,0,.18);
-}
-.hudLabel{
-  color: rgba(233,238,246,.88);
-  font-weight:900;
-  letter-spacing:.4px;
-  font-size:12px;
-}
-.hudValue{
-  color: var(--text);
-  font-weight:1000;
-}
-.hudValue.gold{ color: var(--brand); }
-
-.quotaStrip{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.quotaMini{
+/* Top status bar (Trump | Quotas | First Pick) */
+.statusBar{
+  width:min(1100px, 96vw);
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.18);
-  min-width: 170px;
+  gap:12px;
+  padding:12px 14px;
+  margin: 10px auto 14px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(20,26,38,.70);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.25);
 }
-.quotaMini .name{
-  font-weight:900;
+.statusLeft, .statusRight{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.statusItem{
+  display:flex;
+  gap:8px;
+  align-items:baseline;
   color: rgba(233,238,246,.92);
-}
-.quotaMini .vals{
-  display:flex;
-  gap:10px;
-  color: rgba(233,238,246,.90);
-  font-weight:900;
-}
-.quotaMini .vals span{
-  color: rgba(166,176,195,.95);
   font-weight:800;
 }
+.statusItem .label{ color: rgba(166,176,195,.95); font-weight:800; font-size:12px; letter-spacing:.5px; text-transform:uppercase; }
+.statusItem .value{ font-size:14px; }
+.firstPick{
+  padding:8px 10px;
+  border-radius:14px;
+  border:1px solid rgba(212,178,84,.35);
+  background: rgba(212,178,84,.10);
+}
+.hidden{ display:none !important; }
 
-/* Felt Table */
 .feltTable{
   width: min(1100px, 96vw);
   height: min(640px, 72vh);
-  margin: 0 auto;
   position: relative;
 
   transform-style: preserve-3d;
-  perspective: 1200px;
+  perspective: 1100px;
 
-  background:
-    radial-gradient(120% 140% at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
+  background: radial-gradient(120% 140% at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
   border-radius: 28px;
   box-shadow:
     0 22px 60px rgba(0,0,0,.55),
@@ -200,6 +134,7 @@ body{
   overflow: hidden;
 }
 
+/* inner border */
 .feltTable::after{
   content:"";
   position:absolute;
@@ -209,17 +144,7 @@ body{
   pointer-events: none;
 }
 
-.feltInset{
-  position:absolute;
-  inset: 80px 90px 110px 90px;
-  border-radius: 22px;
-  border: 2px dashed rgba(255,255,255,.25);
-  background: rgba(0,0,0,.08);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.25);
-  pointer-events:none;
-}
-
-/* Seats */
+/* ===== Seats ===== */
 .seat{
   position:absolute;
   z-index: 3;
@@ -229,154 +154,129 @@ body{
   color: #eaf2ff;
   text-shadow: 0 1px 2px rgba(0,0,0,.45);
 }
+
+/* keep AIs on the EDGE */
 .seat-left{
   left: 18px;
   top: 50%;
-  transform: translateY(-50%) translateZ(30px);
+  transform: translateY(-50%) translateZ(26px);
   align-items:flex-start;
 }
 .seat-right{
   right: 18px;
   top: 50%;
-  transform: translateY(-50%) translateZ(30px);
+  transform: translateY(-50%) translateZ(26px);
   align-items:flex-end;
 }
+
+/* YOU is at the table, centered */
 .seat-bottom{
   left: 50%;
   bottom: 18px;
-  transform: translateX(-50%) translateZ(60px);
-  width: min(1040px, 94%);
+  transform: translateX(-50%) translateZ(56px);
+  width: min(980px, 94%);
   align-items:center;
 }
 
-/* Avatar wrap + “person silhouette” */
+/* ===== Player badge (now head + shoulders) ===== */
 .avatarWrap{
   display:flex;
   align-items:center;
   gap:12px;
-  background: rgba(0,0,0,.20);
+  background: rgba(0,0,0,.22);
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 18px;
   padding: 10px 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.18);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(6px);
 }
 
 .avatar{
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 999px;
   position: relative;
 
-  /* lighter so it’s visible (not black blob) */
+  /* NOT blacked out: visible silhouette */
   background:
-    radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.26) 0%, rgba(255,255,255,0) 55%),
-    radial-gradient(70% 80% at 50% 45%, rgba(30,40,60,.35) 0%, rgba(10,12,18,.65) 75%);
-
+    radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.20) 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(70% 80% at 50% 45%, rgba(35,45,60,.85) 0%, rgba(10,14,22,.95) 70%);
   box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.12),
-    0 10px 18px rgba(0,0,0,.30);
+    inset 0 0 0 2px rgba(255,255,255,.14),
+    0 10px 18px rgba(0,0,0,.35);
 }
 
-/* head */
-.avatar::before{
-  content:"";
-  position:absolute;
-  left: 50%;
-  top: 38%;
-  transform: translate(-50%,-50%);
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.22);
-  box-shadow: inset 0 0 0 2px rgba(255,255,255,.10);
-}
-/* shoulders + arms */
+/* head + shoulders + arms */
 .avatar::after{
   content:"";
   position:absolute;
-  left: 50%;
-  top: 68%;
+  left:50%;
+  top:58%;
   transform: translate(-50%,-50%);
-  width: 46px;
-  height: 26px;
-  border-radius: 999px 999px 18px 18px;
-  background:
-    radial-gradient(45px 22px at 50% 35%, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.16);
   box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.08);
-  opacity:.95;
+    0 24px 0 12px rgba(255,255,255,.12),
+    -22px 26px 0 2px rgba(255,255,255,.08),
+    22px 26px 0 2px rgba(255,255,255,.08);
 }
 
 .avatar-you{
   box-shadow:
-    inset 0 0 0 2px rgba(215,176,74,.38),
-    0 10px 18px rgba(0,0,0,.30);
+    inset 0 0 0 2px rgba(212,178,84,.38),
+    0 10px 18px rgba(0,0,0,.35);
 }
 
-.seatLabel .seatName{
-  font-weight: 950;
-  letter-spacing: .6px;
-  font-size: 18px;
-}
-.seatLabel .seatSub{
-  opacity: .90;
-  font-size: 12px;
-  margin-top: 2px;
-  color: rgba(233,238,246,.82);
-}
+.seatLabel .seatName{ font-weight: 900; letter-spacing: .6px; }
+.seatLabel .seatSub{ opacity:.85; font-size:12px; margin-top:2px; }
 
-/* AI hidden hand backs */
+/* ===== AI backs ===== */
 .aiBackRow{
   display:flex;
   gap:6px;
   padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(0,0,0,.14);
-  border: 1px solid rgba(255,255,255,.08);
-  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(6px);
 }
 .cardBack{
-  width: 22px;
-  height: 34px;
+  width: 28px;
+  height: 40px;
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.16), rgba(0,0,0,.22));
+  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(0,0,0,.20));
   border: 1px solid rgba(255,255,255,.18);
 }
 
-/* Center Trick */
+/* ===== Center trick zone ===== */
 .trickCenter{
   position:absolute;
   left: 50%;
-  top: 45%;
-  transform: translate(-50%,-50%) translateZ(20px);
-  width: min(560px, 76%);
+  top: 46%;
+  transform: translate(-50%,-50%) translateZ(18px);
+  width: min(560px, 72%);
   height: 250px;
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index: 2;
 }
 .trickInner{
   width: 100%;
   height: 100%;
   border-radius: 22px;
   border: 2px dashed rgba(255,255,255,.25);
-  background: rgba(0,0,0,.10);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.25);
+  background: rgba(0,0,0,.12);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.35);
   display:flex;
   flex-direction: column;
   align-items:center;
   justify-content:center;
   gap: 10px;
   padding: 14px;
-  text-align:center;
 }
-.trickTitle{
-  font-weight: 950;
-  opacity: .95;
-}
+.trickTitle{ font-weight: 900; opacity: .92; }
 .trickSlots{
   width: 100%;
   display:flex;
@@ -385,12 +285,9 @@ body{
   gap: 14px;
   min-height: 120px;
 }
-.slotHint{
-  opacity: .78;
-  font-size: 13px;
-}
+.slotHint{ opacity: .75; font-size: 13px; }
 
-/* YOU dock */
+/* ===== YOU dock + 17 cards straight line ===== */
 .youDock{
   width: 100%;
   display:flex;
@@ -398,65 +295,74 @@ body{
   align-items:center;
   gap: 10px;
 }
+
 .youRow{
+  width: 100%;
   display:flex;
+  align-items:center;
   justify-content:center;
 }
 
-/* Your hand: straight line, all 17 visible (auto-fit) */
+/* cards row */
 .yourHandRow{
   width: 100%;
   display:flex;
-  flex-wrap:nowrap;
   justify-content:center;
   align-items:flex-end;
   gap: 6px;
-  padding: 10px 10px 6px;
+  padding: 10px 12px;
   border-radius: 18px;
-  background: rgba(0,0,0,.16);
+  background: rgba(0,0,0,.18);
   border: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(10px);
+  overflow: hidden; /* keep straight line, no wrap */
 }
 
+/* 17 cards fit: smaller by default, scales up on desktop */
 .cardFaceMini{
-  /* auto-fit all 17 cards */
-  width: max(18px, min(44px, calc((100% - 12px) / 17)));
-  height: calc(max(18px, min(44px, calc((100% - 12px) / 17))) * 1.35);
-
+  width: clamp(28px, 4.0vw, 44px);
+  height: clamp(44px, 6.0vw, 62px);
   border-radius: 10px;
-  background: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.94);
   color: #0b1220;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight: 1000;
+  font-weight: 950;
   font-size: clamp(10px, 1.6vw, 14px);
-  box-shadow: 0 10px 18px rgba(0,0,0,.25);
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
   border: 1px solid rgba(0,0,0,.15);
   user-select:none;
+  flex: 0 0 auto;
 }
 
-.cardFaceMini.red{ color: #b3122d; }
-.cardFaceMini.black{ color: #111827; }
+.cardFaceMini.red{ color:#b3122d; }
+.cardFaceMini.black{ color:#111827; }
 
-/* Reset button should not cover cards */
+/* ===== Actions (Reset) =====
+   Put it top-of-table OR under cards. You asked: under cards OR top.
+   We'll place it just BELOW the table, centered, clean.
+*/
 .tableActions{
-  position: absolute;
-  left: 18px;
-  top: 18px;
-  z-index: 5;
-  transform: translateZ(80px);
+  width:min(1100px, 96vw);
+  margin: 12px auto 0;
+  display:flex;
+  justify-content:center;
 }
 
-/* Responsive */
-@media (max-width: 900px){
-  .feltTable{ height: min(680px, 74vh); transform: rotateX(8deg); }
+/* Footer */
+.footer{
+  padding:18px;
+  text-align:center;
+  color:#6e7a93;
+  border-top:1px solid var(--line);
+  margin-top:18px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 860px){
+  .feltTable{ height: 74vh; transform: rotateX(8deg); }
   .seat-left{ left: 12px; }
   .seat-right{ right: 12px; }
-  .feltInset{ inset: 74px 60px 110px 60px; }
-}
-
-@media (max-width: 600px){
-  .tableActions{ left: 12px; top: 12px; }
-  .seatLabel .seatName{ font-size: 16px; }
+  .trickCenter{ top: 44%; height: 235px; }
+  .statusBar{ padding:10px 12px; }
 }
