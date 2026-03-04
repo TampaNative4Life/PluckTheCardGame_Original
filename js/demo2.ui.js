@@ -1,107 +1,65 @@
 // js/demo2.ui.js
-// Demo2 UI layer (DOM only). Calls Engine only via actions.
+// Demo2 UI (DOM only). Talks to engine via actions.
 
-(function () {
+import { createEngine } from "./engine.js";
+
+(function(){
   "use strict";
 
-  if (!window.Engine) {
-    console.error("Engine not loaded. Ensure js/engine.js loads BEFORE js/demo2.ui.js");
-    return;
-  }
+  const engine = createEngine();
 
   const $ = (id) => document.getElementById(id);
 
-  // DOM
-  const youHandEl = $("youHand");
-  const trumpLabelEl = $("trumpLabel");
-  const booksSummaryEl = $("booksSummary");
-  const resetBtn = $("resetBtn");
-
-  const trickSlotsEl = $("trickSlots"); // optional in your HTML
-  const suitParam = new URLSearchParams(location.search).get("trump");
-
-  // Build UI card
-  function suitSymbol(s){ return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣"; }
-  function isRed(s){ return s==="H" || s==="D"; }
+  function suitSymbol(s){
+    return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣";
+  }
+  const isRed = (s) => (s==="H" || s==="D");
 
   function makeMiniFace(card){
     const el = document.createElement("div");
     el.className = "cardFaceMini";
 
-    if (card === "BJ" || card === "LJ"){
-      el.textContent = card;
-      return el;
-    }
-
     const suit = card.slice(-1);
     const rank = card.slice(0,-1);
+
     el.classList.add(isRed(suit) ? "red" : "black");
     el.textContent = rank + suitSymbol(suit);
     return el;
   }
 
-  // App state (single source of truth)
-  let state = Engine.newGame();
+  function render(){
+    const st = engine.getState();
 
-  function renderHud(){
-    if (trumpLabelEl){
-      if (state.trumpSuit) trumpLabelEl.textContent = `${state.trumpSuit} (${Engine.suitName(state.trumpSuit)})`;
-      else trumpLabelEl.textContent = "(not set)";
-      trumpLabelEl.classList.toggle("muted", !state.trumpSuit);
+    // HUD
+    const trumpEl = $("trumpLabel");
+    if (trumpEl){
+      trumpEl.textContent = st.trump ? `${st.trump} ${suitSymbol(st.trump)}` : "(not set)";
+      trumpEl.classList.toggle("muted", !st.trump);
     }
-    if (booksSummaryEl){
-      booksSummaryEl.textContent = `YOU ${state.books.YOU} • AI2 ${state.books.AI2} • AI3 ${state.books.AI3}`;
+
+    const booksEl = $("booksSummary");
+    if (booksEl){
+      booksEl.textContent = `YOU ${st.books.YOU} • AI2 ${st.books.AI2} • AI3 ${st.books.AI3}`;
+    }
+
+    // Hand (17 cards visible)
+    const handEl = $("youHand");
+    if (handEl){
+      handEl.innerHTML = "";
+      handEl.classList.toggle("tight", st.youHand.length >= 14);
+      for (const c of st.youHand) handEl.appendChild(makeMiniFace(c));
     }
   }
 
-  function renderHand(){
-    if (!youHandEl) return;
+  // Reset
+  const resetBtn = $("resetBtn");
+  resetBtn?.addEventListener("click", () => {
+    engine.dispatch({ type:"RESET" });
+    // trick area reset (optional)
+    const slots = $("trickSlots");
+    if (slots) slots.innerHTML = '<div class="slotHint">(empty)</div>';
+    render();
+  });
 
-    const hand = Engine.sortHand(state.players[2].hand, state.trumpSuit);
-    youHandEl.innerHTML = "";
-    youHandEl.classList.toggle("tight", hand.length >= 14);
-
-    hand.forEach((cardStr) => {
-      // Convert display order back to real hand index for PLAY_CARD
-      const realIdx = state.players[2].hand.indexOf(cardStr);
-
-      const el = makeMiniFace(cardStr);
-      el.addEventListener("click", () => {
-        state = Engine.dispatch(state, { type:"PLAY_CARD", pi:2, handIndex: realIdx });
-        renderAll();
-      });
-
-      youHandEl.appendChild(el);
-    });
-  }
-
-  function renderTrickArea(){
-    if (!trickSlotsEl) return;
-    // demo2 engine auto-completes tricks, so keep it simple
-    trickSlotsEl.innerHTML = '<div class="slotHint">(auto-resolves in demo2)</div>';
-  }
-
-  function renderAll(){
-    renderHud();
-    renderHand();
-    renderTrickArea();
-  }
-
-  function resetHand(){
-    state = Engine.dispatch(state, { type:"RESET_HAND" });
-    renderAll();
-  }
-
-  // Boot
-  const initialTrump = (suitParam || "").toUpperCase();
-  if (["S","H","D","C"].includes(initialTrump)){
-    state = Engine.dispatch(state, { type:"SET_TRUMP", suit: initialTrump });
-  }
-
-  // Start a hand immediately (demo2 visual)
-  state = Engine.startHand(state, { trumpSuit: state.trumpSuit, includeJokers:false });
-  renderAll();
-
-  resetBtn?.addEventListener("click", resetHand);
-
+  render();
 })();
