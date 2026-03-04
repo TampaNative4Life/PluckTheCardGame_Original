@@ -1,4 +1,4 @@
-// Pluck Web Demo v21 RESTORE (full replacement)
+// Pluck Web Demo v21 RESTORE (FULL REPLACEMENT)
 // Stable engine (no freezes), card faces, sorting (jokers first, trump suit first, then black/red order).
 
 (function () {
@@ -74,8 +74,7 @@
   const TOTAL_TRICKS = 17;
   const SUITS = ["S", "H", "D", "C"];
 
-  // black/red alternation order baseline
-  // (Spades black, Hearts red, Clubs black, Diamonds red)
+  // black/red alternation order baseline: Spades(black), Hearts(red), Clubs(black), Diamonds(red)
   const BRBR = ["S", "H", "C", "D"];
 
   // 51 card deck: 3-A of each suit (48) + 2C + BJ + LJ
@@ -105,6 +104,7 @@
     deck.push(CARD_LITTLE_JOKER);
     return deck;
   }
+
   function shuffle(a) {
     for (let i=a.length-1;i>0;i--) {
       const j = Math.floor(Math.random()*(i+1));
@@ -246,9 +246,7 @@
 
   // ---------- sorting (your requirement) ----------
   function suitOrderForHand(){
-    // If trump is chosen: trump suit first, then BRBR remainder
     if (trumpSuit) return [trumpSuit, ...BRBR.filter(s => s !== trumpSuit)];
-    // If trump not chosen yet: just BRBR
     return BRBR.slice();
   }
 
@@ -325,7 +323,7 @@
     if (phase === "PLAY" && turnIndex === 2) legal = legalCardsFor(2);
 
     for (const card of displayHand) {
-      const realIdx = players[2].hand.indexOf(card); // safe enough for this demo
+      const realIdx = players[2].hand.indexOf(card); // ok for demo (unique strings most of the time)
       const playable = (phase === "PLAY" && turnIndex === 2);
       const disabled = !playable || !legal.includes(realIdx);
 
@@ -377,14 +375,11 @@
 
   // ---------- initial pick ----------
   function pickOneCard(){
-  function pickOneCard(){
-  const d = shuffle(makeDeck51());
-  let c = d.pop();
-  while (c === CARD_BIG_JOKER || c === CARD_LITTLE_JOKER) {
-    c = d.pop();
+    const d = shuffle(makeDeck51());
+    let c = d.pop();
+    while (c === CARD_BIG_JOKER || c === CARD_LITTLE_JOKER) c = d.pop();
+    return c;
   }
-  return c;
-}
 
   function pickRankValue(cardStr){
     if (cardStr === CARD_BIG_JOKER) return 100;
@@ -407,11 +402,7 @@
   }
 
   function doPick(){
-    const picks = {
-      ai2: pickOneCard(),
-      ai3: pickOneCard(),
-      you: pickOneCard()
-    };
+    const picks = { ai2: pickOneCard(), ai3: pickOneCard(), you: pickOneCard() };
 
     if (pickAI2El) { pickAI2El.innerHTML = ""; pickAI2El.appendChild(makeCardFace(picks.ai2, true)); }
     if (pickAI3El) { pickAI3El.innerHTML = ""; pickAI3El.appendChild(makeCardFace(picks.ai3, true)); }
@@ -527,21 +518,25 @@
     cards.sort((a,b)=> (RANK_VALUE[a.slice(0,-1)]||99) - (RANK_VALUE[b.slice(0,-1)]||99));
     return cards[0];
   }
+
   function highestOfSuitNonJoker(pi, suit){
     const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
     if (!cards.length) return null;
     cards.sort((a,b)=> (RANK_VALUE[b.slice(0,-1)]||0) - (RANK_VALUE[a.slice(0,-1)]||0));
     return cards[0];
   }
+
   function removeFromHand(pi, cardStr){
     const idx = players[pi].hand.indexOf(cardStr);
     if (idx >= 0) players[pi].hand.splice(idx, 1);
   }
+
   function usedSuitSet(pluckerI, pluckeeI){
     const k = pairKey(pluckerI, pluckeeI);
     if (!pluckSuitUsedByPair.has(k)) pluckSuitUsedByPair.set(k, new Set());
     return pluckSuitUsedByPair.get(k);
   }
+
   function availablePluckSuits(pluckerI, pluckeeI){
     const used = usedSuitSet(pluckerI, pluckeeI);
     const suits = [];
@@ -552,6 +547,7 @@
     }
     return suits;
   }
+
   function attemptPluck(pluckerI, pluckeeI, suit){
     const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
     if (!giveLow) return { ok:false, reason:`Plucker has no ${suit}.` };
@@ -666,8 +662,6 @@
   }
 
   // ---------- trump pick ----------
-  function trumpCallerIndex(){ return dealerIndex; }
-
   function chooseTrumpFromOwnHand(pi){
     const suitScore = { S:0, H:0, D:0, C:0 };
     for (const c of players[pi].hand){
@@ -817,7 +811,6 @@
     const need = players[pi].quota - players[pi].tricks;
 
     if (trick.length === 0){
-      // lead high if need, else low
       let best = legal[0], bestScore = -999999;
       for (const idx of legal){
         const c = hand[idx];
@@ -833,10 +826,9 @@
     for (const idx of legal){
       const c = hand[idx];
       const temp = trick.concat([{ playerIndex: pi, cardStr: c }]);
-
       const anyTrump = temp.some(t=>isTrumpCard(t.cardStr,trumpSuit));
-      let wouldWin = false;
 
+      let wouldWin = false;
       if (anyTrump){
         let bestPi = temp[0].playerIndex, bestP=-1;
         for (const t of temp){
@@ -1059,19 +1051,5 @@
   setPhase("PICK_DEALER");
   msg("Pick dealer to begin.");
   render();
-
-    function setFirstPick(nameOrBlank){
-  const bar = document.getElementById("firstPickBar");
-  const val = document.getElementById("firstPickVal");
-  if (!bar || !val) return;
-
-  if (!nameOrBlank){
-    bar.classList.add("hidden");      // not visible until needed
-    val.textContent = "—";
-    return;
-  }
-  bar.classList.remove("hidden");
-  val.textContent = nameOrBlank;
-    }
 
 })();
