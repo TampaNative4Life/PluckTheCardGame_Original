@@ -9,14 +9,12 @@
 }
 
 *{box-sizing:border-box}
-
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(1200px 800px at 30% 20%, rgba(70,90,140,.18), transparent 60%),
-    radial-gradient(900px 600px at 80% 65%, rgba(212,178,84,.08), transparent 60%),
-    var(--bg);
+  background: radial-gradient(1200px 800px at 30% 20%, rgba(70,90,140,.18), transparent 60%),
+              radial-gradient(900px 600px at 80% 65%, rgba(212,178,84,.08), transparent 60%),
+              var(--bg);
   color:var(--text);
 }
 
@@ -57,104 +55,10 @@ body{
 .navlinks a:hover{color:var(--text)}
 .navlinks .activeLink{
   color: var(--brand);
+  border: 1px solid rgba(212,178,84,.35);
   background: rgba(212,178,84,.10);
-  border: 1px solid rgba(212,178,84,.22);
 }
 
-.container{
-  max-width:1200px;
-  margin:0 auto;
-  padding:16px;
-}
-
-/* ===== Shared UI bits (needed by game.js) ===== */
-.btn{
-  border:1px solid var(--line);
-  background:#1b2336;
-  color:var(--text);
-  padding:10px 12px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:700;
-  min-height:44px;
-}
-.btn:hover{filter:brightness(1.08)}
-.msg{ color:#d2dbef; margin-top:10px; min-height:22px; }
-
-/* ===== Card faces (from Demo1) ===== */
-.hand{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
-.cardFace{
-  width:74px;
-  height:104px;
-  background:#f7f7fb;
-  color:#111;
-  border-radius:10px;
-  border:1px solid rgba(0,0,0,.18);
-  position:relative;
-  box-shadow: 0 10px 16px rgba(0,0,0,.25);
-  cursor:pointer;
-  user-select:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: transform .08s ease;
-  touch-action: manipulation;
-}
-.cardFace:hover{ transform: translateY(-2px); }
-.cardFace:active{ transform: translateY(0px); }
-
-.cardFace.disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  transform:none;
-}
-
-.corner{
-  position:absolute;
-  line-height:1.05;
-  font-weight:900;
-  font-size:14px;
-}
-.corner.tl{top:6px; left:7px;}
-.corner.br{bottom:6px; right:7px; transform:rotate(180deg);}
-
-.suitBig{
-  font-size:34px;
-  font-weight:900;
-  margin-top:6px;
-}
-
-.red{ color:#c0152a; }
-.black{ color:#111; }
-
-.joker{
-  background: linear-gradient(135deg, #f7f7fb, #efe9ff);
-  border:1px solid rgba(90,50,160,.35);
-}
-.joker .suitBig{ font-size:22px; }
-.jokerTag{
-  position:absolute;
-  bottom:8px;
-  left:8px;
-  right:8px;
-  text-align:center;
-  font-size:11px;
-  font-weight:900;
-  color:#3b2a7a;
-  opacity:.95;
-}
-
-.trickCard{
-  outline: 2px solid rgba(212,178,84,.45);
-  box-shadow: 0 16px 22px rgba(0,0,0,.35);
-}
-
-/* ===== Footer ===== */
 .footer{
   padding:18px;
   text-align:center;
@@ -163,27 +67,24 @@ body{
   margin-top:18px;
 }
 
-/* =========================
-   DEMO 2: Spades-style Table
-   ========================= */
-
-/* Always center table regardless of rotation/orientation */
-.tableStage{
-  margin-top: 18px;
-  min-height: calc(100svh - 160px);
-  display: grid;
-  place-items: center;
+/* ==========================================================
+   Demo2: FULLSCREEN CENTERED TABLE (works in any rotation)
+   ========================================================== */
+.demo2Stage{
+  min-height: calc(100svh - 72px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
 }
 
-/* 3D felt table */
+/* The table always stays centered */
 .feltTable{
   width: min(1100px, 96vw);
-  height: min(650px, 76svh);
+  height: min(680px, 78vh);
   position: relative;
 
-  transform-style: preserve-3d;
-  perspective: 1200px;
-
+  /* felt look */
   background: radial-gradient(120% 140% at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
   border-radius: 28px;
   box-shadow:
@@ -191,48 +92,49 @@ body{
     inset 0 0 0 2px rgba(255,255,255,.06),
     inset 0 0 40px rgba(0,0,0,.35);
 
-  transform: rotateX(10deg);
-  overflow: hidden;
+  /* 3D angle */
+  transform: perspective(1200px) rotateX(10deg);
+  transform-origin:center;
+  overflow:hidden;
 }
+
 .feltTable::after{
   content:"";
   position:absolute;
   inset: 14px;
   border-radius: 22px;
   border: 2px solid rgba(255,255,255,.10);
-  pointer-events: none;
+  pointer-events:none;
 }
 
+/* Seats */
 .seat{
   position:absolute;
   z-index: 3;
   display:flex;
-  align-items:center;
-  gap:12px;
+  flex-direction:column;
+  gap: 10px;
   color: #eaf2ff;
   text-shadow: 0 1px 2px rgba(0,0,0,.45);
 }
-
 .seat-left{
   left: 18px;
   top: 50%;
   transform: translateY(-50%) translateZ(30px);
 }
-
 .seat-right{
   right: 18px;
   top: 50%;
   transform: translateY(-50%) translateZ(30px);
 }
-
 .seat-bottom{
   left: 50%;
   bottom: 14px;
   transform: translateX(-50%) translateZ(60px);
-  width: min(1040px, 94%);
+  width: min(980px, 92%);
 }
 
-/* Avatar blocks */
+/* Avatar card */
 .avatarWrap{
   display:flex;
   align-items:center;
@@ -245,8 +147,8 @@ body{
   backdrop-filter: blur(6px);
 }
 .avatar{
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
   background:
     radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 55%),
@@ -256,26 +158,30 @@ body{
     0 10px 18px rgba(0,0,0,.35);
   position: relative;
 }
-.avatar::after{
+/* Head + shoulders + arms silhouette */
+.avatar.headArms::after{
   content:"";
   position:absolute;
-  left: 50%;
-  top: 58%;
+  left:50%;
+  top:58%;
   transform: translate(-50%,-50%);
   width: 26px;
   height: 26px;
   border-radius: 999px;
   background: rgba(255,255,255,.10);
-  box-shadow: 0 22px 0 10px rgba(255,255,255,.08);
+  box-shadow:
+    0 22px 0 12px rgba(255,255,255,.08),  /* shoulders */
+    -28px 24px 0 6px rgba(255,255,255,.06), /* left arm hint */
+    28px 24px 0 6px rgba(255,255,255,.06);  /* right arm hint */
 }
 .avatar-you{
   box-shadow:
-    inset 0 0 0 2px rgba(215,176,74,.35),
+    inset 0 0 0 2px rgba(212,178,84,.45),
     0 10px 18px rgba(0,0,0,.35);
 }
 
 .seatLabel .seatName{
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: .6px;
 }
 .seatLabel .seatSub{
@@ -284,11 +190,20 @@ body{
   margin-top: 2px;
 }
 
-/* AI hidden row (optional text output from engine) */
-.aiHiddenRow{
-  margin-top: 10px;
-  font-size: 12px;
-  opacity: .75;
+/* AI hidden backs */
+.aiBacks{
+  display:flex;
+  gap:6px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+  min-height: 56px;
+  align-items:center;
+}
+.aiBacks::before{
+  content:"🂠 🂠 🂠 🂠 🂠";
+  opacity:.85;
 }
 
 /* Center trick zone */
@@ -297,8 +212,8 @@ body{
   left: 50%;
   top: 45%;
   transform: translate(-50%,-50%) translateZ(20px);
-  width: min(560px, 72%);
-  height: 250px;
+  width: min(520px, 70%);
+  height: 240px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -318,7 +233,7 @@ body{
   padding: 14px;
 }
 .trickTitle{
-  font-weight: 800;
+  font-weight: 900;
   opacity: .92;
 }
 .trickSlots{
@@ -328,7 +243,6 @@ body{
   justify-content:center;
   gap: 12px;
   min-height: 120px;
-  flex-wrap: wrap;
 }
 .slotHint{
   opacity: .7;
@@ -336,63 +250,115 @@ body{
   text-align:center;
 }
 
-/* YOU panel + hand dock */
-.youPanel{
-  width: 100%;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 22px;
-  padding: 12px;
-  box-shadow: 0 14px 34px rgba(0,0,0,.32);
-  backdrop-filter: blur(6px);
-}
-.youTop{
+/* Bottom bar */
+.youBar{
   display:flex;
   align-items:center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+  justify-content:space-between;
+  gap: 12px;
+  width:100%;
 }
-.demo2Controls{
+.demo2Reset{
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.22);
+  color: var(--text);
+  padding: 12px 14px;
+  border-radius: 14px;
+  cursor:pointer;
+  font-weight:900;
+  min-height:44px;
+}
+.demo2Reset:hover{ filter: brightness(1.08); }
+
+.demo2Msg{
+  margin-top: 10px;
+  color: rgba(255,255,255,.88);
+  font-weight: 700;
+  min-height: 24px;
+}
+
+/* ==========================================================
+   Card faces (reused from Demo1 engine)
+   Demo2: shrink + overlap so 17 fit
+   ========================================================== */
+.demo2Hand{
+  margin-top: 10px;
   display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  overflow-x:auto;
+  padding: 12px 10px 4px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
 }
 
-.handDock{
-  justify-content: center;
-  gap: 6px;
-}
-
-/* Fit 17 cards better in Demo2: slightly smaller */
-.handDock .cardFace{
-  width: 58px;
-  height: 82px;
+/* Smaller cards for demo2 */
+.demo2Page .cardFace{
+  width: 52px;
+  height: 74px;
   border-radius: 10px;
+  box-shadow: 0 10px 16px rgba(0,0,0,.25);
 }
-.handDock .corner{ font-size: 12px; }
-.handDock .suitBig{ font-size: 26px; }
 
-/* Hide required-but-not-used elements */
-.demo2Hidden{
+/* overlap them to fit 17 */
+.demo2Page .demo2Hand .cardFace{
+  margin-left: -30px;
+  transform-origin: bottom center;
+}
+.demo2Page .demo2Hand .cardFace:first-child{
+  margin-left: 0;
+}
+
+/* subtle fan effect */
+.demo2Page .demo2Hand .cardFace:nth-child(1){ transform: rotate(-14deg) translateY(6px); }
+.demo2Page .demo2Hand .cardFace:nth-child(2){ transform: rotate(-10deg) translateY(4px); }
+.demo2Page .demo2Hand .cardFace:nth-child(3){ transform: rotate(-6deg) translateY(2px); }
+.demo2Page .demo2Hand .cardFace:nth-child(4){ transform: rotate(-3deg) translateY(1px); }
+.demo2Page .demo2Hand .cardFace:nth-child(5){ transform: rotate(0deg) translateY(0px); }
+.demo2Page .demo2Hand .cardFace:nth-child(6){ transform: rotate(3deg) translateY(1px); }
+.demo2Page .demo2Hand .cardFace:nth-child(7){ transform: rotate(6deg) translateY(2px); }
+.demo2Page .demo2Hand .cardFace:nth-child(8){ transform: rotate(9deg) translateY(4px); }
+.demo2Page .demo2Hand .cardFace:nth-child(9){ transform: rotate(12deg) translateY(6px); }
+
+/* keep hover from exploding overlap */
+.demo2Page .cardFace:hover{ transform: translateY(-6px) !important; }
+
+/* Trick highlight */
+.trickCard{
+  outline: 2px solid rgba(212,178,84,.55);
+  box-shadow: 0 16px 22px rgba(0,0,0,.35);
+}
+
+/* Buttons (for hidden panel compat) */
+.btn{
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.22);
+  color: var(--text);
+  padding:10px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:900;
+  min-height:44px;
+}
+
+/* Hide the “engine UI” but keep it in DOM */
+.engineHidden{
   position:absolute !important;
+  left:-99999px !important;
+  top:auto !important;
   width:1px !important;
   height:1px !important;
   overflow:hidden !important;
-  clip: rect(0 0 0 0) !important;
-  white-space: nowrap !important;
-  clip-path: inset(50%) !important;
 }
 
-/* Mobile/tablet tweaks */
+/* Mobile tweaks */
 @media (max-width: 860px){
   .feltTable{
-    height: min(700px, 80svh);
-    transform: rotateX(8deg);
+    height: min(720px, 80vh);
+    transform: perspective(900px) rotateX(8deg);
   }
-  .seat-left{ left: 10px; }
-  .seat-right{ right: 10px; }
-  .trickCenter{ top: 44%; height: 230px; }
-  .handDock .cardFace{ width: 54px; height: 78px; }
+  .seat-left{ left: 12px; }
+  .seat-right{ right: 12px; }
+  .trickCenter{ top: 44%; }
 }
