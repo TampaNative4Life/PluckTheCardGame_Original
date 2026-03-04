@@ -1,8 +1,3 @@
-/* =========================================================
-   Pluck - style.css (FULL REPLACEMENT)
-   Clean, mobile-first, Demo2-ready
-   ========================================================= */
-
 :root{
   --bg:#0d0f12;
   --panel:#141a26;
@@ -12,262 +7,162 @@
   --line:#26324a;
   --brand:#d4b254;
   --good:#38b56a;
-
-  --felt1:#1f6b3b;
-  --felt2:#0f4d2a;
-  --felt3:#0a3a20;
 }
 
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
-
+*{box-sizing:border-box}
+html,body{height:100%}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(1200px 800px at 30% 20%, rgba(70,90,140,.18), transparent 60%),
-    radial-gradient(900px 600px at 80% 65%, rgba(212,178,84,.08), transparent 60%),
-    var(--bg);
+  background: radial-gradient(1200px 800px at 30% 20%, rgba(70,90,140,.18), transparent 60%),
+              radial-gradient(900px 600px at 80% 65%, rgba(212,178,84,.08), transparent 60%),
+              var(--bg);
   color:var(--text);
 }
-
-img{ max-width:100%; display:block; }
 
 /* ===== Nav ===== */
 .nav{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
   padding:12px 18px;
   border-bottom:1px solid var(--line);
   background:#0b0d10;
-  position:sticky;
-  top:0;
-  z-index:50;
 }
-
 .brand{
   display:flex;
   gap:10px;
   align-items:center;
   color:var(--text);
   text-decoration:none;
-  font-weight:900;
+  font-weight:800;
   letter-spacing:1px;
 }
-
 .brand img{
   height:40px;
   width:auto;
-  border-radius:10px;
+  border-radius:8px;
 }
-
 .navlinks{
   display:flex;
   flex-wrap:wrap;
   gap:12px;
-  align-items:center;
 }
-
 .navlinks a{
   color:var(--muted);
   text-decoration:none;
-  font-weight:700;
-  padding:8px 10px;
+  padding:10px 10px;
   border-radius:12px;
 }
+.navlinks a:hover{color:var(--text)}
+.navlinks .activeLink{
+  color: var(--brand);
+  background: rgba(212,178,84,.10);
+  border: 1px solid rgba(212,178,84,.22);
+}
 
-.navlinks a:hover{ color:var(--text); background: rgba(255,255,255,.04); }
-.navlinks .activeLink{ color: var(--brand); background: rgba(212,178,84,.10); border: 1px solid rgba(212,178,84,.25); }
-
-/* ===== Containers ===== */
+/* ===== Page Container ===== */
 .container{
   max-width:1200px;
   margin:0 auto;
   padding:16px;
 }
 
-/* ===== Reusable Card / Panel ===== */
-.card{
-  background: rgba(20,26,38,.92);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.25);
-  backdrop-filter: blur(6px);
+/* =========================
+   DEMO 2 - Header Row (Trump + Books)
+   ========================= */
+.topHud{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin: 10px 0 14px;
 }
 
-/* ===== Buttons ===== */
+.statusBar{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(20,26,38,.88);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(8px);
+}
+
+.statusItem{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  white-space:nowrap;
+}
+.statusLabel{
+  font-weight:900;
+  letter-spacing:.7px;
+  color:#cfd7ea;
+  font-size:12px;
+  text-transform:uppercase;
+}
+.statusValue{
+  font-weight:900;
+  color: var(--text);
+  font-size:14px;
+}
+.statusValue.muted{ color: var(--muted); font-weight:800; }
+
+.statusDivider{
+  height:18px;
+  width:1px;
+  background: rgba(255,255,255,.12);
+}
+
+/* Optional subline if you want later */
+.hudSubRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(15,20,34,.60);
+  color: var(--muted);
+}
+
 .btn{
   border:1px solid var(--line);
   background:#1b2336;
   color:var(--text);
   padding:10px 14px;
-  border-radius:14px;
+  border-radius:12px;
   cursor:pointer;
-  font-weight:800;
+  font-weight:900;
   min-height:44px;
-  line-height:1;
 }
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform: translateY(1px)}
 
-.btn:hover{ filter:brightness(1.08); }
-.btn:active{ transform: translateY(1px); }
-
-.btn-secondary{
-  background:#141b2a;
-  color: var(--muted);
-}
-
-/* =========================================================
-   DEMO 2 LAYOUT
-   ========================================================= */
-
+/* =========================
+   Table Stage
+   ========================= */
 .tableStage{
-  margin-top:14px;
-  min-height: calc(100vh - 180px);
+  margin-top: 10px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:14px;
-}
-
-/* ---------- Status / Trump / Books strip ---------- */
-/* You can wrap your trump+books+reset in a single block and these styles will apply. */
-.statusBar,
-.demo2Status,
-.topStatus,
-.topBar{
-  width:min(1100px, 96vw);
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:space-between;
   gap:12px;
 }
 
-.statusLeft,
-.statusItems,
-.metaLeft{
+.tableTopBar{
+  width: min(1100px, 96vw);
   display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:12px;
-}
-
-/* Trump + Books sit together (side-by-side) */
-.statusItem,
-.trumpInline,
-.booksInline{
-  display:flex;
-  align-items:baseline;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: rgba(15,20,34,.75);
-  backdrop-filter: blur(6px);
-}
-
-.statusKey{
-  font-weight:900;
-  letter-spacing:.8px;
-  color: rgba(233,238,246,.9);
-  text-transform:uppercase;
-  font-size:12px;
-}
-
-.statusVal{
-  font-weight:900;
-  color: var(--brand);
-  font-size:13px;
-}
-
-.statusVal.muted{ color: var(--muted); font-weight:800; }
-
-/* Reset button top-right of status row */
-.statusActions,
-.metaRight{
-  display:flex;
-  gap:10px;
+  justify-content:flex-end;
   align-items:center;
 }
 
-/* ---------- Optional Books list panel ---------- */
-.booksPanel,
-.trumpBooksPanel,
-.sidePanel,
-.metaPanel{
-  width:min(1100px, 96vw);
-  border:1px solid var(--line);
-  background: rgba(20,26,38,.82);
-  border-radius:18px;
-  padding:14px;
-  box-shadow: 0 16px 40px rgba(0,0,0,.28);
-  backdrop-filter: blur(6px);
-}
-
-/* If you have a “BOOKS” header row, keep it tight and clean */
-.panelTitle,
-.sectionTitle{
-  font-weight:900;
-  letter-spacing:.8px;
-  color: rgba(233,238,246,.92);
-  text-transform:uppercase;
-  margin: 0 0 10px 0;
-}
-
-/* Books rows: pull the number IN from the far right */
-.booksRow,
-.bookRow,
-.booksLine,
-.row.books,
-.metaRow.books{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;   /* key change: NOT space-between */
-  gap:12px;
-  padding:10px 12px;
-  border-radius:14px;
-  background: rgba(15,20,34,.55);
-  border:1px solid rgba(255,255,255,.06);
-  margin-top:10px;
-}
-
-/* Name left */
-.booksName,
-.bookName,
-.rowLabel{
-  font-weight:900;
-  color:#cfd8ee;
-  min-width:72px;
-}
-
-/* Value sits close to name, NOT at far right */
-.booksVal,
-.bookVal,
-.rowValue,
-.value{
-  font-weight:900;
-  color: var(--text);
-  padding:6px 10px;
-  border-radius:12px;
-  background: rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.08);
-}
-
-/* If your old CSS had the value forced to far-right, override it */
-.booksRow .booksVal,
-.bookRow .bookVal,
-.booksLine .value,
-.row.books .value{
-  margin-left: 0 !important;
-}
-
-/* =========================================================
-   FELT TABLE
-   ========================================================= */
-
+/* The felt table */
 .feltTable{
   width: min(1100px, 96vw);
   height: min(620px, 70vh);
@@ -276,7 +171,7 @@ img{ max-width:100%; display:block; }
   transform-style: preserve-3d;
   perspective: 1200px;
 
-  background: radial-gradient(120% 140% at 50% 35%, var(--felt1) 0%, var(--felt2) 55%, var(--felt3) 100%);
+  background: radial-gradient(120% 140% at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
   border-radius: 28px;
   box-shadow:
     0 22px 60px rgba(0,0,0,.55),
@@ -287,7 +182,8 @@ img{ max-width:100%; display:block; }
   overflow: hidden;
 }
 
-.feltInset{
+.feltTable::after{
+  content:"";
   position:absolute;
   inset: 14px;
   border-radius: 22px;
@@ -295,13 +191,15 @@ img{ max-width:100%; display:block; }
   pointer-events: none;
 }
 
-/* Seats */
+/* =========================
+   Seats
+   ========================= */
 .seat{
   position:absolute;
   z-index: 3;
   display:flex;
-  flex-direction:column;
-  gap:10px;
+  align-items:center;
+  gap:12px;
   color: #eaf2ff;
   text-shadow: 0 1px 2px rgba(0,0,0,.45);
 }
@@ -318,102 +216,105 @@ img{ max-width:100%; display:block; }
   transform: translateY(-50%) translateZ(30px);
 }
 
-/* YOU is at the table, centered */
+/* YOU at the table (centered bottom, but ON the felt) */
 .seat-bottom{
   left: 50%;
-  bottom: 18px;
+  bottom: 22px;
   transform: translateX(-50%) translateZ(60px);
   width: min(980px, 92%);
-  align-items:center;
+  justify-content:center;
 }
 
-/* Avatar wrap */
+/* Avatar card */
 .avatarWrap{
   display:flex;
   align-items:center;
   gap:12px;
-  background: rgba(0,0,0,.16);
-  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.12);
   border-radius: 18px;
   padding: 10px 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.20);
-  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(8px);
 }
 
-/* Visible silhouette (NOT “blacked out”) */
+/* Visible silhouette (not blacked out) */
 .avatar{
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   border-radius: 999px;
   background:
-    radial-gradient(80% 80% at 35% 28%, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 55%),
-    radial-gradient(70% 80% at 50% 55%, rgba(15,20,34,.40) 0%, rgba(15,20,34,.78) 72%),
-    linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.12));
+    radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(70% 80% at 50% 45%, rgba(30,35,45,.55) 0%, rgba(18,22,30,.92) 70%);
   box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.12),
-    0 10px 18px rgba(0,0,0,.25);
+    inset 0 0 0 2px rgba(255,255,255,.14),
+    0 10px 18px rgba(0,0,0,.35);
   position: relative;
 }
 
+/* Head + shoulders + arms feel */
 .avatar::after{
   content:"";
   position:absolute;
   left: 50%;
-  top: 56%;
+  top: 54%;
   transform: translate(-50%,-50%);
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background: rgba(255,255,255,.14);
-  box-shadow: 0 24px 0 10px rgba(255,255,255,.10);
-  filter: blur(.1px);
+  background: rgba(255,255,255,.16);
+  box-shadow:
+    0 22px 0 10px rgba(255,255,255,.12),
+    -18px 26px 0 2px rgba(255,255,255,.08),
+     18px 26px 0 2px rgba(255,255,255,.08);
+  filter: blur(.15px);
 }
 
 .avatar-you{
   box-shadow:
-    inset 0 0 0 2px rgba(212,178,84,.40),
-    0 10px 18px rgba(0,0,0,.25);
+    inset 0 0 0 2px rgba(215,176,74,.35),
+    0 10px 18px rgba(0,0,0,.35);
 }
 
 .seatLabel .seatName{
   font-weight: 900;
   letter-spacing: .6px;
 }
-
 .seatLabel .seatSub{
   opacity: .85;
   font-size: 12px;
   margin-top: 2px;
-  color: rgba(233,238,246,.82);
 }
 
-/* AI hidden hand backs row */
+/* AI hidden hand backs (small row under seat) */
 .aiBackRow{
+  margin-top: 10px;
   display:flex;
   gap:6px;
   padding: 10px 12px;
-  border-radius: 16px;
-  background: rgba(0,0,0,.12);
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,.10);
-  width: fit-content;
+  background: rgba(0,0,0,.14);
+  backdrop-filter: blur(8px);
 }
-
 .cardBack{
   width: 22px;
   height: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(0,0,0,.18));
+  background: linear-gradient(135deg, rgba(255,255,255,.15), rgba(0,0,0,.25));
   border: 1px solid rgba(255,255,255,.18);
 }
 
-/* Center trick zone */
+/* =========================
+   Center Trick Zone
+   ========================= */
 .trickCenter{
   position:absolute;
   left: 50%;
   top: 45%;
   transform: translate(-50%,-50%) translateZ(20px);
-  width: min(560px, 72%);
-  height: 250px;
+  width: min(520px, 70%);
+  height: 240px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -425,61 +326,57 @@ img{ max-width:100%; display:block; }
   border-radius: 22px;
   border: 2px dashed rgba(255,255,255,.25);
   background: rgba(0,0,0,.10);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.30);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.35);
   display:flex;
   flex-direction: column;
   align-items:center;
   justify-content:center;
   gap: 10px;
   padding: 14px;
-  text-align:center;
 }
 
 .trickTitle{
   font-weight: 900;
-  opacity: .95;
+  opacity: .92;
 }
-
 .trickSlots{
   width: 100%;
   display:flex;
   align-items:center;
   justify-content:center;
   gap: 14px;
-  min-height: 90px;
-  flex-wrap: wrap;
+  min-height: 120px;
 }
-
 .slotHint{
   opacity: .75;
   font-size: 13px;
 }
 
-/* YOU dock */
+/* =========================
+   YOU hand - straight line, all 17 visible
+   ========================= */
 .youDock{
   width: 100%;
   display:flex;
   flex-direction:column;
-  gap:10px;
   align-items:center;
+  gap: 10px;
 }
 
 .youRow{
-  width:100%;
+  width: 100%;
   display:flex;
   justify-content:center;
 }
 
-/* Your visible hand (17 cards) - keep them all visible, straight line */
 .yourHandRow{
   width: 100%;
   display:flex;
   justify-content:center;
-  align-items:flex-end;
   gap: 6px;
   padding: 10px 12px;
   border-radius: 18px;
-  background: rgba(0,0,0,.12);
+  background: rgba(0,0,0,.16);
   border: 1px solid rgba(255,255,255,.10);
   overflow-x: auto;
   overflow-y: hidden;
@@ -487,46 +384,36 @@ img{ max-width:100%; display:block; }
   scrollbar-width: thin;
 }
 
-.yourHandRow::-webkit-scrollbar{ height: 8px; }
-.yourHandRow::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.14); border-radius: 999px; }
-
-/* Straight mini faces */
+/* Card mini */
 .cardFaceMini{
   flex: 0 0 auto;
-  width: 48px;
-  height: 66px;
-  border-radius: 12px;
+  width: 44px;
+  height: 62px;
+  border-radius: 10px;
   background: rgba(255,255,255,.94);
   color: #0b1220;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight: 950;
-  box-shadow: 0 10px 18px rgba(0,0,0,.30);
-  border: 1px solid rgba(0,0,0,.14);
+  font-weight: 900;
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  border: 1px solid rgba(0,0,0,.15);
   user-select:none;
 }
+.cardFaceMini.red{ color:#b3122d; }
+.cardFaceMini.black{ color:#111827; }
 
-.cardFaceMini.red{ color: #b3122d; }
-.cardFaceMini.black{ color: #111827; }
-
-/* Tighten when lots of cards (keeps all visible) */
+/* When 17 cards, tighten a hair more */
 .yourHandRow.tight .cardFaceMini{
-  width: 44px;
-  height: 62px;
-  border-radius: 11px;
+  width: 40px;
+  height: 58px;
+  border-radius: 9px;
+  font-size: 13px;
 }
 
-/* Actions (if you still have a button inside table) */
-.tableActions{
-  position:absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
-  transform: translateZ(80px);
-}
-
-/* Footer */
+/* =========================
+   Footer
+   ========================= */
 .footer{
   padding:18px;
   text-align:center;
@@ -535,18 +422,15 @@ img{ max-width:100%; display:block; }
   margin-top:18px;
 }
 
-/* Mobile / tablet tweaks */
+/* =========================
+   Responsive tweaks
+   ========================= */
 @media (max-width: 860px){
-  .feltTable{ height: 72vh; transform: perspective(900px) rotateX(8deg); }
+  .feltTable{
+    height: 72vh;
+    transform: perspective(900px) rotateX(10deg);
+  }
   .seat-left{ left: 12px; }
   .seat-right{ right: 12px; }
-  .trickCenter{ top: 46%; height: 230px; }
-  .cardFaceMini{ width: 46px; height: 64px; }
-}
-
-@media (max-width: 520px){
-  .statusItem, .trumpInline, .booksInline{ width: 100%; justify-content:space-between; }
-  .statusActions{ width:100%; justify-content:flex-end; }
-  .cardFaceMini{ width: 42px; height: 60px; }
-  .yourHandRow.tight .cardFaceMini{ width: 40px; height: 58px; }
+  .trickCenter{ top: 46%; }
 }
