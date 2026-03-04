@@ -2,144 +2,235 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<body class="demo2Page">
-  <!-- ===== Nav (same style as demo1) ===== -->
+<body class="demo2">
+  <!-- NAV -->
   <header class="nav">
-    <a class="brand" href="index.html">
-      <img src="assets/logo.png" alt="Pluck" onerror="this.style.display='none'">
+    <a class="brand" href="index.html" aria-label="Pluck Home">
+      <img src="assets/QS.png" alt="Pluck" />
       <span>PLUCK</span>
     </a>
-
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
-      <a class="activeLink" href="demo2.html">Demo 2</a>
+      <a href="demo2.html" class="activeLink">Demo 2</a>
       <a href="rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
-  <!-- ===== Demo2 stage ===== -->
-  <main class="demo2Stage">
-    <section class="feltTable" aria-label="3-player table">
-      <!-- LEFT SEAT -->
-      <div class="seat seat-left">
-        <div class="avatarWrap">
-          <div class="avatar headArms"></div>
-          <div class="seatLabel">
-            <div class="seatName">AI2 (Left)</div>
-            <div class="seatSub">Hidden hand</div>
-          </div>
-        </div>
-        <div id="ai2Hand" class="aiBacks" aria-label="AI2 hidden cards"></div>
-      </div>
+  <main class="container">
+    <section class="tableStage">
+      <div class="feltTable" aria-label="3-player table">
 
-      <!-- RIGHT SEAT -->
-      <div class="seat seat-right">
-        <div class="avatarWrap">
-          <div class="avatar headArms"></div>
-          <div class="seatLabel">
-            <div class="seatName">AI3 (Right)</div>
-            <div class="seatSub">Hidden hand</div>
-          </div>
-        </div>
-        <div id="ai3Hand" class="aiBacks" aria-label="AI3 hidden cards"></div>
-      </div>
+        <div class="feltInset"></div>
 
-      <!-- CENTER TRICK -->
-      <div class="trickCenter">
-        <div class="trickInner">
-          <div class="trickTitle">Trick Area</div>
-
-          <!-- game.js renders trick cards into #trick -->
-          <div id="trick" class="trickSlots"></div>
-
-          <div class="slotHint">Center play cards go here</div>
-        </div>
-      </div>
-
-      <!-- BOTTOM (YOU) -->
-      <div class="seat seat-bottom">
-        <div class="youBar">
+        <!-- LEFT AI -->
+        <div class="seat seat-left">
           <div class="avatarWrap">
-            <div class="avatar headArms avatar-you"></div>
+            <div class="avatar" aria-hidden="true"></div>
             <div class="seatLabel">
-              <div class="seatName">YOU</div>
-              <div class="seatSub">Your cards are in front of you</div>
+              <div class="seatName">AI2 (Left)</div>
+              <div class="seatSub">Hidden hand</div>
             </div>
           </div>
-
-          <button id="resetBtn" class="btn demo2Reset">Reset (New Deal)</button>
+          <div class="aiBackRow" aria-hidden="true">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
         </div>
 
-        <!-- Message line -->
-        <div id="msg" class="demo2Msg">Pick dealer to begin.</div>
-
-        <!-- Your hand (game.js renders into #hand) -->
-        <div id="hand" class="demo2Hand"></div>
-      </div>
-
-      <!-- ===== Hidden engine-required UI (kept for compatibility) ===== -->
-      <div class="engineHidden" aria-hidden="true">
-        <!-- pick dealer panel dependencies -->
-        <button id="pickBtn">Pick</button>
-        <button id="pickOkBtn">OK</button>
-        <button id="pickReBtn">Re-Pick</button>
-        <div id="pickStatus"></div>
-        <div id="pickAI2"></div>
-        <div id="pickAI3"></div>
-        <div id="pickYOU"></div>
-
-        <!-- labels game.js updates -->
-        <div id="phaseLabel"></div>
-        <div id="trumpLabel"></div>
-        <div id="trumpOpenLabel"></div>
-        <div id="turnBanner"></div>
-
-        <div id="ai2Tricks"></div>
-        <div id="ai3Tricks"></div>
-        <div id="youTricks"></div>
-
-        <div id="ai2Quota"></div>
-        <div id="ai3Quota"></div>
-        <div id="youQuota"></div>
-
-        <div id="trickNum"></div>
-        <div id="trickMax"></div>
-
-        <div id="dealerLabel"></div>
-        <div id="dealerBanner"></div>
-
-        <div id="pDeal"></div>
-        <div id="pPluck"></div>
-        <div id="pTrump"></div>
-        <div id="pPlay"></div>
-
-        <div id="pluckPanel"></div>
-        <div id="pluckStatus"></div>
-        <div id="pluckChoices"></div>
-        <button id="pluckNextBtn"></button>
-
-        <div id="trumpPanel">
-          <button data-trump="S"></button>
-          <button data-trump="H"></button>
-          <button data-trump="D"></button>
-          <button data-trump="C"></button>
+        <!-- RIGHT AI -->
+        <div class="seat seat-right">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI3 (Right)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
         </div>
-        <div id="trumpStatus"></div>
-        <div id="trumpAceSlot"></div>
-      </div>
 
+        <!-- CENTER TRICK -->
+        <div class="trickCenter" id="trickArea">
+          <div class="trickInner">
+            <div class="trickTitle">Trick Area</div>
+            <div class="trickSlots" id="trickSlots">
+              <div class="slotHint">(empty)</div>
+            </div>
+            <div class="slotHint">Center play cards go here</div>
+          </div>
+        </div>
+
+        <!-- YOU: centered at table -->
+        <div class="seat seat-bottom">
+          <div class="youDock">
+            <div class="youRow">
+              <div class="avatarWrap">
+                <div class="avatar avatar-you" aria-hidden="true"></div>
+                <div class="seatLabel">
+                  <div class="seatName">YOU</div>
+                  <div class="seatSub">Your cards are in front of you</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hand -->
+            <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="tableActions">
+          <button class="btn" id="resetBtn">Reset (New Deal)</button>
+        </div>
+      </div>
     </section>
+
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <footer class="footer">© 2026 Pluck The Card Game</footer>
+  <script>
+  (function(){
+    "use strict";
 
-  <!-- Use the same engine as demo1 -->
-  <script src="js/game.js"></script>
+    // Demo2 is visual-first, but we can still enforce your hand ordering.
+    // Optional trump in URL: demo2.html?trump=D
+    const params = new URLSearchParams(location.search);
+    const trumpSuit = (params.get("trump") || "").toUpperCase();
+    const SUITS = ["S","H","D","C"];
+    const BRBR = ["S","H","C","D"]; // black, red, black, red
+    const isRed = s => (s==="H" || s==="D");
+
+    const CARD_BIG_JOKER = "BJ";
+    const CARD_LITTLE_JOKER = "LJ";
+
+    // Build a 17-card sample hand (NO jokers by default in demo2 visual)
+    // You can flip includeJokers to true if you want them visible.
+    const includeJokers = false;
+
+    function makeDeckNo2(){
+      const ranks = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
+      const deck = [];
+      for (const s of SUITS) for (const r of ranks) deck.push(r+s);
+      deck.push("2C"); // the opener
+      return deck;
+    }
+
+    function shuffle(a){
+      for (let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function suitOrder(){
+      if (!SUITS.includes(trumpSuit)) return BRBR.slice();
+      return [trumpSuit, ...BRBR.filter(s => s !== trumpSuit)];
+    }
+
+    function rankVal(r){
+      if (r==="A") return 14;
+      if (r==="K") return 13;
+      if (r==="Q") return 12;
+      if (r==="J") return 11;
+      if (r==="10") return 10;
+      return parseInt(r,10) || 0;
+    }
+
+    function sortHand(hand){
+      const sOrder = suitOrder();
+      const sIndex = s => {
+        const i = sOrder.indexOf(s);
+        return i<0 ? 99 : i;
+      };
+
+      return hand.slice().sort((a,b)=>{
+        // Jokers left
+        if (a===CARD_BIG_JOKER) return (b===CARD_BIG_JOKER)?0:-1;
+        if (b===CARD_BIG_JOKER) return 1;
+        if (a===CARD_LITTLE_JOKER) return (b===CARD_LITTLE_JOKER)?0:-1;
+        if (b===CARD_LITTLE_JOKER) return 1;
+
+        const sa = a.slice(-1), sb = b.slice(-1);
+        const ra = a.slice(0,-1), rb = b.slice(0,-1);
+
+        const ga = sIndex(sa), gb = sIndex(sb);
+        if (ga !== gb) return ga - gb;
+
+        // high to low within suit
+        return rankVal(rb) - rankVal(ra);
+      });
+    }
+
+    function suitSymbol(s){
+      return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣";
+    }
+
+    function makeMiniFace(card){
+      const el = document.createElement("div");
+      el.className = "cardFaceMini";
+
+      if (card===CARD_BIG_JOKER || card===CARD_LITTLE_JOKER){
+        el.textContent = card;
+        el.style.background = "rgba(255,255,255,.92)";
+        return el;
+      }
+
+      const suit = card.slice(-1);
+      const rank = card.slice(0,-1);
+      const sym = suitSymbol(suit);
+
+      el.classList.add(isRed(suit) ? "red" : "black");
+      el.textContent = rank + sym;
+      return el;
+    }
+
+    function deal17(){
+      const deck = shuffle(makeDeckNo2());
+      const hand = [];
+
+      if (includeJokers){
+        hand.push(CARD_BIG_JOKER, CARD_LITTLE_JOKER);
+      }
+
+      while (hand.length < 17){
+        hand.push(deck.pop());
+      }
+      return hand;
+    }
+
+    function renderHand(){
+      const handEl = document.getElementById("youHand");
+      if (!handEl) return;
+
+      const hand = sortHand(deal17());
+      handEl.innerHTML = "";
+
+      // if 17 cards, tighten sizing a bit
+      handEl.classList.toggle("tight", hand.length >= 14);
+
+      for (const c of hand){
+        handEl.appendChild(makeMiniFace(c));
+      }
+    }
+
+    document.getElementById("resetBtn")?.addEventListener("click", () => {
+      renderHand();
+      const slots = document.getElementById("trickSlots");
+      if (slots) slots.innerHTML = '<div class="slotHint">(empty)</div>';
+    });
+
+    renderHand();
+  })();
+  </script>
 </body>
 </html>
