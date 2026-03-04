@@ -91,3 +91,327 @@ body{
 .btn:disabled{
   opacity:.55;
   cursor:not-allowed;
+}
+.footer{
+  padding:18px;
+  text-align:center;
+  color:#6e7a93;
+  border-top:1px solid var(--line);
+  margin-top:18px;
+}
+
+/* ==========================================
+   DEMO 2: Spades-style green table (CENTERED)
+   ========================================== */
+
+body.demo2 .container{
+  max-width: 1400px;
+}
+
+/* This guarantees the table stays centered in portrait/landscape */
+body.demo2 .tableStage{
+  min-height: calc(100vh - 92px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 18px 14px 26px;
+}
+
+body.demo2 .feltTable{
+  width: min(1200px, 96vw);
+  height: min(720px, 76vh);
+  position: relative;
+
+  /* Felt */
+  background: radial-gradient(120% 140% at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
+  border-radius: 34px;
+
+  /* Depth */
+  box-shadow:
+    0 22px 60px rgba(0,0,0,.55),
+    inset 0 0 0 2px rgba(255,255,255,.06),
+    inset 0 0 50px rgba(0,0,0,.35);
+
+  overflow:hidden;
+
+  /* 3D angle (subtle, looks good on phone/tablet) */
+  transform: perspective(1100px) rotateX(10deg);
+  transform-origin: center;
+}
+
+body.demo2 .feltTable::after{
+  content:"";
+  position:absolute;
+  inset: 18px;
+  border-radius: 26px;
+  border: 2px solid rgba(255,255,255,.10);
+  pointer-events:none;
+}
+
+/* Inner “rail” */
+body.demo2 .feltInset{
+  position:absolute;
+  inset: 32px;
+  border-radius: 24px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.06);
+  pointer-events:none;
+}
+
+/* Seats */
+body.demo2 .seat{
+  position:absolute;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#eaf2ff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.45);
+  z-index: 5;
+}
+
+/* Left/Right AIs */
+body.demo2 .seat-left{
+  left: 18px;
+  top: 52%;
+  transform: translateY(-50%) translateZ(26px);
+}
+body.demo2 .seat-right{
+  right: 18px;
+  top: 52%;
+  transform: translateY(-50%) translateZ(26px);
+}
+
+/* YOU: centered at bottom */
+body.demo2 .seat-bottom{
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%) translateZ(60px);
+  width: min(1080px, 94%);
+  justify-content:center;
+}
+
+/* Avatar panel (head/shoulders/arms silhouette) */
+body.demo2 .avatarWrap{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(8px);
+}
+
+body.demo2 .avatar{
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background:
+    radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(70% 80% at 50% 45%, rgba(0,0,0,.65) 0%, rgba(0,0,0,.95) 70%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.12),
+    0 10px 18px rgba(0,0,0,.35);
+  position: relative;
+}
+
+/* head */
+body.demo2 .avatar::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:44%;
+  transform: translate(-50%,-50%);
+  width: 22px;
+  height: 22px;
+  border-radius:999px;
+  background: rgba(255,255,255,.12);
+}
+
+/* shoulders + arms */
+body.demo2 .avatar::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:70%;
+  transform: translate(-50%,-50%);
+  width: 44px;
+  height: 24px;
+  border-radius: 16px 16px 20px 20px;
+  background: rgba(255,255,255,.10);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+body.demo2 .avatar-you{
+  box-shadow:
+    inset 0 0 0 2px rgba(212,178,84,.35),
+    0 10px 18px rgba(0,0,0,.35);
+}
+
+body.demo2 .seatLabel .seatName{
+  font-weight: 900;
+  letter-spacing: .6px;
+}
+body.demo2 .seatLabel .seatSub{
+  opacity: .85;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* AI hidden cards (tiny backs) */
+body.demo2 .aiBackRow{
+  display:flex;
+  gap:6px;
+  margin-left: 6px;
+}
+body.demo2 .cardBack{
+  width: 22px;
+  height: 32px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(0,0,0,.28));
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 8px 14px rgba(0,0,0,.28);
+}
+
+/* Center trick zone */
+body.demo2 .trickCenter{
+  position:absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%,-50%) translateZ(18px);
+  width: min(560px, 74%);
+  height: 260px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 4;
+}
+
+body.demo2 .trickInner{
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  border: 2px dashed rgba(255,255,255,.26);
+  background: rgba(0,0,0,.14);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.35);
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  padding: 14px;
+}
+body.demo2 .trickTitle{
+  font-weight: 900;
+  opacity: .92;
+}
+body.demo2 .trickSlots{
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 14px;
+  min-height: 120px;
+}
+body.demo2 .slotHint{
+  opacity: .7;
+  font-size: 13px;
+}
+
+/* ===== YOU area: centered, hand slightly BELOW you ===== */
+body.demo2 .youDock{
+  width: 100%;
+  position: relative;
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  gap: 8px;
+}
+
+/* This keeps YOU centered, and pushes hand slightly lower */
+body.demo2 .youRow{
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 14px;
+}
+
+/* Hand fan row */
+body.demo2 .yourHandRow{
+  width: min(1100px, 96%);
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  gap: 6px;
+  padding: 10px 12px;
+
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+
+  /* slightly below YOU */
+  margin-top: 10px;
+
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* smaller faces so 17 fits */
+body.demo2 .cardFaceMini{
+  flex: 0 0 auto;
+  width: 44px;
+  height: 62px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.94);
+  color: #0b1220;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  border: 1px solid rgba(0,0,0,.15);
+  user-select:none;
+}
+
+/* fan effect */
+body.demo2 .cardFaceMini:nth-child(1){ transform: rotate(-12deg) translateY(4px); }
+body.demo2 .cardFaceMini:nth-child(2){ transform: rotate(-8deg) translateY(2px); }
+body.demo2 .cardFaceMini:nth-child(3){ transform: rotate(-4deg) translateY(1px); }
+body.demo2 .cardFaceMini:nth-child(4){ transform: rotate(0deg) translateY(0px); }
+body.demo2 .cardFaceMini:nth-child(5){ transform: rotate(4deg) translateY(1px); }
+body.demo2 .cardFaceMini:nth-child(6){ transform: rotate(8deg) translateY(2px); }
+body.demo2 .cardFaceMini:nth-child(7){ transform: rotate(12deg) translateY(4px); }
+
+/* when there are many cards, keep them tighter */
+body.demo2 .yourHandRow.tight .cardFaceMini{
+  width: 40px;
+  height: 58px;
+  border-radius: 9px;
+}
+
+/* card colors */
+body.demo2 .cardFaceMini.red{ color:#b3122d; }
+body.demo2 .cardFaceMini.black{ color:#111827; }
+
+/* Reset button on table */
+body.demo2 .tableActions{
+  position:absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 8;
+}
+
+/* Responsive tweaks */
+@media (max-width: 860px){
+  body.demo2 .feltTable{
+    height: min(760px, 78vh);
+    transform: perspective(900px) rotateX(8deg);
+  }
+  body.demo2 .seat-left{ left: 10px; }
+  body.demo2 .seat-right{ right: 10px; }
+  body.demo2 .trickCenter{ width: min(520px, 84%); }
+  body.demo2 .yourHandRow{ width: 98%; }
+  body.demo2 .yourHandRow.tight .cardFaceMini{ width: 38px; height: 56px; }
+}
