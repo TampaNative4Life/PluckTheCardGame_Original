@@ -2,130 +2,134 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <!-- NAV (matches your site style) -->
+  <!-- NAV (matches your existing site style) -->
   <header class="nav">
-    <a class="brand" href="index.html">
+    <a class="brand" href="index.html" aria-label="Pluck Home">
       <img src="assets/logo.png" alt="Pluck" onerror="this.style.display='none'">
       <span>PLUCK</span>
     </a>
-
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
       <a class="activeLink" href="demo2.html">Demo 2</a>
-      <a href="rules.html">Rules</a>
+      <a href="docs/rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
   <main class="container">
-    <section class="demo2Stage">
-      <div class="demo2Table" role="img" aria-label="3-seat card table">
 
-        <!-- LEFT AI -->
-        <div class="demo2Seat seatLeft">
-          <div class="demo2Player">
-            <div class="demo2Avatar"></div>
-            <div class="demo2Label">
-              <div class="demo2Name">AI2</div>
-              <div class="demo2Sub">Hidden hand</div>
-            </div>
+    <!-- CENTERED TABLE STAGE -->
+    <section class="tableStage" aria-label="Demo 2 Table Stage">
+      <div class="feltTable" role="img" aria-label="Green felt table">
+
+        <!-- LEFT PLAYER -->
+        <div class="seat seat-left">
+          <div class="playerFigure">
+            <div class="pf-head"></div>
+            <div class="pf-shoulders"></div>
+            <div class="pf-arms"></div>
           </div>
-
-          <div class="demo2BackFan" aria-hidden="true">
-            <span class="demo2Back"></span><span class="demo2Back"></span><span class="demo2Back"></span>
-            <span class="demo2Back"></span><span class="demo2Back"></span>
-          </div>
-        </div>
-
-        <!-- RIGHT AI -->
-        <div class="demo2Seat seatRight">
-          <div class="demo2Player">
-            <div class="demo2Avatar"></div>
-            <div class="demo2Label">
-              <div class="demo2Name">AI3</div>
-              <div class="demo2Sub">Hidden hand</div>
-            </div>
-          </div>
-
-          <div class="demo2BackFan" aria-hidden="true">
-            <span class="demo2Back"></span><span class="demo2Back"></span><span class="demo2Back"></span>
-            <span class="demo2Back"></span><span class="demo2Back"></span>
+          <div class="seatTag">
+            <div class="seatName">AI2 (Left)</div>
+            <div class="seatSub">Hidden hand</div>
           </div>
         </div>
 
-        <!-- CENTER TRICK -->
-        <div class="demo2Trick" id="trickArea">
-          <div class="demo2TrickInner">
-            <div class="demo2TrickTitle">Trick Area</div>
-
-            <div class="demo2TrickSlots">
-              <div class="demo2Slot">AI2 play</div>
-              <div class="demo2Slot">AI3 play</div>
-              <div class="demo2Slot">YOU play</div>
-            </div>
-
-            <div class="demo2TrickHint">Center play cards go here</div>
+        <!-- RIGHT PLAYER -->
+        <div class="seat seat-right">
+          <div class="seatTag right">
+            <div class="seatName">AI3 (Right)</div>
+            <div class="seatSub">Hidden hand</div>
+          </div>
+          <div class="playerFigure">
+            <div class="pf-head"></div>
+            <div class="pf-shoulders"></div>
+            <div class="pf-arms"></div>
           </div>
         </div>
 
-        <!-- YOU (center-bottom seat, cards spread across table edge) -->
-        <div class="demo2Seat seatBottom">
-          <div class="demo2YouRow">
-            <div class="demo2Player demo2You">
-              <div class="demo2Avatar demo2AvatarYou"></div>
-              <div class="demo2Label">
-                <div class="demo2Name">YOU</div>
-                <div class="demo2Sub">Your cards are in front of you</div>
-              </div>
+        <!-- CENTER TRICK AREA -->
+        <div class="trickCenter">
+          <div class="trickInner">
+            <div class="trickTitle">Trick Area</div>
+            <div id="trickArea" class="trickSlots">
+              <div class="trickSlot">AI2 play</div>
+              <div class="trickSlot">AI3 play</div>
+              <div class="trickSlot">YOU play</div>
             </div>
-
-            <!-- Your 17 cards (placeholder faces) -->
-            <div class="demo2Hand" id="youHand" aria-label="Your hand (17 cards)">
-              <!-- 17 cards -->
-              <div class="demo2Card red">A♦</div>
-              <div class="demo2Card black">K♠</div>
-              <div class="demo2Card red">Q♥</div>
-              <div class="demo2Card black">J♣</div>
-              <div class="demo2Card red">10♦</div>
-              <div class="demo2Card black">9♠</div>
-              <div class="demo2Card red">8♥</div>
-              <div class="demo2Card black">7♣</div>
-              <div class="demo2Card red">6♦</div>
-              <div class="demo2Card black">5♠</div>
-              <div class="demo2Card red">4♥</div>
-              <div class="demo2Card black">3♣</div>
-              <div class="demo2Card black">A♣</div>
-              <div class="demo2Card red">K♦</div>
-              <div class="demo2Card black">Q♠</div>
-              <div class="demo2Card red">J♥</div>
-              <div class="demo2Card black">10♣</div>
-            </div>
+            <div class="slotHint">Center play cards go here</div>
           </div>
         </div>
 
-      </div>
+        <!-- YOU (BOTTOM-CENTER) + 17 CARD SPREAD -->
+        <div class="seat seat-bottom">
+          <div class="youDock">
+            <div class="youFigure">
+              <div class="pf-head"></div>
+              <div class="pf-shoulders"></div>
+              <div class="pf-arms"></div>
+            </div>
+            <div class="youTag">
+              <div class="seatName">YOU</div>
+              <div class="seatSub">Your cards are in front of you</div>
+            </div>
+          </div>
 
-      <div class="card demo2Note">
-        <div style="font-weight:900; margin-bottom:6px;">Demo 2 Goal</div>
-        <div style="color:var(--muted); line-height:1.45;">
-          Table layout + “you at the table” view (no gameplay wiring yet).<br><br>
-          Next: plug Demo 1 engine output into:
-          <ul style="margin:10px 0 0 18px; color:var(--muted);">
-            <li><b>#trickArea</b> (center)</li>
-            <li><b>#youHand</b> (bottom/front)</li>
-            <li>AI seats (left/right)</li>
-          </ul>
+          <div class="handSpreadWrap" aria-label="Your 17-card spread">
+            <div id="youHand" class="handSpread"></div>
+          </div>
         </div>
+
       </div>
     </section>
+
+    <section class="demo2Note card">
+      <div style="font-weight:900; font-size:18px; margin-bottom:6px;">Demo 2 Goal</div>
+      <div style="color:var(--muted); line-height:1.5;">
+        Table layout + “you at the table” view (no gameplay wiring yet).<br>
+        Next: plug Demo 1 engine into these containers:
+        <ul style="margin:10px 0 0 18px; color:var(--muted);">
+          <li><code>#trickArea</code> (center)</li>
+          <li><code>#youHand</code> (bottom/front)</li>
+          <li>AI seats (left/right)</li>
+        </ul>
+      </div>
+    </section>
+
   </main>
 
   <footer class="footer">© 2026 Pluck The Card Game</footer>
+
+  <!-- DEMO 2: generate a 17-card spread (visual only) -->
+  <script>
+    (function(){
+      const hand = document.getElementById("youHand");
+      if(!hand) return;
+
+      // 17 cards. Swap these later with real engine output.
+      const cards = [
+        "3♦","J♠","A♥","K♣","Q♦","10♠","9♥","8♣","7♦","6♠","5♥","4♣",
+        "A♦","K♠","Q♥","J♣","10♦"
+      ];
+
+      hand.innerHTML = "";
+      cards.forEach((t, i) => {
+        const c = document.createElement("div");
+        c.className = "miniCard " + (/[♥♦]/.test(t) ? "red" : "black");
+        c.textContent = t;
+        // fan positions
+        c.style.setProperty("--i", i);
+        c.style.setProperty("--n", cards.length);
+        hand.appendChild(c);
+      });
+    })();
+  </script>
+
 </body>
 </html>
