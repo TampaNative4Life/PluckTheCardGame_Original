@@ -1,139 +1,151 @@
-/* =========================================================
-   Demo2 UI — v1
-   - Renders engine state
-   - Sends events to engine
-   - Keeps your current presentation
-   ========================================================= */
+// demo2.js (FULL REPLACEMENT)
+// Demo 2 UI logic: deal 17, sort, render. No clipping on left/right.
 
 (function(){
   "use strict";
 
-  const $ = (id) => document.getElementById(id);
-
-  const elTrump = $("trumpLabel");
-  const elBooks = $("booksSummary");
-  const elReset = $("resetBtn");
-
-  const elYouHand = $("youHand");
-  const elTrickSlots = $("trickSlots");
-
   const SUITS = ["S","H","D","C"];
+  const BRBR  = ["S","H","C","D"]; // black, red, black, red
   const isRed = s => (s==="H" || s==="D");
-  const suitSymbol = s => (s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣");
 
-  let state = PluckEngine.initialState();
+  const CARD_BIG_JOKER = "BJ";
+  const CARD_LITTLE_JOKER = "LJ";
+  const OPEN_LEAD = "2C";
 
-  function dispatch(evt){
-    state = PluckEngine.reduce(state, evt);
-    render();
-    // let AI play until it is YOU
-    pumpAI();
-  }
+  const books = { YOU: 0, AI2: 0, AI3: 0 };
 
-  function pumpAI(){
-    // run AI steps quickly but safely
-    let guard = 0;
-    while (state.turn !== 2 && guard < 6){
-      state = PluckEngine.reduce(state, { type:"AI_STEP" });
-      guard++;
-    }
-    render();
-  }
+  function $(id){ return document.getElementById(id); }
+
+  const params = new URLSearchParams(location.search);
+  const trumpSuit = (params.get("trump") || "").toUpperCase();
 
   function setHud(){
-    if (elTrump){
-      const t = (SUITS.includes(state.trumpSuit) ? state.trumpSuit : "(not set)");
-      elTrump.textContent = t;
-      elTrump.classList.toggle("muted", !SUITS.includes(state.trumpSuit));
+    const t = $("trumpLabel");
+    if (t){
+      const ok = SUITS.includes(trumpSuit);
+      t.textContent = ok ? trumpSuit : "(not set)";
+      t.classList.toggle("muted", !ok);
     }
-    if (elBooks){
-      elBooks.textContent = `YOU ${state.books.YOU} • AI2 ${state.books.AI2} • AI3 ${state.books.AI3}`;
+    const b = $("booksSummary");
+    if (b){
+      b.textContent = `YOU ${books.YOU} • AI2 ${books.AI2} • AI3 ${books.AI3}`;
     }
+  }
+
+  function shuffle(a){
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function makeDeck(){
+    // ranks 3-A per suit + 2C opener (keeps your “2C exists” behavior)
+    const ranks = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
+    const deck = [];
+    for (const s of SUITS) for (const r of ranks) deck.push(r+s);
+    deck.push(OPEN_LEAD);
+    return deck;
+  }
+
+  function suitOrder(){
+    if (!SUITS.includes(trumpSuit)) return BRBR.slice();
+    return [trumpSuit, ...BRBR.filter(s => s !== trumpSuit)];
+  }
+
+  function rankVal(r){
+    if (r==="A") return 14;
+    if (r==="K") return 13;
+    if (r==="Q") return 12;
+    if (r==="J") return 11;
+    if (r==="10") return 10;
+    return parseInt(r,10) || 0;
+  }
+
+  function sortHand(hand){
+    const sOrder = suitOrder();
+    const sIndex = s => {
+      const i = sOrder.indexOf(s);
+      return i<0 ? 99 : i;
+    };
+
+    return hand.slice().sort((a,b)=>{
+      // jokers first if present
+      if (a===CARD_BIG_JOKER) return (b===CARD_BIG_JOKER)?0:-1;
+      if (b===CARD_BIG_JOKER) return 1;
+      if (a===CARD_LITTLE_JOKER) return (b===CARD_LITTLE_JOKER)?0:-1;
+      if (b===CARD_LITTLE_JOKER) return 1;
+
+      const sa = a.slice(-1), sb = b.slice(-1);
+      const ra = a.slice(0,-1), rb = b.slice(0,-1);
+
+      const ga = sIndex(sa), gb = sIndex(sb);
+      if (ga !== gb) return ga - gb;
+
+      // high to low
+      return rankVal(rb) - rankVal(ra);
+    });
+  }
+
+  function suitSymbol(s){
+    return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣";
   }
 
   function makeMiniFace(card){
-    const el = document.createElement("button");
-    el.type = "button";
+    const el = document.createElement("div");
     el.className = "cardFaceMini";
+
+    if (card===CARD_BIG_JOKER || card===CARD_LITTLE_JOKER){
+      el.textContent = card;
+      return el;
+    }
 
     const suit = card.slice(-1);
     const rank = card.slice(0,-1);
-
     el.classList.add(isRed(suit) ? "red" : "black");
     el.textContent = rank + suitSymbol(suit);
-
-    el.addEventListener("click", () => {
-      // only allow your play
-      if (state.turn !== 2) return;
-      dispatch({ type:"PLAY_CARD", pi:2, card });
-    });
-
     return el;
   }
 
+  function deal17(){
+    const deck = shuffle(makeDeck());
+    const hand = [];
+    while (hand.length < 17 && deck.length){
+      hand.push(deck.pop());
+    }
+    // safety: if deck was short (shouldn't be), pad
+    while (hand.length < 17) hand.push("3S");
+    return hand;
+  }
+
   function renderHand(){
-    if (!elYouHand) return;
+    const handEl = $("youHand");
+    if (!handEl) return;
 
-    const sorted = PluckEngine.sortHand(state.players[2].hand, state.trumpSuit);
+    const hand = sortHand(deal17());
 
-    elYouHand.innerHTML = "";
-    elYouHand.classList.toggle("tight", sorted.length >= 14);
+    handEl.innerHTML = "";
+    handEl.classList.toggle("tight", hand.length >= 14);
 
-    // spacers so first/last card are NEVER clipped by rounded container
-    const leftPad = document.createElement("div");
-    leftPad.className = "handEdgePad";
-    const rightPad = document.createElement("div");
-    rightPad.className = "handEdgePad";
-
-    elYouHand.appendChild(leftPad);
-    for (const c of sorted) elYouHand.appendChild(makeMiniFace(c));
-    elYouHand.appendChild(rightPad);
-  }
-
-  function renderTrick(){
-    if (!elTrickSlots) return;
-
-    elTrickSlots.innerHTML = "";
-
-    if (!state.trick.length){
-      const h = document.createElement("div");
-      h.className = "slotHint";
-      h.textContent = "(empty)";
-      elTrickSlots.appendChild(h);
-      return;
+    for (const c of hand){
+      handEl.appendChild(makeMiniFace(c));
     }
 
-    for (const t of state.trick){
-      const wrap = document.createElement("div");
-      wrap.className = "trickSlot";
-
-      const name = document.createElement("div");
-      name.className = "trickWho";
-      name.textContent = state.players[t.pi].id;
-
-      const face = document.createElement("div");
-      face.className = "cardFaceMini trickMini";
-      const suit = t.card.slice(-1);
-      const rank = t.card.slice(0,-1);
-      face.classList.add(isRed(suit) ? "red" : "black");
-      face.textContent = rank + suitSymbol(suit);
-
-      wrap.appendChild(name);
-      wrap.appendChild(face);
-      elTrickSlots.appendChild(wrap);
-    }
+    // HARD-LOCK: ensure first and last cards can NEVER be clipped.
+    // This forces a tiny scroll recalculation so padding is honored on mobile browsers.
+    requestAnimationFrame(() => {
+      handEl.scrollLeft = 0;
+    });
   }
 
-  function render(){
-    setHud();
+  $("resetBtn")?.addEventListener("click", () => {
     renderHand();
-    renderTrick();
-  }
+    const slots = $("trickSlots");
+    if (slots) slots.innerHTML = '<div class="slotHint">(empty)</div>';
+    setHud();
+  });
 
-  // events
-  elReset?.addEventListener("click", () => dispatch({ type:"RESET" }));
-
-  // boot
-  dispatch({ type:"RESET" });
-
+  setHud();
+  renderHand();
 })();
