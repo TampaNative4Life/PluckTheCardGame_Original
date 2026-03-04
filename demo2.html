@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pluck Demo 2</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- Top Nav (matches your site style) -->
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.png" alt="Pluck" onerror="this.style.display='none'">
+      <span>PLUCK</span>
+    </a>
+
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a class="activeLink" href="demo2.html">Demo 2</a>
+      <a href="docs/rules.html" onerror="return false">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Demo2 stage: ALWAYS centered -->
+    <section class="tableStage">
+      <div class="feltTable" aria-label="3-player table">
+
+        <!-- LEFT SEAT (AI2) -->
+        <div class="seat seat-left">
+          <div class="avatarWrap">
+            <div class="avatar"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI2 (Left)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+
+          <!-- Engine output target (AI2 hidden hand) -->
+          <div id="ai2Hand" class="aiHiddenRow"></div>
+        </div>
+
+        <!-- RIGHT SEAT (AI3) -->
+        <div class="seat seat-right">
+          <div class="avatarWrap">
+            <div class="avatar"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI3 (Right)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+
+          <!-- Engine output target (AI3 hidden hand) -->
+          <div id="ai3Hand" class="aiHiddenRow"></div>
+        </div>
+
+        <!-- CENTER TRICK -->
+        <div class="trickCenter">
+          <div class="trickInner">
+            <div class="trickTitle">Trick Area</div>
+
+            <!-- Engine output target (cards played to trick) -->
+            <div id="trick" class="trickSlots"></div>
+
+            <div class="slotHint">Center play cards go here</div>
+          </div>
+        </div>
+
+        <!-- BOTTOM SEAT (YOU) -->
+        <div class="seat seat-bottom">
+          <div class="youPanel">
+            <div class="youTop">
+              <div class="avatarWrap">
+                <div class="avatar avatar-you"></div>
+                <div class="seatLabel">
+                  <div class="seatName">YOU</div>
+                  <div class="seatSub">Your cards are in front of you</div>
+                </div>
+              </div>
+
+              <!-- Minimal control strip -->
+              <div class="demo2Controls">
+                <button id="resetBtn" class="btn">Reset (New Deal)</button>
+              </div>
+            </div>
+
+            <!-- Engine message line -->
+            <div id="msg" class="msg"></div>
+
+            <!-- Engine output target (your hand = 17 cards) -->
+            <div id="hand" class="hand handDock"></div>
+          </div>
+
+          <!-- Hidden but REQUIRED by game.js (so it doesn't crash) -->
+          <div class="demo2Hidden">
+            <span id="phaseLabel"></span>
+            <span id="trumpLabel"></span>
+            <span id="trumpOpenLabel"></span>
+            <span id="turnBanner"></span>
+
+            <span id="ai2Tricks"></span>
+            <span id="ai3Tricks"></span>
+            <span id="youTricks"></span>
+
+            <span id="ai2Quota"></span>
+            <span id="ai3Quota"></span>
+            <span id="youQuota"></span>
+
+            <span id="trickNum"></span>
+            <span id="trickMax"></span>
+
+            <span id="dealerLabel"></span>
+            <span id="dealerBanner"></span>
+
+            <span id="pDeal"></span>
+            <span id="pPluck"></span>
+            <span id="pTrump"></span>
+            <span id="pPlay"></span>
+
+            <div id="pluckPanel"></div>
+            <div id="pluckStatus"></div>
+            <div id="pluckChoices"></div>
+            <button id="pluckNextBtn"></button>
+
+            <div id="trumpPanel"></div>
+            <div id="trumpStatus"></div>
+
+            <button id="pickBtn"></button>
+            <button id="pickOkBtn"></button>
+            <button id="pickReBtn"></button>
+            <div id="pickStatus"></div>
+            <div id="pickAI2"></div>
+            <div id="pickAI3"></div>
+            <div id="pickYOU"></div>
+
+            <div id="trumpAceSlot"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">© 2026 Pluck The Card Game</footer>
+
+  <!-- Demo 1 engine -->
+  <script src="js/game.js"></script>
+</body>
+</html>
