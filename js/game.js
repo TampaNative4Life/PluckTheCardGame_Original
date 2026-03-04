@@ -377,9 +377,10 @@
 
   // ---------- initial pick ----------
   function pickOneCard(){
-    const d = shuffle(makeDeck51());
-    return d.pop();
-  }
+  // No Jokers allowed in the dealer-pick phase
+  const d = shuffle(makeDeck51()).filter(c => c !== "BJ" && c !== "LJ");
+  return d.pop();
+}
 
   function pickRankValue(cardStr){
     if (cardStr === CARD_BIG_JOKER) return 100;
