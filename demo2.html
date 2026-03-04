@@ -21,122 +21,115 @@
       <a href="about.html">About</a>
     </nav>
   </header>
-  <section class="statusBar" aria-label="Status Bar">
-  <div class="statusLeft">
-    <div class="statusItem">
-      <span class="label">Trump</span>
-      <span class="value" id="trumpVal">(not set)</span>
-    </div>
-
-    <div class="statusItem">
-      <span class="label">Quotas</span>
-      <span class="value" id="quotaVal">YOU 0 • AI2 0 • AI3 0</span>
-    </div>
-  </div>
-
-  <div class="statusRight">
-    <div class="statusItem firstPick hidden" id="firstPickBar">
-      <span class="label">First Pick</span>
-      <span class="value" id="firstPickVal">—</span>
-    </div>
-  </div>
-  </section>
 
   <main class="container">
     <section class="tableStage">
 
-      <!-- HUD: Trump + Quotas ABOVE table -->
-      <div class="demo2Hud" aria-label="Game HUD">
-        <div class="hudLeft">
-          <div class="hudPill" id="trumpPill" aria-label="Trump">
-            <div class="hudLabel">TRUMP</div>
-            <div class="hudValue gold" id="trumpValue">—</div>
-          </div>
-
-          <div class="quotaStrip" aria-label="Quotas">
-            <div class="quotaMini">
-              <div class="name">AI2</div>
-              <div class="vals"><span>Q:</span><b id="qAI2">—</b> <span>T:</span><b id="tAI2">—</b></div>
+      <div class="demo2Wrap">
+        <!-- LEFT: TRUMP + BOOKS -->
+        <aside class="leftRail">
+          <div class="railPanel">
+            <div class="railTitle">TRUMP</div>
+            <div class="railRow">
+              <div class="railKey">Suit</div>
+              <div class="railVal" id="trumpVal">(not set)</div>
             </div>
-            <div class="quotaMini">
-              <div class="name">AI3</div>
-              <div class="vals"><span>Q:</span><b id="qAI3">—</b> <span>T:</span><b id="tAI3">—</b></div>
-            </div>
-            <div class="quotaMini">
-              <div class="name">YOU</div>
-              <div class="vals"><span>Q:</span><b id="qYOU">—</b> <span>T:</span><b id="tYOU">—</b></div>
-            </div>
-          </div>
-        </div>
 
-        <div class="hudRight">
-          <button class="btn" id="resetBtn">Reset (New Deal)</button>
-        </div>
-      </div>
-
-      <!-- TABLE -->
-      <div class="feltTable" aria-label="3-player table">
-        <div class="feltInset" aria-hidden="true"></div>
-
-        <!-- LEFT AI -->
-        <div class="seat seat-left">
-          <div class="avatarWrap">
-            <div class="avatar" aria-hidden="true"></div>
-            <div class="seatLabel">
-              <div class="seatName">AI2 (Left)</div>
-              <div class="seatSub">Hidden hand</div>
+            <div class="railTitle" style="margin-top:10px;">BOOKS</div>
+            <div class="booksList" aria-label="Books scoreboard">
+              <div class="booksItem">
+                <div class="booksName">YOU</div>
+                <div class="booksVal" id="booksYou">0</div>
+              </div>
+              <div class="booksItem">
+                <div class="booksName">AI2</div>
+                <div class="booksVal" id="booksAI2">0</div>
+              </div>
+              <div class="booksItem">
+                <div class="booksName">AI3</div>
+                <div class="booksVal" id="booksAI3">0</div>
+              </div>
             </div>
           </div>
-          <div class="aiBackRow" aria-hidden="true">
-            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-            <div class="cardBack"></div><div class="cardBack"></div>
-          </div>
-        </div>
+        </aside>
 
-        <!-- RIGHT AI -->
-        <div class="seat seat-right">
-          <div class="avatarWrap">
-            <div class="avatar" aria-hidden="true"></div>
-            <div class="seatLabel">
-              <div class="seatName">AI3 (Right)</div>
-              <div class="seatSub">Hidden hand</div>
+        <!-- RIGHT: TOP BAR + TABLE -->
+        <div>
+          <!-- Top controls ABOVE table -->
+          <div class="tableTopBar">
+            <div>
+              <div class="tableTopTitle">Demo 2</div>
+              <div class="tableTopHint">Layout-only sandbox (engine wiring comes next)</div>
             </div>
+            <button class="btn" id="resetBtn">Reset (New Deal)</button>
           </div>
-          <div class="aiBackRow" aria-hidden="true">
-            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-            <div class="cardBack"></div><div class="cardBack"></div>
-          </div>
-        </div>
 
-        <!-- CENTER TRICK -->
-        <div class="trickCenter" id="trickArea">
-          <div class="trickInner">
-            <div class="trickTitle">Trick Area</div>
-            <div class="trickSlots" id="trickSlots">
-              <div class="slotHint">(empty)</div>
-            </div>
-            <div class="slotHint">Center play cards go here</div>
-          </div>
-        </div>
+          <div class="feltTable" aria-label="3-player table">
+            <div class="feltInset"></div>
 
-        <!-- YOU: centered at table -->
-        <div class="seat seat-bottom">
-          <div class="youDock">
-            <div class="youRow">
+            <!-- LEFT AI -->
+            <div class="seat seat-left">
               <div class="avatarWrap">
-                <div class="avatar avatar-you" aria-hidden="true"></div>
-                <div class="seatLabel">
-                  <div class="seatName">YOU</div>
-                  <div class="seatSub">Your cards are in front of you</div>
+                <div class="avatar" aria-hidden="true"></div>
+                <div>
+                  <div class="seatName">AI2 (Left)</div>
+                  <div class="seatSub">Hidden hand</div>
                 </div>
+              </div>
+              <div class="aiBackRow" aria-hidden="true">
+                <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+                <div class="cardBack"></div><div class="cardBack"></div>
               </div>
             </div>
 
-            <!-- Hand -->
-            <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
+            <!-- RIGHT AI (kept on the edge) -->
+            <div class="seat seat-right">
+              <div class="avatarWrap">
+                <div class="avatar" aria-hidden="true"></div>
+                <div>
+                  <div class="seatName">AI3 (Right)</div>
+                  <div class="seatSub">Hidden hand</div>
+                </div>
+              </div>
+              <div class="aiBackRow" aria-hidden="true">
+                <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+                <div class="cardBack"></div><div class="cardBack"></div>
+              </div>
+            </div>
+
+            <!-- CENTER TRICK -->
+            <div class="trickCenter" id="trickArea">
+              <div class="trickInner">
+                <div class="trickTitle">Trick Area</div>
+                <div class="trickSlots" id="trickSlots">
+                  <div class="slotHint">(empty)</div>
+                </div>
+                <div class="slotHint">Center play cards go here</div>
+              </div>
+            </div>
+
+            <!-- YOU at the table -->
+            <div class="seat seat-bottom">
+              <div class="youDock">
+                <div class="youRow">
+                  <div class="avatarWrap">
+                    <div class="avatar avatar-you" aria-hidden="true"></div>
+                    <div>
+                      <div class="seatName">YOU</div>
+                      <div class="seatSub">Your cards are in front of you</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hand -->
+                <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+
     </section>
 
     <footer class="footer">© 2026 Pluck The Card Game</footer>
@@ -153,38 +146,13 @@
     const BRBR = ["S","H","C","D"]; // black, red, black, red
     const isRed = s => (s==="H" || s==="D");
 
-    const CARD_BIG_JOKER = "BJ";
-    const CARD_LITTLE_JOKER = "LJ";
-
-    // Prevent jokers in initial pluck / demo2 hand
-    const includeJokers = false;
-
-    // Simple placeholder quotas (until D1 wiring supplies real values)
-    const quota = { AI2: 7, AI3: 6, YOU: 4 };
-    const tricks = { AI2: 0, AI3: 0, YOU: 0 };
-
-    function suitSymbol(s){
-      return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":s==="C"?"♣":"—";
-    }
-
-    function setHUD(){
-      const tVal = document.getElementById("trumpValue");
-      tVal.textContent = SUITS.includes(trumpSuit) ? suitSymbol(trumpSuit) : "—";
-
-      document.getElementById("qAI2").textContent = quota.AI2;
-      document.getElementById("qAI3").textContent = quota.AI3;
-      document.getElementById("qYOU").textContent = quota.YOU;
-
-      document.getElementById("tAI2").textContent = tricks.AI2;
-      document.getElementById("tAI3").textContent = tricks.AI3;
-      document.getElementById("tYOU").textContent = tricks.YOU;
-    }
+    const includeJokers = false; // Prevent jokers in initial deal
 
     function makeDeckNo2(){
       const ranks = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
       const deck = [];
       for (const s of SUITS) for (const r of ranks) deck.push(r+s);
-      deck.push("2C"); // opener
+      deck.push("2C"); // the opener
       return deck;
     }
 
@@ -218,12 +186,6 @@
       };
 
       return hand.slice().sort((a,b)=>{
-        // jokers left (unused now, but safe)
-        if (a===CARD_BIG_JOKER) return (b===CARD_BIG_JOKER)?0:-1;
-        if (b===CARD_BIG_JOKER) return 1;
-        if (a===CARD_LITTLE_JOKER) return (b===CARD_LITTLE_JOKER)?0:-1;
-        if (b===CARD_LITTLE_JOKER) return 1;
-
         const sa = a.slice(-1), sb = b.slice(-1);
         const ra = a.slice(0,-1), rb = b.slice(0,-1);
 
@@ -235,15 +197,13 @@
       });
     }
 
+    function suitSymbol(s){
+      return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣";
+    }
+
     function makeMiniFace(card){
       const el = document.createElement("div");
       el.className = "cardFaceMini";
-
-      if (card===CARD_BIG_JOKER || card===CARD_LITTLE_JOKER){
-        el.textContent = card;
-        el.style.background = "rgba(255,255,255,.92)";
-        return el;
-      }
 
       const suit = card.slice(-1);
       const rank = card.slice(0,-1);
@@ -258,14 +218,18 @@
       const deck = shuffle(makeDeckNo2());
       const hand = [];
 
-      if (includeJokers){
-        hand.push(CARD_BIG_JOKER, CARD_LITTLE_JOKER);
-      }
-
+      // No jokers (per request)
       while (hand.length < 17){
         hand.push(deck.pop());
       }
       return hand;
+    }
+
+    function renderTrump(){
+      const el = document.getElementById("trumpVal");
+      if (!el) return;
+      if (!SUITS.includes(trumpSuit)) el.textContent = "(not set)";
+      else el.textContent = suitSymbol(trumpSuit) + " " + trumpSuit;
     }
 
     function renderHand(){
@@ -274,6 +238,8 @@
 
       const hand = sortHand(deal17());
       handEl.innerHTML = "";
+      handEl.classList.toggle("tight", hand.length >= 14);
+
       for (const c of hand){
         handEl.appendChild(makeMiniFace(c));
       }
@@ -285,7 +251,7 @@
       if (slots) slots.innerHTML = '<div class="slotHint">(empty)</div>';
     });
 
-    setHUD();
+    renderTrump();
     renderHand();
   })();
   </script>
