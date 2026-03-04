@@ -4,10 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="css/style.css?v=999" />
+  <link rel="stylesheet" href="css/style.css?v=22" />
 </head>
 
 <body class="demo2">
+  <!-- NAV -->
   <header class="nav">
     <a class="brand" href="index.html" aria-label="Pluck Home">
       <img src="assets/QS.png" alt="Pluck" />
@@ -40,59 +41,65 @@
       </div>
     </section>
 
-    <!-- TABLE + RESET ABOVE IT -->
+    <!-- STAGE -->
     <section class="tableStage">
+
+      <!-- RESET ABOVE TABLE -->
       <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
       </div>
 
-      <div class="feltTable" aria-label="3-player table">
+      <!-- WRAP (table + overlays) -->
+      <div class="tableWrap">
 
-        <div class="feltInset"></div>
+        <!-- TABLE (clipped for rounded corners) -->
+        <div class="feltTable" aria-label="3-player table">
+          <div class="feltInset" aria-hidden="true"></div>
 
-        <!-- LEFT AI -->
-        <div class="seat seat-left">
-          <div class="avatarWrap">
-            <div class="avatar" aria-hidden="true"></div>
-            <div class="seatLabel">
-              <div class="seatName">AI2 (Left)</div>
-              <div class="seatSub">Hidden hand</div>
+          <!-- LEFT AI -->
+          <div class="seat seat-left">
+            <div class="avatarWrap">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="seatLabel">
+                <div class="seatName">AI2 (Left)</div>
+                <div class="seatSub">Hidden hand</div>
+              </div>
+            </div>
+            <div class="aiBackRow" aria-hidden="true">
+              <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+              <div class="cardBack"></div><div class="cardBack"></div>
             </div>
           </div>
-          <div class="aiBackRow" aria-hidden="true">
-            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-            <div class="cardBack"></div><div class="cardBack"></div>
+
+          <!-- RIGHT AI -->
+          <div class="seat seat-right">
+            <div class="avatarWrap">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="seatLabel">
+                <div class="seatName">AI3 (Right)</div>
+                <div class="seatSub">Hidden hand</div>
+              </div>
+            </div>
+            <div class="aiBackRow" aria-hidden="true">
+              <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+              <div class="cardBack"></div><div class="cardBack"></div>
+            </div>
+          </div>
+
+          <!-- CENTER TRICK -->
+          <div class="trickCenter" id="trickArea">
+            <div class="trickInner">
+              <div class="trickTitle">Trick Area</div>
+              <div class="trickSlots" id="trickSlots">
+                <div class="slotHint">(empty)</div>
+              </div>
+              <div class="slotHint">Center play cards go here</div>
+            </div>
           </div>
         </div>
 
-        <!-- RIGHT AI -->
-        <div class="seat seat-right">
-          <div class="avatarWrap">
-            <div class="avatar" aria-hidden="true"></div>
-            <div class="seatLabel">
-              <div class="seatName">AI3 (Right)</div>
-              <div class="seatSub">Hidden hand</div>
-            </div>
-          </div>
-          <div class="aiBackRow" aria-hidden="true">
-            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-            <div class="cardBack"></div><div class="cardBack"></div>
-          </div>
-        </div>
-
-        <!-- CENTER TRICK -->
-        <div class="trickCenter" id="trickArea">
-          <div class="trickInner">
-            <div class="trickTitle">Trick Area</div>
-            <div class="trickSlots" id="trickSlots">
-              <div class="slotHint">(empty)</div>
-            </div>
-            <div class="slotHint">Center play cards go here</div>
-          </div>
-        </div>
-
-        <!-- YOU -->
-        <div class="seat seat-bottom">
+        <!-- YOU OVERLAY (NOT CLIPPED) -->
+        <div class="youOverlay">
           <div class="youDock">
             <div class="youRow">
               <div class="avatarWrap">
@@ -104,6 +111,7 @@
               </div>
             </div>
 
+            <!-- Hand -->
             <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
           </div>
         </div>
@@ -114,10 +122,6 @@
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <!-- Engine (pure) -->
-  <script src="js/engine.js?v=999"></script>
-
-  <!-- UI (demo2) -->
-  <script src="js/demo2.ui.js?v=999"></script>
+  <script src="js/demo2.js?v=22"></script>
 </body>
 </html>
