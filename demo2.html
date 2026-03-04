@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="css/style.css?v=22" />
+  <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 
 <body class="demo2">
@@ -38,75 +38,133 @@
           <span class="statusLabel">Books</span>
           <span class="statusValue" id="booksSummary">YOU 0 • AI2 0 • AI3 0</span>
         </div>
+
+        <div class="statusDivider" aria-hidden="true"></div>
+
+        <div class="statusItem">
+          <span class="statusLabel">Phase</span>
+          <span class="statusValue" id="phaseLabel">PICK</span>
+        </div>
+
+        <div class="statusDivider" aria-hidden="true"></div>
+
+        <div class="statusItem">
+          <span class="statusLabel">Dealer</span>
+          <span class="statusValue" id="dealerLabel">(not set)</span>
+        </div>
       </div>
     </section>
 
-    <!-- STAGE -->
+    <!-- TABLE + RESET ABOVE IT -->
     <section class="tableStage">
-
-      <!-- RESET ABOVE TABLE -->
       <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
       </div>
 
-      <!-- WRAP (table + overlays) -->
-      <div class="tableWrap">
+      <div class="feltTable" aria-label="3-player table">
+        <div class="feltInset" aria-hidden="true"></div>
 
-        <!-- TABLE (clipped for rounded corners) -->
-        <div class="feltTable" aria-label="3-player table">
-          <div class="feltInset" aria-hidden="true"></div>
+        <!-- PICK PANEL (shows first, then hides) -->
+        <div class="overlayPanel" id="pickPanel" aria-label="Pick dealer">
+          <div class="overlayCard">
+            <div class="overlayTitle">Pick First (Choose Dealer)</div>
+            <div class="overlaySub">
+              Each player draws 1 card. <strong>Lowest card</strong> becomes Dealer.
+              If tied for lowest, Re-Pick.
+            </div>
 
-          <!-- LEFT AI -->
-          <div class="seat seat-left">
-            <div class="avatarWrap">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="seatLabel">
-                <div class="seatName">AI2 (Left)</div>
-                <div class="seatSub">Hidden hand</div>
+            <div class="overlayButtons">
+              <button class="btn" id="pickBtn">Pick</button>
+              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK</button>
+              <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
+            </div>
+
+            <div class="overlayStatus" id="pickStatus">Click Pick.</div>
+
+            <div class="pickRow">
+              <div class="pickSlot">
+                <div class="pickName">AI2</div>
+                <div class="pickCard" id="pickAI2">(none)</div>
               </div>
-            </div>
-            <div class="aiBackRow" aria-hidden="true">
-              <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-              <div class="cardBack"></div><div class="cardBack"></div>
-            </div>
-          </div>
-
-          <!-- RIGHT AI -->
-          <div class="seat seat-right">
-            <div class="avatarWrap">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="seatLabel">
-                <div class="seatName">AI3 (Right)</div>
-                <div class="seatSub">Hidden hand</div>
+              <div class="pickSlot">
+                <div class="pickName">AI3</div>
+                <div class="pickCard" id="pickAI3">(none)</div>
               </div>
-            </div>
-            <div class="aiBackRow" aria-hidden="true">
-              <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-              <div class="cardBack"></div><div class="cardBack"></div>
-            </div>
-          </div>
-
-          <!-- CENTER TRICK -->
-          <div class="trickCenter" id="trickArea">
-            <div class="trickInner">
-              <div class="trickTitle">Trick Area</div>
-              <div class="trickSlots" id="trickSlots">
-                <div class="slotHint">(empty)</div>
+              <div class="pickSlot">
+                <div class="pickName">YOU</div>
+                <div class="pickCard" id="pickYOU">(none)</div>
               </div>
-              <div class="slotHint">Center play cards go here</div>
             </div>
           </div>
         </div>
 
-        <!-- YOU OVERLAY (NOT CLIPPED) -->
-        <div class="youOverlay">
+        <!-- TRUMP PANEL (only shows if YOU are dealer) -->
+        <div class="overlayPanel hidden" id="trumpPanel" aria-label="Pick trump">
+          <div class="overlayCard">
+            <div class="overlayTitle">Dealer Calls Trump</div>
+            <div class="overlaySub" id="trumpStatus">Pick trump suit.</div>
+            <div class="overlayButtons" style="flex-wrap:wrap;">
+              <button class="btn" data-trump="S">Spades</button>
+              <button class="btn" data-trump="H">Hearts</button>
+              <button class="btn" data-trump="D">Diamonds</button>
+              <button class="btn" data-trump="C">Clubs</button>
+            </div>
+            <div class="overlayStatus muted" style="margin-top:10px;">
+              Rule: Clubs = trump starts open. Otherwise trump opens when first trump is played.
+            </div>
+          </div>
+        </div>
+
+        <!-- LEFT AI -->
+        <div class="seat seat-left">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName" id="ai2Name">AI2 (Left)</div>
+              <div class="seatSub" id="ai2Sub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true" id="ai2Backs">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT AI -->
+        <div class="seat seat-right">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName" id="ai3Name">AI3 (Right)</div>
+              <div class="seatSub" id="ai3Sub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true" id="ai3Backs">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
+        </div>
+
+        <!-- CENTER TRICK -->
+        <div class="trickCenter" id="trickArea">
+          <div class="trickInner">
+            <div class="trickTitle" id="trickTitle">Trick Area</div>
+            <div class="trickSlots" id="trickSlots">
+              <div class="slotHint">(empty)</div>
+            </div>
+            <div class="slotHint" id="turnHint">Pick first to begin</div>
+          </div>
+        </div>
+
+        <!-- YOU -->
+        <div class="seat seat-bottom">
           <div class="youDock">
             <div class="youRow">
               <div class="avatarWrap">
                 <div class="avatar avatar-you" aria-hidden="true"></div>
                 <div class="seatLabel">
-                  <div class="seatName">YOU</div>
-                  <div class="seatSub">Your cards are in front of you</div>
+                  <div class="seatName" id="youName">YOU</div>
+                  <div class="seatSub" id="youSub">Your cards are in front of you</div>
                 </div>
               </div>
             </div>
@@ -122,6 +180,6 @@
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <script src="js/demo2.js?v=22"></script>
+  <script src="js/demo2.js?v=2"></script>
 </body>
 </html>
