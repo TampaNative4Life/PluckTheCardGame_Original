@@ -1,6 +1,8 @@
 /* =========================
    PLUCK - style.css (FULL REPLACEMENT)
-   HARD LOCK: far-left / far-right cards never clipped.
+   HARD LOCK FIX:
+   - Your hand is no longer clipped by feltTable overflow
+   - First/last cards always fully visible (padding + scroll rules)
    ========================= */
 
 :root{
@@ -43,13 +45,29 @@ body{
   font-weight:800;
   letter-spacing:1px;
 }
-.brand img{ height:40px; width:auto; border-radius:8px; }
-.navlinks{ display:flex; flex-wrap:wrap; gap:12px; }
-.navlinks a{ color:var(--muted); text-decoration:none; font-weight:700; }
+.brand img{
+  height:40px;
+  width:auto;
+  border-radius:8px;
+}
+.navlinks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.navlinks a{
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:700;
+}
 .navlinks a:hover{ color:var(--text); }
 .navlinks .activeLink{ color: var(--brand); }
 
-.container{ max-width:1200px; margin:0 auto; padding:16px; }
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:16px;
+}
 
 /* ===== Buttons ===== */
 .btn{
@@ -91,7 +109,12 @@ body{
   align-items:center;
   justify-content:space-between;
 }
-.statusItem{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.statusItem{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+}
 .statusLabel{
   font-size:12px;
   font-weight:900;
@@ -99,12 +122,20 @@ body{
   color: var(--muted);
   text-transform: uppercase;
 }
-.statusValue{ font-size:14px; font-weight:900; letter-spacing:.3px; }
+.statusValue{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.3px;
+}
 .muted{ opacity:.7; }
-.statusDivider{ width:1px; height:18px; background: rgba(255,255,255,.12); }
+.statusDivider{
+  width:1px;
+  height:18px;
+  background: rgba(255,255,255,.12);
+}
 
 /* =========================
-   DEMO 2 - Table Stage
+   DEMO 2 - Stage
    ========================= */
 .tableStage{
   margin-top: 6px;
@@ -125,6 +156,7 @@ body{
   display:flex;
   justify-content:flex-end;
   pointer-events:none;
+  z-index: 20;
 }
 .tableTopBar .btn{
   pointer-events:auto;
@@ -132,9 +164,16 @@ body{
   padding:12px 16px;
 }
 
-/* ===== Felt Table ===== */
-.feltTable{
+/* Wrap holds table + overlay that must NOT be clipped */
+.tableWrap{
   width: min(1100px, 96vw);
+  position:relative;
+  margin-top: 54px; /* space for reset bar */
+}
+
+/* ===== Felt Table (clipped) ===== */
+.feltTable{
+  width: 100%;
   height: min(620px, 70vh);
   position: relative;
 
@@ -149,11 +188,7 @@ body{
     inset 0 0 40px rgba(0,0,0,.35);
 
   transform: rotateX(12deg);
-  overflow: hidden;
-  margin-top: 54px;
-
-  /* HARD LOCK: create a safe bottom band so the hand never hits rounded edge */
-  padding-bottom: 130px;
+  overflow: hidden; /* KEEP rounded clip for table */
 }
 
 .feltInset{
@@ -190,17 +225,6 @@ body{
   align-items:flex-end;
 }
 
-/* YOU stays centered and safely above bottom curve */
-.seat-bottom{
-  left: 50%;
-  bottom: 76px; /* was 110; now tuned with padding-bottom safe band */
-  transform: translateX(-50%) translateZ(60px);
-  width: min(980px, 94%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
 /* ===== Avatar Wrap ===== */
 .avatarWrap{
   display:flex;
@@ -213,6 +237,7 @@ body{
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
   backdrop-filter: blur(6px);
 }
+
 .avatar{
   width: 54px;
   height: 54px;
@@ -226,6 +251,7 @@ body{
     0 10px 18px rgba(0,0,0,.35);
   position: relative;
 }
+
 .avatar::after{
   content:"";
   position:absolute;
@@ -238,13 +264,22 @@ body{
   background: rgba(255,255,255,.14);
   box-shadow: 0 22px 0 11px rgba(255,255,255,.10);
 }
+
 .avatar-you{
   box-shadow:
     inset 0 0 0 2px rgba(215,176,74,.35),
     0 10px 18px rgba(0,0,0,.35);
 }
-.seatLabel .seatName{ font-weight: 900; letter-spacing: .6px; }
-.seatLabel .seatSub{ opacity: .85; font-size: 12px; margin-top: 2px; }
+
+.seatLabel .seatName{
+  font-weight: 900;
+  letter-spacing: .6px;
+}
+.seatLabel .seatSub{
+  opacity: .85;
+  font-size: 12px;
+  margin-top: 2px;
+}
 
 /* ===== AI hidden hand backs ===== */
 .aiBackRow{
@@ -292,30 +327,34 @@ body{
   gap: 10px;
   padding: 14px;
 }
-.trickTitle{ font-weight: 900; opacity: .92; }
+.trickTitle{
+  font-weight: 900;
+  opacity: .92;
+}
 .trickSlots{
   width: 100%;
   display:flex;
-  align-items:flex-end;
+  align-items:center;
   justify-content:center;
   gap: 14px;
   min-height: 120px;
 }
-.slotHint{ opacity: .75; font-size: 13px; }
-
-.trickSlot{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-}
-.trickWho{
-  font-size:12px;
-  font-weight:900;
-  opacity:.9;
+.slotHint{
+  opacity: .75;
+  font-size: 13px;
 }
 
-/* ===== YOU dock ===== */
+/* ===== YOU OVERLAY (NOT CLIPPED) ===== */
+.youOverlay{
+  position:absolute;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%);
+  width: min(1040px, 96vw);
+  z-index: 25; /* above feltTable */
+  pointer-events: auto;
+}
+
 .youDock{
   width: 100%;
   display:flex;
@@ -323,43 +362,45 @@ body{
   align-items:center;
   gap: 12px;
 }
-.youRow{ width: 100%; display:flex; justify-content:center; }
 
-/* ===== Your Hand (HARD LOCK NO CLIP) ===== */
+.youRow{
+  width: 100%;
+  display:flex;
+  justify-content:center;
+}
+
+/* ===== Your Hand (HARD LOCK: NO EDGE CUTTING) ===== */
 .yourHandRow{
-  width: min(1040px, 96vw);
-  max-width: 100%;
+  width: 100%;
   display:flex;
   align-items:flex-end;
-
-  /* IMPORTANT: don’t center the row itself; let padding create edges */
-  justify-content:flex-start;
-
+  justify-content:flex-start; /* IMPORTANT: don’t center then clip */
   gap: 8px;
-  padding: 12px 18px;
+
+  /* HARD LOCK PADDING: first/last card always fully visible */
+  padding: 10px 22px;
+
   border-radius: 18px;
   background: rgba(0,0,0,.18);
   border: 1px solid rgba(255,255,255,.10);
   box-shadow: 0 14px 34px rgba(0,0,0,.32);
   backdrop-filter: blur(6px);
 
-  /* The real “no cut” solution */
   overflow-x:auto;
   overflow-y:hidden;
   -webkit-overflow-scrolling: touch;
 
-  /* ensures snapping respects padding */
-  scroll-padding-left: 18px;
-  scroll-padding-right: 18px;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 22px;
+  scroll-padding-right: 22px;
 }
 
-/* edge pads inserted by demo2.ui.js so first/last card never touches rounded corners */
-.handEdgePad{
-  flex: 0 0 10px;
-  height: 1px;
+.yourHandRow::-webkit-scrollbar{ height: 10px; }
+.yourHandRow::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.12);
+  border-radius: 999px;
 }
 
-/* cards */
 .cardFaceMini{
   flex: 0 0 auto;
   width: 54px;
@@ -375,14 +416,10 @@ body{
   box-shadow: 0 10px 18px rgba(0,0,0,.35);
   border: 1px solid rgba(0,0,0,.15);
   user-select:none;
+  scroll-snap-align: start;
 }
 .cardFaceMini.red{ color: #b3122d; }
 .cardFaceMini.black{ color: #111827; }
-
-.cardFaceMini.trickMini{
-  width: 58px;
-  height: 78px;
-}
 
 .yourHandRow.tight .cardFaceMini{
   width: 50px;
@@ -392,6 +429,7 @@ body{
 }
 
 @media (max-width: 520px){
+  .yourHandRow{ padding: 10px 18px; scroll-padding-left:18px; scroll-padding-right:18px; }
   .yourHandRow.tight .cardFaceMini{
     width: 46px;
     height: 66px;
@@ -404,13 +442,12 @@ body{
   .feltTable{
     height: min(72vh, 620px);
     transform: rotateX(10deg);
-    padding-bottom: 140px; /* keep safe band on small screens */
   }
   .seat-left{ left: 10px; }
   .seat-right{ right: 10px; }
-  .seat-bottom{
-    bottom: 72px;
-    width: min(980px, 96%);
+  .youOverlay{
+    bottom: 54px;
+    width: min(1040px, 98vw);
   }
   .trickCenter{ top: 46%; }
 }
