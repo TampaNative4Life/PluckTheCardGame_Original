@@ -1,26 +1,23 @@
 /* =========================
    PLUCK - style.css (FULL REPLACEMENT)
-   Fixes:
-   - Broken CSS bracket that was killing the whole stylesheet
-   - Table stays centered on any rotation
-   - AI seats at edges, YOU centered
+   Goals:
+   - No broken brackets (CSS always loads)
+   - Table centered & stable
+   - AI2 left / AI3 right / YOU centered
    - Reset button above table (top-right)
-   - 17 cards never cut off (auto-fit + horizontal scroll fallback)
+   - 17 cards never cut off (scroll instead of chopping)
    ========================= */
 
 :root{
   --bg:#0d0f12;
   --panel:#141a26;
-  --panel2:#0f1422;
   --text:#e9eef6;
   --muted:#a6b0c3;
   --line:#26324a;
   --brand:#d4b254;
-  --good:#38b56a;
 }
 
 *{ box-sizing:border-box; }
-
 html, body{ height:100%; }
 
 body{
@@ -99,20 +96,8 @@ body{
   margin-top:18px;
 }
 
-/* =========================
-   DEMO 2 - Table Stage
-   ========================= */
-
-.tableStage{
-  margin-top: 14px;
-  min-height: calc(100vh - 180px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-}
-
-/* optional top status bar/pills (if present in HTML elsewhere) */
+/* ===== Top HUD ===== */
+.topHud{ margin-top: 12px; }
 .statusBar{
   width:min(1100px, 96vw);
   margin: 0 auto 14px;
@@ -125,31 +110,65 @@ body{
   gap:12px;
   flex-wrap:wrap;
   align-items:center;
-  justify-content:space-between;
 }
-.pillRow{
+.statusItem{
   display:flex;
+  align-items:baseline;
   gap:10px;
   flex-wrap:wrap;
-  align-items:center;
 }
-.pill{
-  font-size:12px;          /* FIXED: bracket + semicolon */
-  color: var(--muted);
+.statusLabel{
+  font-size:12px;
   font-weight:900;
   letter-spacing:.4px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  border:1px solid rgba(255,255,255,.08);
-  background: rgba(0,0,0,.18);
+  color: var(--muted);
+  text-transform: uppercase;
 }
-.pill strong{ color: var(--text); font-weight:1000; }
-.pill .dot{ opacity:.55; padding:0 6px; }
+.statusValue{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.3px;
+}
+.muted{ opacity:.7; }
+.statusDivider{
+  width:1px;
+  height:18px;
+  background: rgba(255,255,255,.12);
+}
+
+/* =========================
+   DEMO 2 - Table Stage
+   ========================= */
+.tableStage{
+  margin-top: 6px;
+  min-height: calc(100vh - 210px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+/* Reset button ABOVE table */
+.tableTopBar{
+  width: min(1100px, 96vw);
+  position:absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display:flex;
+  justify-content:flex-end;
+  pointer-events:none; /* let table still be interactive */
+}
+.tableTopBar .btn{
+  pointer-events:auto;
+  border-radius:16px;
+  padding:12px 16px;
+}
 
 /* ===== Felt Table ===== */
 .feltTable{
   width: min(1100px, 96vw);
-  height: min(620px, 70vh); /* “original” height feel */
+  height: min(620px, 70vh);
   position: relative;
 
   transform-style: preserve-3d;
@@ -164,6 +183,7 @@ body{
 
   transform: rotateX(12deg);
   overflow: hidden;
+  margin-top: 54px; /* creates space for Reset bar above */
 }
 
 .feltInset{
@@ -200,10 +220,10 @@ body{
   align-items:flex-end;
 }
 
-/* YOU centered at table, not drifting left */
+/* YOU stays centered */
 .seat-bottom{
   left: 50%;
-  bottom: 110px; /* lift YOU up onto the table */
+  bottom: 110px;
   transform: translateX(-50%) translateZ(60px);
   width: min(980px, 94%);
   display:flex;
@@ -211,7 +231,7 @@ body{
   justify-content:center;
 }
 
-/* ===== Avatar Wrap (label + silhouette) ===== */
+/* ===== Avatar Wrap ===== */
 .avatarWrap{
   display:flex;
   align-items:center;
@@ -228,7 +248,6 @@ body{
   width: 54px;
   height: 54px;
   border-radius: 999px;
-  /* brighter silhouette (not “blacked out”) */
   background:
     radial-gradient(90% 90% at 35% 30%, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 55%),
     radial-gradient(80% 90% at 55% 55%, rgba(255,255,255,.12) 0%, rgba(0,0,0,.55) 70%),
@@ -282,8 +301,7 @@ body{
   width: 28px;
   height: 40px;
   border-radius: 10px;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.14), rgba(0,0,0,.28));
+  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(0,0,0,.28));
   border: 1px solid rgba(255,255,255,.18);
   box-shadow: 0 10px 18px rgba(0,0,0,.25);
 }
@@ -340,18 +358,13 @@ body{
   align-items:center;
   gap: 12px;
 }
-
 .youRow{
   width: 100%;
   display:flex;
   justify-content:center;
 }
 
-/* ===== Your Hand (17 cards) =====
-   Goal: never cut off left/right cards.
-   - If screen wide enough: fit
-   - If not: allow horizontal scroll
-*/
+/* ===== Your Hand (NO CUTTING) ===== */
 .yourHandRow{
   width: min(1040px, 96vw);
   max-width: 100%;
@@ -366,10 +379,9 @@ body{
   box-shadow: 0 14px 34px rgba(0,0,0,.32);
   backdrop-filter: blur(6px);
 
-  overflow-x:auto;           /* KEY: no cutting */
+  overflow-x:auto;           /* key: no chopping left/right */
   overflow-y:hidden;
   -webkit-overflow-scrolling: touch;
-
   scroll-snap-type: x proximity;
 }
 .yourHandRow::-webkit-scrollbar{ height: 10px; }
@@ -378,9 +390,8 @@ body{
   border-radius: 999px;
 }
 
-/* card faces */
 .cardFaceMini{
-  flex: 0 0 auto;            /* don't shrink to zero */
+  flex: 0 0 auto;
   width: 54px;
   height: 74px;
   border-radius: 12px;
@@ -399,34 +410,19 @@ body{
 .cardFaceMini.red{ color: #b3122d; }
 .cardFaceMini.black{ color: #111827; }
 
-/* When hand is large, tighten slightly (your JS toggles .tight) */
 .yourHandRow.tight .cardFaceMini{
   width: 50px;
   height: 70px;
   border-radius: 11px;
   font-size: 15px;
 }
+
 @media (max-width: 520px){
   .yourHandRow.tight .cardFaceMini{
     width: 46px;
     height: 66px;
     font-size: 14px;
   }
-}
-
-/* ===== Reset button position =====
-   Above table, top-right, stays obvious.
-*/
-.tableActions{
-  position:absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 10;
-  transform: translateZ(80px);
-}
-.tableActions .btn{
-  border-radius: 16px;
-  padding: 12px 16px;
 }
 
 /* ===== Mobile tweaks ===== */
@@ -444,7 +440,7 @@ body{
   .trickCenter{ top: 46%; }
 }
 
-/* reduce motion preference */
+/* reduce motion */
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
 }
