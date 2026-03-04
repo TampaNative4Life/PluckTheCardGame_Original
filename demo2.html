@@ -25,44 +25,39 @@
   <main class="container">
     <section class="tableStage">
 
-      <!-- HUD ABOVE TABLE -->
-      <div class="demo2Hud" aria-label="Round HUD">
+      <!-- HUD: Trump + Quotas ABOVE table -->
+      <div class="demo2Hud" aria-label="Game HUD">
         <div class="hudLeft">
-          <div class="hudTitle">Trump</div>
-          <div class="hudRow">
-            <div class="hudPill">
-              <span class="hudKey">Suit:</span>
-              <span class="hudVal" id="hudTrumpSuit">(not picked)</span>
-            </div>
-            <div class="hudPill">
-              <span class="hudKey">Open:</span>
-              <span class="hudVal" id="hudTrumpOpen">NO</span>
-            </div>
-            <div class="hudPill">
-              <span class="hudKey">Ace:</span>
-              <span class="hudVal" id="hudTrumpAce">(none)</span>
-            </div>
+          <div class="hudPill" id="trumpPill" aria-label="Trump">
+            <div class="hudLabel">TRUMP</div>
+            <div class="hudValue gold" id="trumpValue">—</div>
+          </div>
 
-            <!-- Hidden until you actually want it -->
-            <div class="hudPill" id="hudFirstPick">
-              <span class="hudKey">First Pick:</span>
-              <span class="hudVal" id="hudFirstPickVal">(none)</span>
+          <div class="quotaStrip" aria-label="Quotas">
+            <div class="quotaMini">
+              <div class="name">AI2</div>
+              <div class="vals"><span>Q:</span><b id="qAI2">—</b> <span>T:</span><b id="tAI2">—</b></div>
+            </div>
+            <div class="quotaMini">
+              <div class="name">AI3</div>
+              <div class="vals"><span>Q:</span><b id="qAI3">—</b> <span>T:</span><b id="tAI3">—</b></div>
+            </div>
+            <div class="quotaMini">
+              <div class="name">YOU</div>
+              <div class="vals"><span>Q:</span><b id="qYOU">—</b> <span>T:</span><b id="tYOU">—</b></div>
             </div>
           </div>
         </div>
 
         <div class="hudRight">
-          <div class="hudTitle">Quotas</div>
-          <div class="hudQuotas" id="hudQuotas">
-            <div class="quotaPill"><span class="quotaName">AI2</span><span class="quotaVal">Q: 7 • T: 0</span></div>
-            <div class="quotaPill"><span class="quotaName">AI3</span><span class="quotaVal">Q: 6 • T: 0</span></div>
-            <div class="quotaPill"><span class="quotaName">YOU</span><span class="quotaVal">Q: 4 • T: 0</span></div>
-          </div>
+          <button class="btn" id="resetBtn">Reset (New Deal)</button>
         </div>
       </div>
 
       <!-- TABLE -->
       <div class="feltTable" aria-label="3-player table">
+        <div class="feltInset" aria-hidden="true"></div>
+
         <!-- LEFT AI -->
         <div class="seat seat-left">
           <div class="avatarWrap">
@@ -104,7 +99,7 @@
           </div>
         </div>
 
-        <!-- YOU: at the table -->
+        <!-- YOU: centered at table -->
         <div class="seat seat-bottom">
           <div class="youDock">
             <div class="youRow">
@@ -119,11 +114,6 @@
 
             <!-- Hand -->
             <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
-
-            <!-- Reset under cards -->
-            <div class="bottomControls">
-              <button class="btn" id="resetBtn">Reset (New Deal)</button>
-            </div>
           </div>
         </div>
       </div>
@@ -136,7 +126,6 @@
   (function(){
     "use strict";
 
-    // Demo2 is visual-first, but we keep strict hand ordering.
     // Optional trump in URL: demo2.html?trump=D
     const params = new URLSearchParams(location.search);
     const trumpSuit = (params.get("trump") || "").toUpperCase();
@@ -147,14 +136,35 @@
     const CARD_BIG_JOKER = "BJ";
     const CARD_LITTLE_JOKER = "LJ";
 
-    // Prevent jokers in initial pluck/hand by default
+    // Prevent jokers in initial pluck / demo2 hand
     const includeJokers = false;
+
+    // Simple placeholder quotas (until D1 wiring supplies real values)
+    const quota = { AI2: 7, AI3: 6, YOU: 4 };
+    const tricks = { AI2: 0, AI3: 0, YOU: 0 };
+
+    function suitSymbol(s){
+      return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":s==="C"?"♣":"—";
+    }
+
+    function setHUD(){
+      const tVal = document.getElementById("trumpValue");
+      tVal.textContent = SUITS.includes(trumpSuit) ? suitSymbol(trumpSuit) : "—";
+
+      document.getElementById("qAI2").textContent = quota.AI2;
+      document.getElementById("qAI3").textContent = quota.AI3;
+      document.getElementById("qYOU").textContent = quota.YOU;
+
+      document.getElementById("tAI2").textContent = tricks.AI2;
+      document.getElementById("tAI3").textContent = tricks.AI3;
+      document.getElementById("tYOU").textContent = tricks.YOU;
+    }
 
     function makeDeckNo2(){
       const ranks = ["3","4","5","6","7","8","9","10","J","Q","K","A"];
       const deck = [];
       for (const s of SUITS) for (const r of ranks) deck.push(r+s);
-      deck.push("2C"); // opener exists in deck
+      deck.push("2C"); // opener
       return deck;
     }
 
@@ -188,7 +198,7 @@
       };
 
       return hand.slice().sort((a,b)=>{
-        // jokers to far left (if ever enabled)
+        // jokers left (unused now, but safe)
         if (a===CARD_BIG_JOKER) return (b===CARD_BIG_JOKER)?0:-1;
         if (b===CARD_BIG_JOKER) return 1;
         if (a===CARD_LITTLE_JOKER) return (b===CARD_LITTLE_JOKER)?0:-1;
@@ -205,16 +215,13 @@
       });
     }
 
-    function suitSymbol(s){
-      return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣";
-    }
-
     function makeMiniFace(card){
       const el = document.createElement("div");
       el.className = "cardFaceMini";
 
       if (card===CARD_BIG_JOKER || card===CARD_LITTLE_JOKER){
         el.textContent = card;
+        el.style.background = "rgba(255,255,255,.92)";
         return el;
       }
 
@@ -247,22 +254,9 @@
 
       const hand = sortHand(deal17());
       handEl.innerHTML = "";
-      handEl.classList.toggle("tight", hand.length >= 14);
-
       for (const c of hand){
         handEl.appendChild(makeMiniFace(c));
       }
-    }
-
-    // HUD values (visual only for now)
-    function renderHud(){
-      const suitTxt = trumpSuit ? suitSymbol(trumpSuit) : "(not picked)";
-      document.getElementById("hudTrumpSuit").textContent = suitTxt;
-      document.getElementById("hudTrumpOpen").textContent = "NO";
-      document.getElementById("hudTrumpAce").textContent = "(none)";
-
-      // keep first pick hidden until you decide to show it later
-      // document.getElementById("hudFirstPick").style.display = "inline-flex";
     }
 
     document.getElementById("resetBtn")?.addEventListener("click", () => {
@@ -271,7 +265,7 @@
       if (slots) slots.innerHTML = '<div class="slotHint">(empty)</div>';
     });
 
-    renderHud();
+    setHUD();
     renderHand();
   })();
   </script>
