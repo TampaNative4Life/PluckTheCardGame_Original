@@ -1,107 +1,113 @@
-// js/demo2.ui.js
-// Demo2 UI layer (DOM only). Calls Engine only via actions.
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pluck Demo 2</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
 
-(function () {
-  "use strict";
+<body class="demo2">
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Pluck Home">
+      <img src="assets/QS.png" alt="Pluck" />
+      <span>PLUCK</span>
+    </a>
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html" class="activeLink">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-  if (!window.Engine) {
-    console.error("Engine not loaded. Ensure js/engine.js loads BEFORE js/demo2.ui.js");
-    return;
-  }
+  <main class="container">
 
-  const $ = (id) => document.getElementById(id);
+    <!-- TOP HUD -->
+    <section class="topHud" aria-label="Game status">
+      <div class="statusBar">
+        <div class="pillRow">
+          <div class="pill"><strong>Trump:</strong> <span id="trumpLabel" class="muted">(not set)</span></div>
+          <div class="pill"><strong>Books:</strong> <span id="booksSummary">YOU 0 • AI2 0 • AI3 0</span></div>
+        </div>
+      </div>
+    </section>
 
-  // DOM
-  const youHandEl = $("youHand");
-  const trumpLabelEl = $("trumpLabel");
-  const booksSummaryEl = $("booksSummary");
-  const resetBtn = $("resetBtn");
+    <section class="tableStage">
 
-  const trickSlotsEl = $("trickSlots"); // optional in your HTML
-  const suitParam = new URLSearchParams(location.search).get("trump");
+      <!-- Reset goes ABOVE the table -->
+      <div class="tableActions">
+        <button class="btn" id="resetBtn">Reset (New Deal)</button>
+      </div>
 
-  // Build UI card
-  function suitSymbol(s){ return s==="S"?"♠":s==="H"?"♥":s==="D"?"♦":"♣"; }
-  function isRed(s){ return s==="H" || s==="D"; }
+      <div class="feltTable" aria-label="3-player table">
+        <div class="feltInset"></div>
 
-  function makeMiniFace(card){
-    const el = document.createElement("div");
-    el.className = "cardFaceMini";
+        <!-- LEFT AI -->
+        <div class="seat seat-left">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI2 (Left)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
+        </div>
 
-    if (card === "BJ" || card === "LJ"){
-      el.textContent = card;
-      return el;
-    }
+        <!-- RIGHT AI -->
+        <div class="seat seat-right">
+          <div class="avatarWrap">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="seatLabel">
+              <div class="seatName">AI3 (Right)</div>
+              <div class="seatSub">Hidden hand</div>
+            </div>
+          </div>
+          <div class="aiBackRow" aria-hidden="true">
+            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
+            <div class="cardBack"></div><div class="cardBack"></div>
+          </div>
+        </div>
 
-    const suit = card.slice(-1);
-    const rank = card.slice(0,-1);
-    el.classList.add(isRed(suit) ? "red" : "black");
-    el.textContent = rank + suitSymbol(suit);
-    return el;
-  }
+        <!-- CENTER TRICK -->
+        <div class="trickCenter" id="trickArea">
+          <div class="trickInner">
+            <div class="trickTitle">Trick Area</div>
+            <div class="trickSlots" id="trickSlots">
+              <div class="slotHint">(auto-resolves in demo2)</div>
+            </div>
+          </div>
+        </div>
 
-  // App state (single source of truth)
-  let state = Engine.newGame();
+        <!-- YOU -->
+        <div class="seat seat-bottom">
+          <div class="youDock">
+            <div class="youRow">
+              <div class="avatarWrap">
+                <div class="avatar avatar-you" aria-hidden="true"></div>
+                <div class="seatLabel">
+                  <div class="seatName">YOU</div>
+                  <div class="seatSub">Tap a card to “play” (demo)</div>
+                </div>
+              </div>
+            </div>
 
-  function renderHud(){
-    if (trumpLabelEl){
-      if (state.trumpSuit) trumpLabelEl.textContent = `${state.trumpSuit} (${Engine.suitName(state.trumpSuit)})`;
-      else trumpLabelEl.textContent = "(not set)";
-      trumpLabelEl.classList.toggle("muted", !state.trumpSuit);
-    }
-    if (booksSummaryEl){
-      booksSummaryEl.textContent = `YOU ${state.books.YOU} • AI2 ${state.books.AI2} • AI3 ${state.books.AI3}`;
-    }
-  }
+            <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
+          </div>
+        </div>
 
-  function renderHand(){
-    if (!youHandEl) return;
+      </div>
+    </section>
 
-    const hand = Engine.sortHand(state.players[2].hand, state.trumpSuit);
-    youHandEl.innerHTML = "";
-    youHandEl.classList.toggle("tight", hand.length >= 14);
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
 
-    hand.forEach((cardStr) => {
-      // Convert display order back to real hand index for PLAY_CARD
-      const realIdx = state.players[2].hand.indexOf(cardStr);
-
-      const el = makeMiniFace(cardStr);
-      el.addEventListener("click", () => {
-        state = Engine.dispatch(state, { type:"PLAY_CARD", pi:2, handIndex: realIdx });
-        renderAll();
-      });
-
-      youHandEl.appendChild(el);
-    });
-  }
-
-  function renderTrickArea(){
-    if (!trickSlotsEl) return;
-    // demo2 engine auto-completes tricks, so keep it simple
-    trickSlotsEl.innerHTML = '<div class="slotHint">(auto-resolves in demo2)</div>';
-  }
-
-  function renderAll(){
-    renderHud();
-    renderHand();
-    renderTrickArea();
-  }
-
-  function resetHand(){
-    state = Engine.dispatch(state, { type:"RESET_HAND" });
-    renderAll();
-  }
-
-  // Boot
-  const initialTrump = (suitParam || "").toUpperCase();
-  if (["S","H","D","C"].includes(initialTrump)){
-    state = Engine.dispatch(state, { type:"SET_TRUMP", suit: initialTrump });
-  }
-
-  // Start a hand immediately (demo2 visual)
-  state = Engine.startHand(state, { trumpSuit: state.trumpSuit, includeJokers:false });
-  renderAll();
-
-  resetBtn?.addEventListener("click", resetHand);
-
-})();
+  <!-- IMPORTANT: engine FIRST, then ui -->
+  <script src="js/engine.js"></script>
+  <script src="js/demo2.ui.js"></script>
+</body>
+</html>
