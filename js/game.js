@@ -1060,4 +1060,18 @@
   msg("Pick dealer to begin.");
   render();
 
+    function setFirstPick(nameOrBlank){
+  const bar = document.getElementById("firstPickBar");
+  const val = document.getElementById("firstPickVal");
+  if (!bar || !val) return;
+
+  if (!nameOrBlank){
+    bar.classList.add("hidden");      // not visible until needed
+    val.textContent = "—";
+    return;
+  }
+  bar.classList.remove("hidden");
+  val.textContent = nameOrBlank;
+    }
+
 })();
