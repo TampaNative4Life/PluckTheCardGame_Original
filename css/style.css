@@ -1,17 +1,6 @@
-/* =========================
-   PLUCK - style.css (LOCKED UI BASELINE)
-   UI LOCK:
-   - Top HUD = "all other info"
-   - Table center, AI left/right, trick center
-   - YOU label on table
-   - 17-card hand BELOW table (never cut off)
-   - Controls below table (never overlay the table)
-   ========================= */
-
 :root{
   --bg:#0d0f12;
   --panel:#141a26;
-  --panel2:#0f1422;
   --text:#e9eef6;
   --muted:#a6b0c3;
   --line:#26324a;
@@ -31,8 +20,11 @@ body{
   color:var(--text);
 }
 
-/* ===== Nav ===== */
+/* ===== Nav (HARD FIX: always tappable) ===== */
 .nav{
+  position: sticky;
+  top: 0;
+  z-index: 9999;                /* nav always above any overlay/table */
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -40,6 +32,28 @@ body{
   border-bottom:1px solid var(--line);
   background:#0b0d10;
 }
+
+.navLeft{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.homeBtn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#111827;
+  color:var(--text);
+  text-decoration:none;
+  font-weight:900;
+  min-height:44px;
+}
+.homeBtn:active{ transform: translateY(1px); }
+
 .brand{
   display:flex;
   gap:10px;
@@ -54,6 +68,7 @@ body{
   width:auto;
   border-radius:8px;
 }
+
 .navlinks{
   display:flex;
   flex-wrap:wrap;
@@ -84,10 +99,13 @@ body{
   font-weight:800;
   min-height:44px;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
 .btn:hover{ filter:brightness(1.07); }
 .btn:active{ transform: translateY(1px); }
-.btn[disabled]{ opacity:.45; cursor:not-allowed; }
 .btn-secondary{ background:#141a26; }
 
 /* ===== Footer ===== */
@@ -97,6 +115,26 @@ body{
   color:#6e7a93;
   border-top:1px solid var(--line);
   margin-top:18px;
+}
+
+/* ===== Home ===== */
+.homeHero{
+  padding: 22px 0 10px;
+}
+.homeTitle{
+  margin: 6px 0 6px;
+  font-size: 40px;
+  letter-spacing: 1px;
+}
+.homeSubtitle{
+  margin: 0 0 16px;
+  color: rgba(233,238,246,.78);
+  font-weight: 650;
+}
+.homeButtons{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
 /* ===== Top HUD ===== */
@@ -139,7 +177,9 @@ body{
   background: rgba(255,255,255,.12);
 }
 
-/* ===== Table Stage ===== */
+/* =========================
+   DEMO 2 - Table Stage
+   ========================= */
 .tableStage{
   margin-top: 6px;
   display:flex;
@@ -148,7 +188,7 @@ body{
   position:relative;
 }
 
-/* Reset button ABOVE table, top-right */
+/* Reset button ABOVE table */
 .tableTopBar{
   width: min(1100px, 96vw);
   position:absolute;
@@ -166,7 +206,7 @@ body{
   padding:12px 16px;
 }
 
-/* ===== Felt Table ===== */
+/* ===== Felt Table (approved look) ===== */
 .feltTable{
   width: min(1100px, 96vw);
   height: min(620px, 70vh);
@@ -270,17 +310,11 @@ body{
     inset 0 0 0 2px rgba(215,176,74,.35),
     0 10px 18px rgba(0,0,0,.35);
 }
-.seatLabel .seatName{
-  font-weight: 900;
-  letter-spacing: .6px;
-}
-.seatLabel .seatSub{
-  opacity: .85;
-  font-size: 12px;
-  margin-top: 2px;
-}
 
-/* ===== Trick Center ===== */
+.seatLabel .seatName{ font-weight: 900; letter-spacing: .6px; }
+.seatLabel .seatSub{ opacity: .85; font-size: 12px; margin-top: 2px; }
+
+/* ===== Center Trick ===== */
 .trickCenter{
   position:absolute;
   left: 50%;
@@ -307,10 +341,7 @@ body{
   gap: 10px;
   padding: 14px;
 }
-.trickTitle{
-  font-weight: 900;
-  opacity: .92;
-}
+.trickTitle{ font-weight: 900; opacity: .92; }
 .trickSlots{
   width: 100%;
   display:flex;
@@ -319,165 +350,48 @@ body{
   gap: 14px;
   min-height: 120px;
 }
-.slotHint{ opacity:.75; font-size:13px; }
+.slotHint{ opacity: .75; font-size: 13px; }
 
-.trickSlotWrap{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
+/* ===== Bottom “Pick First” panel (approved look) ===== */
+.bottomPanel{
+  width: min(1100px, 96vw);
+  margin: 14px auto 0;
 }
-.trickSlotLabel{
-  font-size:12px;
-  font-weight:900;
-  color: rgba(255,255,255,.85);
-}
-.trickMini{
-  width: 54px;
-  height: 74px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.92);
-  color: #0b1220;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight: 1000;
-  box-shadow: 0 10px 18px rgba(0,0,0,.35);
-  border: 1px solid rgba(0,0,0,.15);
-}
-.trickMini.red{ color:#b3122d; }
-.trickMini.black{ color:#111827; }
-
-/* ===== BELOW TABLE: your hand ===== */
-.belowTable{
-  width:min(1100px, 96vw);
-  margin: 12px auto 0;
+.bottomCard{
+  background: rgba(20,26,38,.72);
 }
 
-/* HARD LOCK: first + last card NEVER cut off */
-.yourHandRow{
+/* Card shell used by Pick panel (kept consistent) */
+.overlayCard{
   width: 100%;
-  display:flex;
-  align-items:flex-end;
-  justify-content:flex-start;          /* critical: avoid center-crop behavior */
-  gap: 8px;
-
-  padding: 10px 18px;                 /* hard-lock breathing room */
-  border-radius: 18px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: 0 14px 34px rgba(0,0,0,.32);
-  backdrop-filter: blur(6px);
-
-  overflow-x:auto;
-  overflow-y:hidden;
-  -webkit-overflow-scrolling: touch;
-
-  scroll-snap-type: x proximity;
-  scroll-padding-left: 18px;
-  scroll-padding-right: 18px;
-
-  overscroll-behavior-x: contain;
-}
-.yourHandRow::before,
-.yourHandRow::after{
-  content:"";
-  flex: 0 0 14px;                     /* ensures true full-visibility at edges */
-}
-.yourHandRow::-webkit-scrollbar{ height: 10px; }
-.yourHandRow::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,.12);
-  border-radius: 999px;
-}
-
-.cardFaceMini{
-  flex: 0 0 auto;
-  width: 54px;
-  height: 74px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.92);
-  color: #0b1220;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight: 1000;
-  letter-spacing: .2px;
-  box-shadow: 0 10px 18px rgba(0,0,0,.35);
-  border: 1px solid rgba(0,0,0,.15);
-  user-select:none;
-  scroll-snap-align: center;
-  cursor:pointer;
-}
-.cardFaceMini.red{ color:#b3122d; }
-.cardFaceMini.black{ color:#111827; }
-.cardFaceMini.disabled{
-  opacity: .45;
-  cursor: not-allowed;
-  filter: grayscale(.25);
-}
-
-/* tighten when needed */
-.yourHandRow.tight .cardFaceMini{
-  width: 50px;
-  height: 70px;
-  border-radius: 11px;
-  font-size: 15px;
-}
-@media (max-width: 520px){
-  .yourHandRow.tight .cardFaceMini{
-    width: 46px;
-    height: 66px;
-    font-size: 14px;
-  }
-}
-
-/* ===== Controls below table ===== */
-.controlPanel{
-  width:min(1100px, 96vw);
-  margin: 12px auto 0;
-  display:flex;
-  flex-direction:column;
-  gap: 12px;
-}
-
-.panelCard{
   border-radius: 22px;
-  border:1px solid var(--line);
-  background: rgba(20,26,38,.88);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 24px 70px rgba(0,0,0,.45);
-  padding: 14px 14px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 24px 70px rgba(0,0,0,.40);
+  padding: 16px 16px 14px;
 }
-
-.panelTitle{
+.overlayTitle{
   font-size: 18px;
   font-weight: 1000;
   letter-spacing: .4px;
 }
-.panelText{
+.overlaySub{
   margin-top: 6px;
-  color: rgba(233,238,246,.84);
+  color: rgba(233,238,246,.82);
   font-weight: 700;
   line-height: 1.25;
 }
-.panelBtns{
+.overlayButtons{
   display:flex;
   gap:10px;
   margin-top: 12px;
   flex-wrap:wrap;
 }
-
-.msgLine{
-  padding: 10px 12px;
-  border-radius: 16px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.20);
-  color: rgba(233,238,246,.92);
-  font-weight: 800;
+.overlayStatus{
+  margin-top: 10px;
+  font-weight: 900;
+  color: rgba(233,238,246,.88);
 }
-
-/* Pick grid */
-.pickGrid{
+.pickRow{
   display:flex;
   gap:12px;
   flex-wrap:wrap;
@@ -496,7 +410,7 @@ body{
   color: rgba(233,238,246,.85);
   letter-spacing: .5px;
 }
-.pickCardSlot{
+.pickCard{
   margin-top: 8px;
   min-height: 54px;
   display:flex;
@@ -505,7 +419,7 @@ body{
   color: rgba(233,238,246,.75);
 }
 
-/* Mobile tweaks */
+/* ===== Mobile tweaks ===== */
 @media (max-width: 860px){
   .feltTable{
     height: min(72vh, 620px);
@@ -520,6 +434,7 @@ body{
   .trickCenter{ top: 46%; }
 }
 
+/* reduce motion */
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
 }
