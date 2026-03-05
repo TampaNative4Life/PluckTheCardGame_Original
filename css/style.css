@@ -1,3 +1,15 @@
+/* =========================
+   PLUCK - style.css (FULL REPLACEMENT)
+   Goals:
+   - Keep your approved Demo2 look
+   - Fix top-left PLUCK return/home click (mobile safe)
+   - No broken brackets
+   - Demo2 table centered & stable
+   - AI2 left / AI3 right / YOU centered
+   - Reset button above table (top-right)
+   - HARD LOCK: first + last card NEVER cut off
+   ========================= */
+
 :root{
   --bg:#0d0f12;
   --panel:#141a26;
@@ -20,39 +32,20 @@ body{
   color:var(--text);
 }
 
-/* ===== Nav (HARD FIX: always tappable) ===== */
+/* ===== Nav ===== */
 .nav{
-  position: sticky;
-  top: 0;
-  z-index: 9999;                /* nav always above any overlay/table */
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:12px 18px;
   border-bottom:1px solid var(--line);
   background:#0b0d10;
-}
 
-.navLeft{
-  display:flex;
-  align-items:center;
-  gap:12px;
+  /* FIX: keep PLUCK return button always clickable on mobile */
+  position: sticky;
+  top: 0;
+  z-index: 9999;
 }
-
-.homeBtn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:#111827;
-  color:var(--text);
-  text-decoration:none;
-  font-weight:900;
-  min-height:44px;
-}
-.homeBtn:active{ transform: translateY(1px); }
 
 .brand{
   display:flex;
@@ -62,7 +55,14 @@ body{
   text-decoration:none;
   font-weight:800;
   letter-spacing:1px;
+
+  /* FIX: ensure link sits above any overlays */
+  position: relative;
+  z-index: 10000;
+  pointer-events: auto;
+  cursor: pointer;
 }
+
 .brand img{
   height:40px;
   width:auto;
@@ -73,7 +73,11 @@ body{
   display:flex;
   flex-wrap:wrap;
   gap:12px;
+
+  position: relative;
+  z-index: 10000;
 }
+
 .navlinks a{
   color:var(--muted);
   text-decoration:none;
@@ -99,10 +103,6 @@ body{
   font-weight:800;
   min-height:44px;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
 }
 .btn:hover{ filter:brightness(1.07); }
 .btn:active{ transform: translateY(1px); }
@@ -115,26 +115,6 @@ body{
   color:#6e7a93;
   border-top:1px solid var(--line);
   margin-top:18px;
-}
-
-/* ===== Home ===== */
-.homeHero{
-  padding: 22px 0 10px;
-}
-.homeTitle{
-  margin: 6px 0 6px;
-  font-size: 40px;
-  letter-spacing: 1px;
-}
-.homeSubtitle{
-  margin: 0 0 16px;
-  color: rgba(233,238,246,.78);
-  font-weight: 650;
-}
-.homeButtons{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
 }
 
 /* ===== Top HUD ===== */
@@ -182,6 +162,7 @@ body{
    ========================= */
 .tableStage{
   margin-top: 6px;
+  min-height: calc(100vh - 210px);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -206,7 +187,7 @@ body{
   padding:12px 16px;
 }
 
-/* ===== Felt Table (approved look) ===== */
+/* ===== Felt Table ===== */
 .feltTable{
   width: min(1100px, 96vw);
   height: min(620px, 70vh);
@@ -246,18 +227,22 @@ body{
   color: #eaf2ff;
   text-shadow: 0 1px 2px rgba(0,0,0,.45);
 }
+
 .seat-left{
   left: 16px;
   top: 50%;
   transform: translateY(-50%) translateZ(30px);
   align-items:flex-start;
 }
+
 .seat-right{
   right: 16px;
   top: 50%;
   transform: translateY(-50%) translateZ(30px);
   align-items:flex-end;
 }
+
+/* YOU stays centered */
 .seat-bottom{
   left: 50%;
   bottom: 110px;
@@ -280,6 +265,7 @@ body{
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
   backdrop-filter: blur(6px);
 }
+
 .avatar{
   width: 54px;
   height: 54px;
@@ -293,6 +279,7 @@ body{
     0 10px 18px rgba(0,0,0,.35);
   position: relative;
 }
+
 .avatar::after{
   content:"";
   position:absolute;
@@ -305,6 +292,7 @@ body{
   background: rgba(255,255,255,.14);
   box-shadow: 0 22px 0 11px rgba(255,255,255,.10);
 }
+
 .avatar-you{
   box-shadow:
     inset 0 0 0 2px rgba(215,176,74,.35),
@@ -352,53 +340,126 @@ body{
 }
 .slotHint{ opacity: .75; font-size: 13px; }
 
-/* ===== Bottom “Pick First” panel (approved look) ===== */
-.bottomPanel{
-  width: min(1100px, 96vw);
-  margin: 14px auto 0;
+/* Trick slot mini cards */
+.trickSlotWrap{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+.trickSlotLabel{ font-size:12px; font-weight:900; color: rgba(255,255,255,.85); }
+.trickMini{
+  width: 54px;
+  height: 74px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.92);
+  color: #0b1220;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 1000;
+  border: 1px solid rgba(0,0,0,.15);
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
 }
-.bottomCard{
-  background: rgba(20,26,38,.72);
+.trickMini.red{ color:#b3122d; }
+.trickMini.black{ color:#111827; }
+
+/* ===== YOU dock ===== */
+.youDock{
+  width: 100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 12px;
+}
+.youRow{
+  width: 100%;
+  display:flex;
+  justify-content:center;
 }
 
-/* Card shell used by Pick panel (kept consistent) */
-.overlayCard{
-  width: 100%;
-  border-radius: 22px;
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 24px 70px rgba(0,0,0,.40);
-  padding: 16px 16px 14px;
+/* ===== Your Hand (HARD LOCK: NO CUTTING) ===== */
+.yourHandRow{
+  width: min(1040px, 96vw);
+  max-width: 100%;
+  display:flex;
+  align-items:flex-end;
+
+  /* do NOT center-pack; prevents “edge chop” on some viewports */
+  justify-content:flex-start;
+
+  gap: 8px;
+
+  /* HARD LOCK PADDING: first/last card always fully visible */
+  padding: 10px 18px;
+
+  border-radius: 18px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 14px 34px rgba(0,0,0,.32);
+  backdrop-filter: blur(6px);
+
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling: touch;
+
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 18px;
+  scroll-padding-right: 18px;
+
+  overscroll-behavior-x: contain;
 }
-.overlayTitle{
-  font-size: 18px;
+
+.yourHandRow::-webkit-scrollbar{ height: 10px; }
+.yourHandRow::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.12); border-radius: 999px; }
+
+/* Add invisible spacers so first/last card can sit fully inside view */
+.yourHandRow::before,
+.yourHandRow::after{
+  content:"";
+  flex: 0 0 14px;
+}
+
+.cardFaceMini{
+  flex: 0 0 auto;
+  width: 54px;
+  height: 74px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.92);
+  color: #0b1220;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-weight: 1000;
-  letter-spacing: .4px;
+  letter-spacing: .2px;
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  border: 1px solid rgba(0,0,0,.15);
+  user-select:none;
+  scroll-snap-align: center;
+  cursor:pointer;
 }
-.overlaySub{
-  margin-top: 6px;
-  color: rgba(233,238,246,.82);
-  font-weight: 700;
-  line-height: 1.25;
+.cardFaceMini.red{ color: #b3122d; }
+.cardFaceMini.black{ color: #111827; }
+.cardFaceMini.disabled{ opacity: .45; cursor: not-allowed; filter: grayscale(.25); }
+
+.yourHandRow.tight .cardFaceMini{
+  width: 50px;
+  height: 70px;
+  border-radius: 11px;
+  font-size: 15px;
 }
-.overlayButtons{
-  display:flex;
-  gap:10px;
-  margin-top: 12px;
-  flex-wrap:wrap;
+
+@media (max-width: 520px){
+  .yourHandRow.tight .cardFaceMini{
+    width: 46px;
+    height: 66px;
+    font-size: 14px;
+  }
 }
-.overlayStatus{
-  margin-top: 10px;
-  font-weight: 900;
-  color: rgba(233,238,246,.88);
-}
-.pickRow{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
+
+/* ===== Pick/Trump panels (if you use them as inline panels) ===== */
+.pickGrid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 12px;
 }
 .pickSlot{
-  flex: 1 1 160px;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(0,0,0,.18);
@@ -409,9 +470,9 @@ body{
   font-weight: 1000;
   color: rgba(233,238,246,.85);
   letter-spacing: .5px;
+  margin-bottom: 8px;
 }
-.pickCard{
-  margin-top: 8px;
+.pickCardSlot{
   min-height: 54px;
   display:flex;
   align-items:center;
