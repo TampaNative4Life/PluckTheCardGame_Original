@@ -564,3 +564,14 @@ body{
 .navlinks a{
   padding: 8px 4px;
 }
+/* PATCH: keep header clickable above game/table layers */
+.nav{
+  position: relative;
+  z-index: 999;
+}
+
+.tableStage,
+.feltTable,
+.overlayPanel{
+  z-index: 1;
+}
