@@ -1,11 +1,11 @@
 /* =========================
-   PLUCK - style.css (FULL REPLACEMENT)
-   Goals:
-   - No broken brackets
-   - Demo2 table centered & stable
-   - AI2 left / AI3 right / YOU centered
-   - Reset button above table (top-right)
-   - HARD LOCK: first + last card NEVER cut off
+   PLUCK - style.css (UI LOCK)
+   Visual is LOCKED to approved table look.
+   Only functional + additive tweaks going forward.
+
+   HARD LOCK GOAL:
+   - First + last card NEVER cut off
+   - Horizontal scroll if needed
    ========================= */
 
 :root{
@@ -80,15 +80,14 @@ body{
   padding:10px 14px;
   border-radius:14px;
   cursor:pointer;
-  font-weight:800;
+  font-weight:900;
   min-height:44px;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
 }
 .btn:hover{ filter:brightness(1.07); }
 .btn:active{ transform: translateY(1px); }
-.btn-secondary{
-  background:#141a26;
-}
+.btn-secondary{ background:#141a26; }
+.btn[disabled]{ opacity:.55; cursor:not-allowed; }
 
 /* ===== Footer ===== */
 .footer{
@@ -209,22 +208,18 @@ body{
   color: #eaf2ff;
   text-shadow: 0 1px 2px rgba(0,0,0,.45);
 }
-
 .seat-left{
   left: 16px;
   top: 50%;
   transform: translateY(-50%) translateZ(30px);
   align-items:flex-start;
 }
-
 .seat-right{
   right: 16px;
   top: 50%;
   transform: translateY(-50%) translateZ(30px);
   align-items:flex-end;
 }
-
-/* YOU stays centered */
 .seat-bottom{
   left: 50%;
   bottom: 110px;
@@ -247,7 +242,6 @@ body{
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
   backdrop-filter: blur(6px);
 }
-
 .avatar{
   width: 54px;
   height: 54px;
@@ -261,7 +255,6 @@ body{
     0 10px 18px rgba(0,0,0,.35);
   position: relative;
 }
-
 .avatar::after{
   content:"";
   position:absolute;
@@ -274,13 +267,11 @@ body{
   background: rgba(255,255,255,.14);
   box-shadow: 0 22px 0 11px rgba(255,255,255,.10);
 }
-
 .avatar-you{
   box-shadow:
     inset 0 0 0 2px rgba(215,176,74,.35),
     0 10px 18px rgba(0,0,0,.35);
 }
-
 .seatLabel .seatName{
   font-weight: 900;
   letter-spacing: .6px;
@@ -289,25 +280,6 @@ body{
   opacity: .85;
   font-size: 12px;
   margin-top: 2px;
-}
-
-/* ===== AI hidden hand backs ===== */
-.aiBackRow{
-  display:flex;
-  gap:8px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: rgba(0,0,0,.16);
-  border: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(6px);
-}
-.cardBack{
-  width: 28px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(0,0,0,.28));
-  border: 1px solid rgba(255,255,255,.18);
-  box-shadow: 0 10px 18px rgba(0,0,0,.25);
 }
 
 /* ===== Center Trick ===== */
@@ -337,10 +309,7 @@ body{
   gap: 10px;
   padding: 14px;
 }
-.trickTitle{
-  font-weight: 900;
-  opacity: .92;
-}
+.trickTitle{ font-weight: 900; opacity: .92; }
 .trickSlots{
   width: 100%;
   display:flex;
@@ -349,10 +318,7 @@ body{
   gap: 14px;
   min-height: 120px;
 }
-.slotHint{
-  opacity: .75;
-  font-size: 13px;
-}
+.slotHint{ opacity: .75; font-size: 13px; }
 
 .trickSlotWrap{
   display:flex;
@@ -364,10 +330,6 @@ body{
   font-size:12px;
   font-weight:900;
   color: rgba(255,255,255,.85);
-}
-.trickMini{
-  width: 54px !important;
-  height: 74px !important;
 }
 
 /* ===== YOU dock ===== */
@@ -391,13 +353,11 @@ body{
 
   display:flex;
   align-items:flex-end;
-
-  /* IMPORTANT: do NOT center-pack cards; that causes edge clipping on some viewports */
   justify-content:flex-start;
 
   gap: 8px;
 
-  /* HARD LOCK PADDING: first/last card always fully visible */
+  /* HARD LOCK: add breathing room so edge cards never clip */
   padding: 10px 18px;
 
   border-radius: 18px;
@@ -410,21 +370,24 @@ body{
   overflow-y:hidden;
   -webkit-overflow-scrolling: touch;
 
-  /* better “first/last card is clean” behavior */
   scroll-snap-type: x proximity;
   scroll-padding-left: 18px;
   scroll-padding-right: 18px;
 
-  /* prevents weird iOS overscroll glow */
   overscroll-behavior-x: contain;
 }
-
+.yourHandRow::before,
+.yourHandRow::after{
+  content:"";
+  flex: 0 0 14px;
+}
 .yourHandRow::-webkit-scrollbar{ height: 10px; }
 .yourHandRow::-webkit-scrollbar-thumb{
   background: rgba(255,255,255,.12);
   border-radius: 999px;
 }
 
+/* Card tiles (used for both hand + trick) */
 .cardFaceMini{
   flex: 0 0 auto;
   width: 54px;
@@ -442,6 +405,7 @@ body{
   user-select:none;
   scroll-snap-align: center;
   cursor:pointer;
+  position: relative;
 }
 .cardFaceMini.red{ color: #b3122d; }
 .cardFaceMini.black{ color: #111827; }
@@ -450,14 +414,32 @@ body{
   cursor: not-allowed;
   filter: grayscale(.25);
 }
+.cardFaceMini .miniCorner{
+  position:absolute;
+  left:8px;
+  top:6px;
+  font-size:12px;
+  line-height: 1;
+  font-weight: 1000;
+}
+.cardFaceMini .miniSuit{
+  font-size: 22px;
+  opacity: .95;
+}
+.cardFaceMini.joker{
+  background: rgba(255,255,255,.95);
+}
+.cardFaceMini.joker .miniSuit{
+  font-size: 20px;
+}
 
+/* When hand is large */
 .yourHandRow.tight .cardFaceMini{
   width: 50px;
   height: 70px;
   border-radius: 11px;
   font-size: 15px;
 }
-
 @media (max-width: 520px){
   .yourHandRow.tight .cardFaceMini{
     width: 46px;
@@ -477,8 +459,6 @@ body{
   background: rgba(0,0,0,.35);
   backdrop-filter: blur(6px);
 }
-.overlayPanel.hidden{ display:none; }
-
 .overlayCard{
   width: min(760px, 92vw);
   border-radius: 22px;
@@ -487,32 +467,26 @@ body{
   box-shadow: 0 24px 70px rgba(0,0,0,.55);
   padding: 16px 16px 14px;
 }
-
 .overlayTitle{
   font-size: 18px;
   font-weight: 1000;
   letter-spacing: .4px;
 }
-.overlaySub{
+.overlayText{
   margin-top: 6px;
   color: rgba(233,238,246,.82);
   font-weight: 700;
   line-height: 1.25;
 }
-.overlayButtons{
+.overlayBtns{
   display:flex;
   gap:10px;
   margin-top: 12px;
   flex-wrap:wrap;
 }
-.overlayStatus{
-  margin-top: 10px;
-  font-weight: 900;
-  color: rgba(233,238,246,.88);
-}
 
-/* pick row */
-.pickRow{
+/* Pick grid (matches HTML IDs) */
+.pickGrid{
   display:flex;
   gap:12px;
   flex-wrap:wrap;
@@ -531,7 +505,7 @@ body{
   color: rgba(233,238,246,.85);
   letter-spacing: .5px;
 }
-.pickCard{
+.pickCardSlot{
   margin-top: 8px;
   min-height: 54px;
   display:flex;
@@ -539,21 +513,6 @@ body{
   justify-content:center;
   color: rgba(233,238,246,.75);
 }
-.pickFace{
-  width: 64px;
-  height: 86px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.92);
-  border: 1px solid rgba(0,0,0,.18);
-  box-shadow: 0 12px 20px rgba(0,0,0,.35);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight: 1000;
-  color: #0b1220;
-}
-.pickFace.red{ color:#b3122d; }
-.pickFace.black{ color:#111827; }
 
 /* ===== Mobile tweaks ===== */
 @media (max-width: 860px){
@@ -573,18 +532,4 @@ body{
 /* reduce motion */
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
-}
-/* ===== HARD LOCK: show full left/right cards (no edge cropping) ===== */
-.yourHandRow{
-  padding-left: 18px !important;
-  padding-right: 18px !important;
-  scroll-padding-left: 18px;
-  scroll-padding-right: 18px;
-}
-
-/* Add invisible spacers so first/last card can sit fully inside view */
-.yourHandRow::before,
-.yourHandRow::after{
-  content:"";
-  flex: 0 0 14px;
 }
