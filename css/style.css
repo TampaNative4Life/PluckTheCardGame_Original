@@ -1,11 +1,12 @@
 /* =========================
-   PLUCK - style.css (UI LOCK)
-   Visual is LOCKED to approved table look.
-   Only functional + additive tweaks going forward.
-
-   HARD LOCK GOAL:
-   - First + last card NEVER cut off
-   - Horizontal scroll if needed
+   PLUCK - style.css (FULL REPLACEMENT)
+   DEMO2 UI LOCK VERSION
+   Goals:
+   - Table stays visible (NO full-screen overlays)
+   - AI2 left / AI3 right / YOU centered
+   - Reset button above table (top-right)
+   - Your hand: first & last card NEVER cut off (hard lock)
+   - Pick/Trump panels become a bottom dock (not overlay)
    ========================= */
 
 :root{
@@ -80,14 +81,14 @@ body{
   padding:10px 14px;
   border-radius:14px;
   cursor:pointer;
-  font-weight:900;
+  font-weight:800;
   min-height:44px;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
 }
 .btn:hover{ filter:brightness(1.07); }
 .btn:active{ transform: translateY(1px); }
 .btn-secondary{ background:#141a26; }
-.btn[disabled]{ opacity:.55; cursor:not-allowed; }
+.btn[disabled]{ opacity:.5; cursor:not-allowed; }
 
 /* ===== Footer ===== */
 .footer{
@@ -160,7 +161,7 @@ body{
   display:flex;
   justify-content:flex-end;
   pointer-events:none;
-  z-index: 20;
+  z-index: 25;
 }
 .tableTopBar .btn{
   pointer-events:auto;
@@ -272,15 +273,8 @@ body{
     inset 0 0 0 2px rgba(215,176,74,.35),
     0 10px 18px rgba(0,0,0,.35);
 }
-.seatLabel .seatName{
-  font-weight: 900;
-  letter-spacing: .6px;
-}
-.seatLabel .seatSub{
-  opacity: .85;
-  font-size: 12px;
-  margin-top: 2px;
-}
+.seatLabel .seatName{ font-weight: 900; letter-spacing: .6px; }
+.seatLabel .seatSub{ opacity: .85; font-size: 12px; margin-top: 2px; }
 
 /* ===== Center Trick ===== */
 .trickCenter{
@@ -350,14 +344,15 @@ body{
 .yourHandRow{
   width: min(1040px, 96vw);
   max-width: 100%;
-
   display:flex;
   align-items:flex-end;
+
+  /* do NOT center-pack; use scroll */
   justify-content:flex-start;
 
   gap: 8px;
 
-  /* HARD LOCK: add breathing room so edge cards never clip */
+  /* HARD LOCK padding so edges never clip */
   padding: 10px 18px;
 
   border-radius: 18px;
@@ -369,17 +364,11 @@ body{
   overflow-x:auto;
   overflow-y:hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 
   scroll-snap-type: x proximity;
   scroll-padding-left: 18px;
   scroll-padding-right: 18px;
-
-  overscroll-behavior-x: contain;
-}
-.yourHandRow::before,
-.yourHandRow::after{
-  content:"";
-  flex: 0 0 14px;
 }
 .yourHandRow::-webkit-scrollbar{ height: 10px; }
 .yourHandRow::-webkit-scrollbar-thumb{
@@ -387,7 +376,13 @@ body{
   border-radius: 999px;
 }
 
-/* Card tiles (used for both hand + trick) */
+/* invisible spacers so first/last card can fully sit inside */
+.yourHandRow::before,
+.yourHandRow::after{
+  content:"";
+  flex: 0 0 14px;
+}
+
 .cardFaceMini{
   flex: 0 0 auto;
   width: 54px;
@@ -405,7 +400,6 @@ body{
   user-select:none;
   scroll-snap-align: center;
   cursor:pointer;
-  position: relative;
 }
 .cardFaceMini.red{ color: #b3122d; }
 .cardFaceMini.black{ color: #111827; }
@@ -414,26 +408,7 @@ body{
   cursor: not-allowed;
   filter: grayscale(.25);
 }
-.cardFaceMini .miniCorner{
-  position:absolute;
-  left:8px;
-  top:6px;
-  font-size:12px;
-  line-height: 1;
-  font-weight: 1000;
-}
-.cardFaceMini .miniSuit{
-  font-size: 22px;
-  opacity: .95;
-}
-.cardFaceMini.joker{
-  background: rgba(255,255,255,.95);
-}
-.cardFaceMini.joker .miniSuit{
-  font-size: 20px;
-}
 
-/* When hand is large */
 .yourHandRow.tight .cardFaceMini{
   width: 50px;
   height: 70px;
@@ -448,25 +423,43 @@ body{
   }
 }
 
-/* ===== Overlay panels (Pick / Trump) ===== */
+/* =========================================================
+   UI LOCK: Pick/Trump panels are a DOCK (NOT an overlay)
+   We keep your existing HTML IDs, but we restyle them.
+   ========================================================= */
 .overlayPanel{
   position:absolute;
-  inset: 0;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%) translateZ(80px);
+  width: min(840px, 92vw);
+
+  /* NOT full-screen */
+  inset: auto;
+
   display:flex;
-  align-items:center;
+  align-items:flex-end;
   justify-content:center;
+
+  /* no dark wash over table */
+  background: transparent;
+  backdrop-filter: none;
+
   z-index: 30;
-  background: rgba(0,0,0,.35);
-  backdrop-filter: blur(6px);
+  pointer-events:none;
 }
+.overlayPanel[aria-hidden="true"]{ display:none; }
+
 .overlayCard{
-  width: min(760px, 92vw);
+  pointer-events:auto;
+  width: 100%;
   border-radius: 22px;
   border: 1px solid rgba(255,255,255,.12);
-  background: rgba(20,26,38,.92);
+  background: rgba(20,26,38,.90);
   box-shadow: 0 24px 70px rgba(0,0,0,.55);
-  padding: 16px 16px 14px;
+  padding: 14px 14px 12px;
 }
+
 .overlayTitle{
   font-size: 18px;
   font-weight: 1000;
@@ -485,7 +478,6 @@ body{
   flex-wrap:wrap;
 }
 
-/* Pick grid (matches HTML IDs) */
 .pickGrid{
   display:flex;
   gap:12px;
@@ -493,7 +485,7 @@ body{
   margin-top: 12px;
 }
 .pickSlot{
-  flex: 1 1 160px;
+  flex: 1 1 180px;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(0,0,0,.18);
