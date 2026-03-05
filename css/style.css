@@ -574,3 +574,17 @@ body{
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
 }
+/* ===== HARD LOCK: show full left/right cards (no edge cropping) ===== */
+.yourHandRow{
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+  scroll-padding-left: 18px;
+  scroll-padding-right: 18px;
+}
+
+/* Add invisible spacers so first/last card can sit fully inside view */
+.yourHandRow::before,
+.yourHandRow::after{
+  content:"";
+  flex: 0 0 14px;
+}
