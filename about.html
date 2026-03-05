@@ -3,49 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck The Card Game</title>
+  <title>About • Pluck The Card Game</title>
   <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 
 <body>
   <!-- NAV -->
   <header class="nav">
+    <!-- This is your “return/home” button -->
     <a class="brand" href="index.html" aria-label="Pluck Home">
       <img src="assets/QS.png" alt="Pluck" />
       <span>PLUCK</span>
     </a>
-    <nav class="navlinks">
+
+    <nav class="navlinks" aria-label="Primary">
       <a href="game.html">Play Demo</a>
       <a href="demo2.html">Demo 2</a>
       <a href="rules.html">Rules</a>
-      <a href="about.html">About</a>
+      <a href="about.html" class="activeLink">About</a>
     </nav>
   </header>
 
   <main class="container">
-    <section style="padding:18px 0;">
-      <h1 style="margin:0 0 10px; font-weight:1000; letter-spacing:.5px;">Pluck</h1>
-      <p style="margin:0 0 16px; color: rgba(233,238,246,.78); font-weight:700; max-width: 780px;">
+    <section class="pageSection">
+      <h1 class="pageTitle">Pluck</h1>
+      <p class="pageText">
         Quick demos for gameplay flow and UI testing.
       </p>
 
-      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-        <a class="btn" href="game.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-          Play Demo
-        </a>
-
-        <!-- NEW: Demo 2 button -->
-        <a class="btn" href="demo2.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-          Demo 2
-        </a>
-
-        <a class="btn btn-secondary" href="rules.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-          Rules
-        </a>
-
-        <a class="btn btn-secondary" href="about.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-          About
-        </a>
+      <div class="pageButtons">
+        <a class="btn" href="game.html">Play Demo</a>
+        <a class="btn" href="demo2.html">Demo 2</a>
+        <a class="btn btn-secondary" href="rules.html">Rules</a>
       </div>
     </section>
 
