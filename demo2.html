@@ -4,107 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-
-  <!-- Keep your existing stylesheet -->
-  <link rel="stylesheet" href="css/style.css?v=1" />
-
-  <!-- ADD-ON ONLY: tiny UI helpers (no layout redesign) -->
-  <style>
-    /* Hard lock: prevent "half-card" edges when scrolling */
-    #youHand{
-      padding-left: 26px !important;
-      padding-right: 26px !important;
-      scroll-padding-left: 26px;
-      scroll-padding-right: 26px;
-    }
-    #youHand .cardFaceMini:first-child{ margin-left: 6px; }
-    #youHand .cardFaceMini:last-child{ margin-right: 6px; }
-
-    /* Overlay panels (only visible during Pick/Trump). Doesn’t change your table UI. */
-    .overlayMask{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index: 9999;
-      padding: 16px;
-    }
-    .overlayMask.show{ display:flex; }
-
-    .overlayCard{
-      width: min(820px, 96vw);
-      background: rgba(20,26,38,.92);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.55);
-      backdrop-filter: blur(10px);
-      padding: 14px;
-    }
-    .overlayTitle{
-      font-weight: 950;
-      letter-spacing: .6px;
-      margin: 2px 0 8px;
-    }
-    .overlayHint{
-      color: rgba(255,255,255,.78);
-      margin: 0 0 12px;
-      line-height: 1.3;
-    }
-    .overlayRow{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items:center;
-      justify-content: space-between;
-    }
-    .overlaySlots{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-    .pickSlot{
-      flex: 1 1 220px;
-      min-width: 220px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      padding: 10px;
-    }
-    .pickName{
-      font-weight: 900;
-      color: rgba(255,255,255,.90);
-      margin-bottom: 8px;
-    }
-    .pickCardSlot{
-      min-height: 86px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      color: rgba(255,255,255,.75);
-    }
-    .overlayMeta{
-      margin-top: 10px;
-      color: rgba(255,255,255,.78);
-      font-weight: 800;
-    }
-    .overlayMeta strong{ color: #fff; }
-    .btnRow{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content:flex-start;
-      margin-top: 10px;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 
 <body class="demo2">
-
-  <!-- NAV (unchanged) -->
+  <!-- NAV -->
   <header class="nav">
     <a class="brand" href="index.html" aria-label="Pluck Home">
       <img src="assets/QS.png" alt="Pluck" />
@@ -120,44 +24,45 @@
 
   <main class="container">
 
-    <!-- TOP HUD (unchanged structure) -->
+    <!-- TOP HUD -->
     <section class="topHud" aria-label="Game status">
       <div class="statusBar">
         <div class="statusItem">
-          <span class="statusLabel">Trump</span>
+          <span class="statusLabel">TRUMP</span>
           <span class="statusValue muted" id="trumpLabel">(not set)</span>
         </div>
 
         <div class="statusDivider" aria-hidden="true"></div>
 
         <div class="statusItem">
-          <span class="statusLabel">Books</span>
+          <span class="statusLabel">BOOKS</span>
           <span class="statusValue" id="booksSummary">YOU 0 • AI2 0 • AI3 0</span>
         </div>
 
         <div class="statusDivider" aria-hidden="true"></div>
 
         <div class="statusItem">
-          <span class="statusLabel">Phase</span>
-          <span class="statusValue" id="phaseLabel">PICK</span>
+          <span class="statusLabel">PHASE</span>
+          <span class="statusValue" id="phaseVal">PICK</span>
         </div>
 
         <div class="statusDivider" aria-hidden="true"></div>
 
         <div class="statusItem">
-          <span class="statusLabel">Dealer</span>
-          <span class="statusValue muted" id="dealerLabel">(not set)</span>
+          <span class="statusLabel">DEALER</span>
+          <span class="statusValue muted" id="dealerVal">(not set)</span>
         </div>
       </div>
     </section>
 
-    <!-- TABLE + RESET ABOVE IT (unchanged) -->
+    <!-- TABLE + RESET ABOVE IT -->
     <section class="tableStage">
       <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
       </div>
 
       <div class="feltTable" aria-label="3-player table">
+        <div class="feltInset" aria-hidden="true"></div>
 
         <!-- LEFT AI -->
         <div class="seat seat-left">
@@ -168,10 +73,7 @@
               <div class="seatSub">Hidden hand</div>
             </div>
           </div>
-          <div class="aiBackRow" aria-hidden="true" id="ai2BackRow">
-            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-            <div class="cardBack"></div><div class="cardBack"></div>
-          </div>
+          <!-- REMOVED: AI card backs row (per your request) -->
         </div>
 
         <!-- RIGHT AI -->
@@ -183,10 +85,7 @@
               <div class="seatSub">Hidden hand</div>
             </div>
           </div>
-          <div class="aiBackRow" aria-hidden="true" id="ai3BackRow">
-            <div class="cardBack"></div><div class="cardBack"></div><div class="cardBack"></div>
-            <div class="cardBack"></div><div class="cardBack"></div>
-          </div>
+          <!-- REMOVED: AI card backs row (per your request) -->
         </div>
 
         <!-- CENTER TRICK -->
@@ -196,7 +95,7 @@
             <div class="trickSlots" id="trickSlots">
               <div class="slotHint">(empty)</div>
             </div>
-            <div class="slotHint" id="hintLine">Center play cards go here</div>
+            <div class="slotHint">Center play cards go here</div>
           </div>
         </div>
 
@@ -214,7 +113,62 @@
             </div>
 
             <!-- Hand -->
-            <div class="yourHandRow" id="youHand" aria-label="Your hand"></div>
+            <div class="yourHandRow tight" id="youHand" aria-label="Your hand"></div>
+          </div>
+        </div>
+
+        <!-- PICK OVERLAY (hidden after dealer chosen) -->
+        <div class="overlayPanel" id="pickOverlay" aria-hidden="false">
+          <div class="overlayCard">
+            <div class="overlayTitle">Pick First (Choose Dealer)</div>
+            <div class="overlayText">
+              Each player draws 1 card. Lowest card becomes Dealer.
+              If tied for lowest, Re-Pick.
+            </div>
+
+            <div class="overlayBtns">
+              <button class="btn" id="pickBtn">Pick</button>
+              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK</button>
+              <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
+            </div>
+
+            <div class="overlayText" style="margin-top:10px;">
+              <strong>Status:</strong> <span id="pickStatus">Click Pick.</span>
+            </div>
+
+            <div class="pickGrid">
+              <div class="pickSlot">
+                <div class="pickName">AI2</div>
+                <div class="pickCardSlot" id="pickAI2">(none)</div>
+              </div>
+              <div class="pickSlot">
+                <div class="pickName">AI3</div>
+                <div class="pickCardSlot" id="pickAI3">(none)</div>
+              </div>
+              <div class="pickSlot">
+                <div class="pickName">YOU</div>
+                <div class="pickCardSlot" id="pickYOU">(none)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRUMP OVERLAY (only while dealer is choosing) -->
+        <div class="overlayPanel" id="trumpOverlay" aria-hidden="true" style="display:none;">
+          <div class="overlayCard">
+            <div class="overlayTitle">Dealer Calls Trump</div>
+            <div class="overlayText" id="trumpStatus">Dealer selecting...</div>
+
+            <div class="overlayBtns" style="flex-wrap:wrap;">
+              <button class="btn" data-trump="S">Spades</button>
+              <button class="btn" data-trump="H">Hearts</button>
+              <button class="btn" data-trump="D">Diamonds</button>
+              <button class="btn" data-trump="C">Clubs</button>
+            </div>
+
+            <div class="overlayText" style="margin-top:10px;">
+              Clubs = trump starts open. Otherwise trump opens when first trump is played.
+            </div>
           </div>
         </div>
 
@@ -224,61 +178,6 @@
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <!-- OVERLAY: PICK FIRST (hidden unless needed) -->
-  <div class="overlayMask" id="pickOverlay" aria-hidden="true">
-    <div class="overlayCard">
-      <div class="overlayTitle">Pick First (Choose Dealer)</div>
-      <p class="overlayHint">
-        Each player draws 1 card. <strong>Lowest card</strong> becomes Dealer. If tied for lowest, Re-Pick.
-      </p>
-
-      <div class="btnRow">
-        <button class="btn" id="pickBtn">Pick</button>
-        <button class="btn" id="repickBtn" disabled>Re-Pick</button>
-        <button class="btn" id="okBtn" disabled>OK (Start)</button>
-      </div>
-
-      <div class="overlayMeta"><strong>Status:</strong> <span id="pickStatus">Click Pick.</span></div>
-
-      <div class="overlaySlots">
-        <div class="pickSlot">
-          <div class="pickName">AI2</div>
-          <div class="pickCardSlot" id="pickAI2">(none)</div>
-        </div>
-        <div class="pickSlot">
-          <div class="pickName">AI3</div>
-          <div class="pickCardSlot" id="pickAI3">(none)</div>
-        </div>
-        <div class="pickSlot">
-          <div class="pickName">YOU</div>
-          <div class="pickCardSlot" id="pickYOU">(none)</div>
-        </div>
-      </div>
-
-      <div class="overlayMeta" style="margin-top:12px;">
-        <strong>Dealer:</strong> <span id="pickDealer">(not set)</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- OVERLAY: TRUMP CALL (hidden unless needed) -->
-  <div class="overlayMask" id="trumpOverlay" aria-hidden="true">
-    <div class="overlayCard">
-      <div class="overlayTitle">Dealer Calls Trump</div>
-      <p class="overlayHint" id="trumpStatus">
-        Dealer selects trump. Clubs starts open; otherwise trump opens when first trump is played.
-      </p>
-      <div class="btnRow">
-        <button class="btn" data-trump="S">Spades</button>
-        <button class="btn" data-trump="H">Hearts</button>
-        <button class="btn" data-trump="D">Diamonds</button>
-        <button class="btn" data-trump="C">Clubs</button>
-      </div>
-      <div class="overlayMeta"><strong>Selected:</strong> <span id="trumpPickVal">(not set)</span></div>
-    </div>
-  </div>
-
-  <!-- ENGINE -->
-  <script src="js/demo2-engine.js?v=1"></script>
+  <script src="js/demo2.js?v=2"></script>
 </body>
 </html>
