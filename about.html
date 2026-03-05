@@ -1,44 +1,61 @@
 <!doctype html>
 <html lang="en">
+
+<!--
+CHANGE LOG
+2026-03-05 12:55
+Fix: Correct logo path to assets/PluckTheCardGame_Logo.jpg
+No UI changes.
+-->
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>About • Pluck The Card Game</title>
+  <title>Pluck The Card Game</title>
   <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 
 <body>
-  <!-- NAV -->
-  <header class="nav">
-    <!-- This is your “return/home” button -->
-    <a class="brand" href="index.html" aria-label="Pluck Home">
-      <img src="assets/QS.png" alt="Pluck" />
-      <span>PLUCK</span>
-    </a>
 
-    <nav class="navlinks" aria-label="Primary">
-      <a href="game.html">Play Demo</a>
-      <a href="demo2.html">Demo 2</a>
-      <a href="rules.html">Rules</a>
-      <a href="about.html" class="activeLink">About</a>
-    </nav>
-  </header>
+<header class="nav">
+  <a class="brand" href="index.html" aria-label="Pluck Home">
+    <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
+    <span>PLUCK</span>
+  </a>
 
-  <main class="container">
-    <section class="pageSection">
-      <h1 class="pageTitle">Pluck</h1>
-      <p class="pageText">
-        Quick demos for gameplay flow and UI testing.
-      </p>
+  <nav class="navlinks">
+    <a href="game.html">Play Demo</a>
+    <a href="demo2.html">Demo 2</a>
+    <a href="rules.html">Rules</a>
+    <a href="about.html">About</a>
+  </nav>
+</header>
 
-      <div class="pageButtons">
-        <a class="btn" href="game.html">Play Demo</a>
-        <a class="btn" href="demo2.html">Demo 2</a>
-        <a class="btn btn-secondary" href="rules.html">Rules</a>
-      </div>
-    </section>
+<main class="container">
 
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
+<section style="padding:18px 0;">
+  <h1 style="margin:0 0 10px; font-weight:1000; letter-spacing:.5px;">Pluck</h1>
+
+  <p style="margin:0 0 16px; color: rgba(233,238,246,.78); font-weight:700; max-width: 780px;">
+    Quick demos for gameplay flow and UI testing.
+  </p>
+
+  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+
+    <a class="btn" href="game.html">Play Demo</a>
+
+    <a class="btn" href="demo2.html">Demo 2</a>
+
+    <a class="btn btn-secondary" href="rules.html">Rules</a>
+
+    <a class="btn btn-secondary" href="about.html">About</a>
+
+  </div>
+
+</section>
+
+<footer class="footer">© 2026 Pluck The Card Game</footer>
+
+</main>
 </body>
 </html>
