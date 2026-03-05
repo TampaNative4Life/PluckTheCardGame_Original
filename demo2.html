@@ -4,16 +4,22 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="css/style.css?v=99" />
+  <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 
 <body class="demo2">
   <!-- NAV -->
   <header class="nav">
-    <a class="brand" href="index.html" aria-label="Pluck Home">
-      <img src="assets/QS.png" alt="Pluck" />
-      <span>PLUCK</span>
-    </a>
+    <div class="navLeft">
+      <!-- HARD FIX: explicit Home button (top-left) -->
+      <a class="homeBtn" href="index.html" aria-label="Go to Home">← Home</a>
+
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <img src="assets/QS.png" alt="Pluck" />
+        <span>PLUCK</span>
+      </a>
+    </div>
+
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
       <a href="demo2.html" class="activeLink">Demo 2</a>
@@ -24,7 +30,7 @@
 
   <main class="container">
 
-    <!-- TOP HUD (All other info) -->
+    <!-- TOP HUD -->
     <section class="topHud" aria-label="Game status">
       <div class="statusBar">
         <div class="statusItem">
@@ -55,7 +61,7 @@
       </div>
     </section>
 
-    <!-- TABLE -->
+    <!-- TABLE + RESET ABOVE IT -->
     <section class="tableStage">
       <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
@@ -97,7 +103,7 @@
           </div>
         </div>
 
-        <!-- YOU label only (hand is BELOW table to match your sketch) -->
+        <!-- YOU (label stays on table) -->
         <div class="seat seat-bottom">
           <div class="youDock">
             <div class="youRow">
@@ -112,75 +118,47 @@
           </div>
         </div>
 
-      </div>
+      </div><!-- /feltTable -->
     </section>
 
-    <!-- YOU HAND (17 cards) BELOW TABLE -->
-    <section class="belowTable">
-      <div class="yourHandRow tight" id="youHand" aria-label="Your hand"></div>
-    </section>
-
-    <!-- CONTROLS (Pick -> Hide -> Deal -> Dealer Calls Trump -> Gameplay) -->
-    <section class="controlPanel" id="controlPanel">
-
-      <!-- PICK PANEL (shown only in PICK phase) -->
-      <div class="panelCard" id="pickPanel">
-        <div class="panelTitle">Pick First (Choose Dealer)</div>
-        <div class="panelText">
+    <!-- APPROVED LOOK: Pick panel at bottom (NOT overlay) -->
+    <section class="bottomPanel" aria-label="Pick First Panel">
+      <div class="overlayCard bottomCard">
+        <div class="overlayTitle">Pick First (Choose Dealer)</div>
+        <div class="overlaySub">
           Each player draws 1 card. Lowest card becomes Dealer. If tied for lowest, Re-Pick.
         </div>
 
-        <div class="panelBtns">
+        <div class="overlayButtons">
           <button class="btn" id="pickBtn">Pick</button>
           <button class="btn btn-secondary" id="pickOkBtn" disabled>OK</button>
           <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
         </div>
 
-        <div class="panelText" style="margin-top:10px;">
+        <div class="overlayStatus" style="margin-top:10px;">
           <strong>Status:</strong> <span id="pickStatus">Click Pick.</span>
         </div>
 
-        <div class="pickGrid">
+        <div class="pickRow">
           <div class="pickSlot">
             <div class="pickName">AI2</div>
-            <div class="pickCardSlot" id="pickAI2">(none)</div>
+            <div class="pickCard" id="pickAI2">(none)</div>
           </div>
           <div class="pickSlot">
             <div class="pickName">AI3</div>
-            <div class="pickCardSlot" id="pickAI3">(none)</div>
+            <div class="pickCard" id="pickAI3">(none)</div>
           </div>
           <div class="pickSlot">
             <div class="pickName">YOU</div>
-            <div class="pickCardSlot" id="pickYOU">(none)</div>
+            <div class="pickCard" id="pickYOU">(none)</div>
           </div>
         </div>
       </div>
-
-      <!-- TRUMP PANEL (shown only in TRUMP phase) -->
-      <div class="panelCard" id="trumpPanel" style="display:none;">
-        <div class="panelTitle">Dealer Calls Trump</div>
-        <div class="panelText" id="trumpStatus">Dealer selecting...</div>
-
-        <div class="panelBtns" style="flex-wrap:wrap;">
-          <button class="btn" data-trump="S">Spades</button>
-          <button class="btn" data-trump="H">Hearts</button>
-          <button class="btn" data-trump="D">Diamonds</button>
-          <button class="btn" data-trump="C">Clubs</button>
-        </div>
-
-        <div class="panelText" style="margin-top:10px;">
-          Clubs = trump starts open. Otherwise trump opens when first trump is played.
-        </div>
-      </div>
-
-      <!-- MESSAGE LINE -->
-      <div class="msgLine" id="msg">Pick first to begin.</div>
-
     </section>
 
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <script src="js/demo2.js?v=99"></script>
+  <script src="js/demo2.js?v=2"></script>
 </body>
 </html>
