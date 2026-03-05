@@ -1,3 +1,11 @@
+<!--
+CHANGE LOG
+2026-03-05 12:55 (-0500)
+Fix: Remove extra top-left "← Home" text link. Top-left Pluck brand (logo + PLUCK text) is the homepage button.
+Fix: Add non-visual IDs required by demo2.js: #pickPanel and #trumpPanel (prevents JS from failing).
+UI NOTE: No restyle/reorder of existing UI elements beyond removing the unapproved "← Home" link.
+-->
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,11 +19,9 @@
   <!-- NAV -->
   <header class="nav">
     <div class="navLeft">
-      <!-- HARD FIX: explicit Home button (top-left) -->
-      <a class="homeBtn" href="index.html" aria-label="Go to Home">← Home</a>
-
+      <!-- Approved: Brand is the Home button -->
       <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="assets/QS.png" alt="Pluck" />
+        <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
         <span>PLUCK</span>
       </a>
     </div>
@@ -122,7 +128,8 @@
     </section>
 
     <!-- APPROVED LOOK: Pick panel at bottom (NOT overlay) -->
-    <section class="bottomPanel" aria-label="Pick First Panel">
+    <!-- IMPORTANT: give demo2.js what it expects: id="pickPanel" -->
+    <section class="bottomPanel" id="pickPanel" aria-label="Pick First Panel">
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Pick First (Choose Dealer)</div>
         <div class="overlaySub">
@@ -155,6 +162,9 @@
         </div>
       </div>
     </section>
+
+    <!-- Non-visual placeholder required by demo2.js (won't show unless JS sets it) -->
+    <section id="trumpPanel" aria-hidden="true" style="display:none;"></section>
 
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
