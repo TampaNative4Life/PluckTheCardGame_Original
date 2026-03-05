@@ -1,17 +1,17 @@
 /* =========================
-   PLUCK - style.css (FULL REPLACEMENT)
-   DEMO2 UI LOCK VERSION
-   Goals:
-   - Table stays visible (NO full-screen overlays)
-   - AI2 left / AI3 right / YOU centered
-   - Reset button above table (top-right)
-   - Your hand: first & last card NEVER cut off (hard lock)
-   - Pick/Trump panels become a bottom dock (not overlay)
+   PLUCK - style.css (LOCKED UI BASELINE)
+   UI LOCK:
+   - Top HUD = "all other info"
+   - Table center, AI left/right, trick center
+   - YOU label on table
+   - 17-card hand BELOW table (never cut off)
+   - Controls below table (never overlay the table)
    ========================= */
 
 :root{
   --bg:#0d0f12;
   --panel:#141a26;
+  --panel2:#0f1422;
   --text:#e9eef6;
   --muted:#a6b0c3;
   --line:#26324a;
@@ -87,8 +87,8 @@ body{
 }
 .btn:hover{ filter:brightness(1.07); }
 .btn:active{ transform: translateY(1px); }
+.btn[disabled]{ opacity:.45; cursor:not-allowed; }
 .btn-secondary{ background:#141a26; }
-.btn[disabled]{ opacity:.5; cursor:not-allowed; }
 
 /* ===== Footer ===== */
 .footer{
@@ -139,19 +139,16 @@ body{
   background: rgba(255,255,255,.12);
 }
 
-/* =========================
-   DEMO 2 - Table Stage
-   ========================= */
+/* ===== Table Stage ===== */
 .tableStage{
   margin-top: 6px;
-  min-height: calc(100vh - 210px);
   display:flex;
   align-items:center;
   justify-content:center;
   position:relative;
 }
 
-/* Reset button ABOVE table */
+/* Reset button ABOVE table, top-right */
 .tableTopBar{
   width: min(1100px, 96vw);
   position:absolute;
@@ -161,7 +158,7 @@ body{
   display:flex;
   justify-content:flex-end;
   pointer-events:none;
-  z-index: 25;
+  z-index: 20;
 }
 .tableTopBar .btn{
   pointer-events:auto;
@@ -273,10 +270,17 @@ body{
     inset 0 0 0 2px rgba(215,176,74,.35),
     0 10px 18px rgba(0,0,0,.35);
 }
-.seatLabel .seatName{ font-weight: 900; letter-spacing: .6px; }
-.seatLabel .seatSub{ opacity: .85; font-size: 12px; margin-top: 2px; }
+.seatLabel .seatName{
+  font-weight: 900;
+  letter-spacing: .6px;
+}
+.seatLabel .seatSub{
+  opacity: .85;
+  font-size: 12px;
+  margin-top: 2px;
+}
 
-/* ===== Center Trick ===== */
+/* ===== Trick Center ===== */
 .trickCenter{
   position:absolute;
   left: 50%;
@@ -303,7 +307,10 @@ body{
   gap: 10px;
   padding: 14px;
 }
-.trickTitle{ font-weight: 900; opacity: .92; }
+.trickTitle{
+  font-weight: 900;
+  opacity: .92;
+}
 .trickSlots{
   width: 100%;
   display:flex;
@@ -312,7 +319,7 @@ body{
   gap: 14px;
   min-height: 120px;
 }
-.slotHint{ opacity: .75; font-size: 13px; }
+.slotHint{ opacity:.75; font-size:13px; }
 
 .trickSlotWrap{
   display:flex;
@@ -325,36 +332,37 @@ body{
   font-weight:900;
   color: rgba(255,255,255,.85);
 }
-
-/* ===== YOU dock ===== */
-.youDock{
-  width: 100%;
+.trickMini{
+  width: 54px;
+  height: 74px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.92);
+  color: #0b1220;
   display:flex;
-  flex-direction:column;
   align-items:center;
-  gap: 12px;
-}
-.youRow{
-  width: 100%;
-  display:flex;
   justify-content:center;
+  font-weight: 1000;
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  border: 1px solid rgba(0,0,0,.15);
+}
+.trickMini.red{ color:#b3122d; }
+.trickMini.black{ color:#111827; }
+
+/* ===== BELOW TABLE: your hand ===== */
+.belowTable{
+  width:min(1100px, 96vw);
+  margin: 12px auto 0;
 }
 
-/* ===== Your Hand (HARD LOCK: NO CUTTING) ===== */
+/* HARD LOCK: first + last card NEVER cut off */
 .yourHandRow{
-  width: min(1040px, 96vw);
-  max-width: 100%;
+  width: 100%;
   display:flex;
   align-items:flex-end;
-
-  /* do NOT center-pack; use scroll */
-  justify-content:flex-start;
-
+  justify-content:flex-start;          /* critical: avoid center-crop behavior */
   gap: 8px;
 
-  /* HARD LOCK padding so edges never clip */
-  padding: 10px 18px;
-
+  padding: 10px 18px;                 /* hard-lock breathing room */
   border-radius: 18px;
   background: rgba(0,0,0,.18);
   border: 1px solid rgba(255,255,255,.10);
@@ -364,23 +372,22 @@ body{
   overflow-x:auto;
   overflow-y:hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
 
   scroll-snap-type: x proximity;
   scroll-padding-left: 18px;
   scroll-padding-right: 18px;
+
+  overscroll-behavior-x: contain;
+}
+.yourHandRow::before,
+.yourHandRow::after{
+  content:"";
+  flex: 0 0 14px;                     /* ensures true full-visibility at edges */
 }
 .yourHandRow::-webkit-scrollbar{ height: 10px; }
 .yourHandRow::-webkit-scrollbar-thumb{
   background: rgba(255,255,255,.12);
   border-radius: 999px;
-}
-
-/* invisible spacers so first/last card can fully sit inside */
-.yourHandRow::before,
-.yourHandRow::after{
-  content:"";
-  flex: 0 0 14px;
 }
 
 .cardFaceMini{
@@ -401,14 +408,15 @@ body{
   scroll-snap-align: center;
   cursor:pointer;
 }
-.cardFaceMini.red{ color: #b3122d; }
-.cardFaceMini.black{ color: #111827; }
+.cardFaceMini.red{ color:#b3122d; }
+.cardFaceMini.black{ color:#111827; }
 .cardFaceMini.disabled{
   opacity: .45;
   cursor: not-allowed;
   filter: grayscale(.25);
 }
 
+/* tighten when needed */
 .yourHandRow.tight .cardFaceMini{
   width: 50px;
   height: 70px;
@@ -423,61 +431,52 @@ body{
   }
 }
 
-/* =========================================================
-   UI LOCK: Pick/Trump panels are a DOCK (NOT an overlay)
-   We keep your existing HTML IDs, but we restyle them.
-   ========================================================= */
-.overlayPanel{
-  position:absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%) translateZ(80px);
-  width: min(840px, 92vw);
-
-  /* NOT full-screen */
-  inset: auto;
-
+/* ===== Controls below table ===== */
+.controlPanel{
+  width:min(1100px, 96vw);
+  margin: 12px auto 0;
   display:flex;
-  align-items:flex-end;
-  justify-content:center;
-
-  /* no dark wash over table */
-  background: transparent;
-  backdrop-filter: none;
-
-  z-index: 30;
-  pointer-events:none;
+  flex-direction:column;
+  gap: 12px;
 }
-.overlayPanel[aria-hidden="true"]{ display:none; }
 
-.overlayCard{
-  pointer-events:auto;
-  width: 100%;
+.panelCard{
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(20,26,38,.90);
-  box-shadow: 0 24px 70px rgba(0,0,0,.55);
+  border:1px solid var(--line);
+  background: rgba(20,26,38,.88);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 24px 70px rgba(0,0,0,.45);
   padding: 14px 14px 12px;
 }
 
-.overlayTitle{
+.panelTitle{
   font-size: 18px;
   font-weight: 1000;
   letter-spacing: .4px;
 }
-.overlayText{
+.panelText{
   margin-top: 6px;
-  color: rgba(233,238,246,.82);
+  color: rgba(233,238,246,.84);
   font-weight: 700;
   line-height: 1.25;
 }
-.overlayBtns{
+.panelBtns{
   display:flex;
   gap:10px;
   margin-top: 12px;
   flex-wrap:wrap;
 }
 
+.msgLine{
+  padding: 10px 12px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.20);
+  color: rgba(233,238,246,.92);
+  font-weight: 800;
+}
+
+/* Pick grid */
 .pickGrid{
   display:flex;
   gap:12px;
@@ -485,7 +484,7 @@ body{
   margin-top: 12px;
 }
 .pickSlot{
-  flex: 1 1 180px;
+  flex: 1 1 160px;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(0,0,0,.18);
@@ -506,7 +505,7 @@ body{
   color: rgba(233,238,246,.75);
 }
 
-/* ===== Mobile tweaks ===== */
+/* Mobile tweaks */
 @media (max-width: 860px){
   .feltTable{
     height: min(72vh, 620px);
@@ -521,7 +520,6 @@ body{
   .trickCenter{ top: 46%; }
 }
 
-/* reduce motion */
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
 }
