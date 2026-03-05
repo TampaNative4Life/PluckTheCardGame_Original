@@ -575,3 +575,16 @@ body{
 .overlayPanel{
   z-index: 1;
 }
+
+/* =========================================================
+   CHANGE LOG
+   2026-03-05 12:55 (-0500)
+   Fix: Ensure navLeft exists and brand (logo + PLUCK text) sits correctly top-left.
+   Notes: Additive patch only. No UI rework.
+   ========================================================= */
+
+.navLeft{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
