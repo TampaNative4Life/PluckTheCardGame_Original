@@ -499,3 +499,68 @@ body{
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
 }
+/* =========================
+   SAFE ADD-ON: NAV + HOME/ABOUT ONLY
+   (Does NOT touch Demo2 table UI)
+   ========================= */
+
+/* Make sure left brand (home/return) always stays top-left and clickable */
+.navLeft{
+  display:flex;
+  align-items:center;
+}
+
+/* Prevent brand from shrinking/collapsing on small screens */
+.brand{
+  flex: 0 0 auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Home hero */
+.homeHero{
+  padding: 28px 0 8px;
+}
+.homeTitle{
+  margin: 0 0 8px;
+  font-weight: 1000;
+  letter-spacing: .6px;
+}
+.homeSubtitle{
+  margin: 0 0 18px;
+  color: rgba(233,238,246,.78);
+  font-weight: 700;
+  max-width: 760px;
+}
+.homeButtons{
+  display:flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* About page helpers */
+.pageSection{
+  padding: 18px 0;
+}
+.pageTitle{
+  margin: 0 0 10px;
+  font-weight: 1000;
+  letter-spacing: .5px;
+}
+.pageText{
+  margin: 0 0 16px;
+  color: rgba(233,238,246,.78);
+  font-weight: 700;
+  max-width: 780px;
+}
+.pageButtons{
+  display:flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Make nav links more reliable to tap on mobile (no layout change, just hitbox) */
+.navlinks a{
+  padding: 8px 4px;
+}
