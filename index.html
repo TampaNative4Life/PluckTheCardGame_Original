@@ -1,13 +1,12 @@
-<!doctype html>
-<html lang="en">
-
 <!--
 CHANGE LOG
-2026-03-05 12:55
-Fix: Correct logo path. HTML previously referenced assets/QS.png but actual file is assets/PluckTheCardGame_Logo.jpg
-No UI changes.
+2026-03-05 12:55 (-0500)
+Fix: Restore homepage top-left brand (logo + PLUCK text) in nav; keep existing UI layout intact.
+Note: Uses assets/PluckTheCardGame_Logo.jpg as the brand image per user-provided asset.
 -->
 
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -16,38 +15,36 @@ No UI changes.
 </head>
 
 <body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="navLeft">
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
+        <span>PLUCK</span>
+      </a>
+    </div>
 
-<header class="nav">
-  <div class="navLeft">
-    <a class="brand" href="index.html" aria-label="Pluck Home">
-      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
-      <span>PLUCK</span>
-    </a>
-  </div>
+    <nav class="navlinks">
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-  <nav class="navlinks">
-    <a href="game.html">Play Demo</a>
-    <a href="demo2.html">Demo 2</a>
-    <a href="rules.html">Rules</a>
-    <a href="about.html">About</a>
-  </nav>
-</header>
+  <main class="container">
+    <section class="homeHero">
+      <h1 class="homeTitle">Pluck</h1>
+      <p class="homeSubtitle">Play the demos. Tight UI. No nonsense.</p>
 
-<main class="container">
+      <div class="homeButtons">
+        <a class="btn" href="game.html">Play Demo</a>
+        <a class="btn" href="demo2.html">Demo 2</a>
+        <a class="btn btn-secondary" href="rules.html">Rules</a>
+      </div>
+    </section>
 
-<section class="homeHero">
-  <h1 class="homeTitle">Pluck</h1>
-  <p class="homeSubtitle">Play the demos. Tight UI. No nonsense.</p>
-
-  <div class="homeButtons">
-    <a class="btn" href="game.html">Play Demo</a>
-    <a class="btn" href="demo2.html">Demo 2</a>
-    <a class="btn btn-secondary" href="rules.html">Rules</a>
-  </div>
-</section>
-
-<footer class="footer">© 2026 Pluck The Card Game</footer>
-
-</main>
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
 </body>
 </html>
