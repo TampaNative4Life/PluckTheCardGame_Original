@@ -1,46 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About Pluck</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pluck The Card Game</title>
+  <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
-<body>
 
+<body>
+  <!-- NAV -->
   <header class="nav">
-    <a class="brand" href="index.html">
-      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
+    <a class="brand" href="index.html" aria-label="Pluck Home">
+      <img src="assets/QS.png" alt="Pluck" />
       <span>PLUCK</span>
     </a>
     <nav class="navlinks">
       <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
   <main class="container">
-    <h1>About</h1>
+    <section style="padding:18px 0;">
+      <h1 style="margin:0 0 10px; font-weight:1000; letter-spacing:.5px;">Pluck</h1>
+      <p style="margin:0 0 16px; color: rgba(233,238,246,.78); font-weight:700; max-width: 780px;">
+        Quick demos for gameplay flow and UI testing.
+      </p>
 
-    <div class="card">
-      <p><b>Pluck</b> is a three-player trick-taking card game built for strategy, reads, and pressure.</p>
-      <p>This site is the official launchpad. We’re building in public: playable demo first, then full rules, then online play.</p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+        <a class="btn" href="game.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+          Play Demo
+        </a>
 
-      <h3>What’s happening next</h3>
-      <ul>
-        <li>Step 2: 3-player table layout (you + 2 AIs)</li>
-        <li>Step 3: Trick winner logic</li>
-        <li>Step 4: Quotas + pluck phase</li>
-        <li>Step 5: Accounts + game history (free backend)</li>
-      </ul>
+        <!-- NEW: Demo 2 button -->
+        <a class="btn" href="demo2.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+          Demo 2
+        </a>
 
-      <p>When you’re ready, paste your official rules and I’ll convert them into a clean web rules page.</p>
-    </div>
+        <a class="btn btn-secondary" href="rules.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+          Rules
+        </a>
+
+        <a class="btn btn-secondary" href="about.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+          About
+        </a>
+      </div>
+    </section>
+
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
-
-  <footer class="footer">
-    © 2026 Pluck The Card Game
-  </footer>
-
 </body>
 </html>
