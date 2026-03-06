@@ -1,40 +1,145 @@
 <!--
 CHANGE LOG
-2026-03-06 15:20 (-0500)
-Fix: Add a one-page Learn Pluck in 60 Seconds file for onboarding and sharing.
-Fix: Keep the tone light, fast, and table-friendly for first-time players.
-ROW COUNT: 132
-CURRENT FILE ROW COUNT: New file.
-NOTE: New companion file created to support faster adoption without replacing the full rules page.
+2026-03-06 16:10 (-0500)
+Fix: Added link back to rules.html
+ROW COUNT: ~140
 -->
 
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Learn Pluck in 60 Seconds</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --text: #f8fafc;
-      --muted: #cbd5e1;
-      --gold: #fbbf24;
-      --line: rgba(255,255,255,.12);
-    }
 
-    * { box-sizing: border-box; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-    body {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      background: linear-gradient(180deg, #08111f 0%, var(--bg) 100%);
-      color: var(--text);
-      line-height: 1.6;
-    }
+<title>Learn Pluck in 60 Seconds</title>
 
-    .wrap {
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:Georgia,serif;
+margin:0;
+padding:0;
+}
+
+.container{
+max-width:800px;
+margin:auto;
+padding:40px 20px;
+}
+
+.card{
+background:#111827;
+padding:30px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.1);
+}
+
+h1{
+font-size:36px;
+}
+
+h2{
+color:#fbbf24;
+margin-top:30px;
+}
+
+a.button{
+background:#93c5fd;
+color:black;
+padding:12px 20px;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h1>Learn Pluck in 60 Seconds</h1>
+
+<p>
+Three players. Seventeen tricks. Miss your number and someone steals a card advantage next round.
+</p>
+
+<h2>Deck</h2>
+
+<ul>
+
+<li>Remove 2♦ 2♥ 2♠</li>
+
+<li>Keep 2♣</li>
+
+<li>Add both Jokers</li>
+
+<li>Total cards = 51</li>
+
+</ul>
+
+
+<h2>Targets</h2>
+
+<ul>
+
+<li>Dealer needs 7 tricks</li>
+
+<li>Left player needs 6</li>
+
+<li>Right player needs 4</li>
+
+</ul>
+
+
+<h2>Opening</h2>
+
+<ul>
+
+<li>Dealer declares trump</li>
+
+<li>Player with 2♣ leads first trick</li>
+
+</ul>
+
+
+<h2>The Pluck</h2>
+
+<p>
+If you exceed your number you earn plucks.
+</p>
+
+<p>
+You pass a card face down and the player must return their highest card of that suit.
+</p>
+
+
+<h2>One Line Summary</h2>
+
+<p>
+Make your number or someone improves their hand using yours.
+</p>
+
+
+<br><br>
+
+<a class="button" href="rules.html">Read Full Rules →</a>
+
+</div>
+
+</div>
+
+</body>
+
+</html>    .wrap {
       width: min(900px, calc(100% - 28px));
       margin: 0 auto;
       padding: 28px 0 40px;
