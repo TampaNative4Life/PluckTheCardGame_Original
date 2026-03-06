@@ -1,65 +1,450 @@
-<!DOCTYPE html>
+<!--
+CHANGE LOG
+2026-03-06 15:20 (-0500)
+Fix: Rebuild Pluck rules page for readability, humor, and faster onboarding.
+Fix: Add a 60-second quick-learn section at the top without changing the core rules.
+Fix: Organize content into learn order: hook, deck, setup, plucks, trump, play, scoring, edge notes.
+ROW COUNT: 451
+CURRENT FILE ROW COUNT: Unknown from this chat.
+NOTE: This is a full-file replacement. Length comparison to the current file cannot be verified because the current file contents were not provided here.
+-->
+
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Rules</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta
+    name="description"
+    content="Official rules for Pluck, the three-player trick-taking card game where missing your number gets you plucked next hand."
+  />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --gold: #fbbf24;
+      --line: rgba(255,255,255,.12);
+      --accent: #93c5fd;
+      --danger: #fca5a5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(180deg, #08111f 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .hero,
+    .panel {
+      background: rgba(17, 24, 39, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.28);
+    }
+
+    .hero {
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: .82rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.15;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+    }
+
+    h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      color: var(--gold);
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--text);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-7  { grid-column: span 7; }
+    .col-5  { grid-column: span 5; }
+    .col-6  { grid-column: span 6; }
+
+    .panel {
+      padding: 22px 20px;
+    }
+
+    .quick-points,
+    .rule-list,
+    .note-list {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    .quick-points li,
+    .rule-list li,
+    .note-list li {
+      margin: 8px 0;
+    }
+
+    .callout {
+      padding: 14px 16px;
+      background: rgba(251, 191, 36, 0.10);
+      border-left: 4px solid var(--gold);
+      border-radius: 12px;
+      margin-top: 14px;
+    }
+
+    .warning {
+      background: rgba(252, 165, 165, 0.10);
+      border-left-color: var(--danger);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(255,255,255,.05);
+      color: var(--gold);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: .95em;
+      color: #fde68a;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    @media (max-width: 760px) {
+      .col-7, .col-5, .col-6 {
+        grid-column: span 12;
+      }
+
+      .wrap {
+        width: min(100% - 20px, 980px);
+        padding: 20px 0 40px;
+      }
+
+      .hero,
+      .panel {
+        border-radius: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Pluck: Learn It Fast</div>
+      <h1>Pluck Rules</h1>
+      <p class="muted">
+        Pluck is a three-player trick-taking game with no running score.
+        Miss your number, and next hand somebody gets to reach in your business.
+      </p>
 
-  <header class="nav">
-    <a class="brand" href="index.html">
-      <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
-      <span>PLUCK</span>
-    </a>
-    <nav class="navlinks">
-      <a href="game.html">Play Demo</a>
-      <a href="rules.html">Rules</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+      <div class="callout">
+        <strong>60-Second Version:</strong>
+        Three players. Seventeen tricks. Dealer needs 7. Left needs 6. Right needs 4.
+        Dealer picks trump. The player with the 2♣ starts the first trick.
+        Miss your target and somebody earns the right to pluck a card exchange off you next hand.
+      </div>
+    </section>
 
-  <main class="container">
-    <h1>Pluck Rules (Web Demo)</h1>
+    <section class="grid">
+      <article class="panel col-7">
+        <h2>What Makes Pluck Different</h2>
+        <p>
+          Most trick games ask you to keep score. Pluck says, “No, we’re going to make this personal.”
+        </p>
+        <p>
+          In Pluck, if you do not win enough tricks for your seat, another player earns a
+          <strong>pluck</strong> against you in the next hand.
+          That means they pass you a card face down, and you must give back your highest card in that same suit.
+        </p>
+        <p>
+          So no, you are not just losing a hand. You are helping somebody else load up for the next one.
+        </p>
+      </article>
 
-    <div class="card">
-      <h3>Order of Play</h3>
-      <p class="hint"><strong>Deal → Pluck → Trump Pick → Play</strong></p>
-      <ul>
-        <li><strong>Dealer rotates RIGHT</strong> every deal (including first load).</li>
-        <li><strong>Quotas rotate with dealer:</strong> Dealer=7, Left=6, Right=4.</li>
-        <li><strong>No auto-pluck:</strong> Plucks can be hairy. You choose.</li>
-        <li><strong>Trump is NOT chosen before plucks:</strong> Redeal → Plucks → Trump Pick.</li>
-      </ul>
-    </div>
+      <aside class="panel col-5">
+        <h2>Quick Learn</h2>
+        <ul class="quick-points">
+          <li><strong>Players:</strong> 3</li>
+          <li><strong>Cards in deck:</strong> 51</li>
+          <li><strong>Tricks per hand:</strong> 17</li>
+          <li><strong>Dealer target:</strong> 7 tricks</li>
+          <li><strong>Left of dealer:</strong> 6 tricks</li>
+          <li><strong>Right of dealer:</strong> 4 tricks</li>
+          <li><strong>First round:</strong> no plucks</li>
+          <li><strong>Lead card:</strong> 2♣ opens the hand</li>
+        </ul>
+      </aside>
 
-    <div class="card" style="margin-top:14px;">
-      <h3>Hard Lock (Rule Enforcement)</h3>
-      <ul>
-        <li>If you can follow suit, you must follow suit.</li>
-        <li>If trump is not open, you can’t lead trump when you still have non-trump.</li>
-        <li>On Trick 1, whoever has <strong>2♣</strong> leads Trick 1 with it.</li>
-      </ul>
-      <p class="hint">This demo enforces “Hard Lock” by disabling illegal cards.</p>
-    </div>
+      <article class="panel col-6">
+        <h2>The Deck</h2>
+        <p>Start with a standard 52-card deck and make these changes:</p>
+        <ul class="rule-list">
+          <li>Remove the 2♦, 2♥, and 2♠</li>
+          <li>Keep the 2♣</li>
+          <li>Add both Jokers</li>
+          <li>One Joker is the <strong>Big Joker</strong></li>
+          <li>The other is the <strong>Little Joker</strong></li>
+        </ul>
+        <p>
+          That leaves <strong>51 cards</strong>, which works cleanly for three players:
+          <strong>17 tricks per hand</strong>.
+        </p>
+        <p><strong>Aces are high.</strong></p>
+      </article>
 
-    <div class="card" style="margin-top:14px;">
-      <h3>Pluck Notes</h3>
-      <ul>
-        <li>Wrong suit attempt = <strong>Pluck LOST</strong> (no re-pick).</li>
-        <li>Players who fall on hard times are just <strong>SOL</strong>—game has no mercy.</li>
-        <li>Player with 0 tricks is at the mercy of players above quota during pluck process.</li>
-        <li>After pluck exchange, hands must remain the correct size.</li>
-      </ul>
-    </div>
+      <article class="panel col-6">
+        <h2>The Goal</h2>
+        <p>Every seat has a job. Hit your number and you are safe.</p>
+        <table aria-label="Pluck trick targets">
+          <thead>
+            <tr>
+              <th>Seat</th>
+              <th>Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dealer</td>
+              <td>7 tricks</td>
+            </tr>
+            <tr>
+              <td>Left of Dealer</td>
+              <td>6 tricks</td>
+            </tr>
+            <tr>
+              <td>Right of Dealer</td>
+              <td>4 tricks</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout warning">
+          <strong>Miss your number?</strong> Somebody earned the right to pluck you next round.
+        </div>
+      </article>
 
-    <div class="buttons" style="margin-top:14px;">
-      <button class="btn" onclick="location.href='game.html'">Play Demo</button>
-      <button class="btn btn-secondary" onclick="location.href='index.html'">Back Home</button>
-    </div>
+      <article class="panel col-12">
+        <h2>Setup and Deal</h2>
+        <ol class="rule-list">
+          <li>The dealer shuffles.</li>
+          <li>Another player may cut.</li>
+          <li>The dealer deals all 51 cards.</li>
+          <li>There are no plucks in the first round.</li>
+        </ol>
+      </article>
+
+      <article class="panel col-7">
+        <h2>The Pluck</h2>
+        <p>
+          This is the soul of the game. Before a new hand starts, plucks are handled first.
+        </p>
+        <h3>Pluck Order</h3>
+        <ul class="rule-list">
+          <li>The player with the most earned plucks goes first.</li>
+          <li>If players are tied, start with the dealer and move left.</li>
+        </ul>
+
+        <h3>How a Pluck Works</h3>
+        <ol class="rule-list">
+          <li>The plucker passes one card face down to the pluckee.</li>
+          <li>This is usually a low card in that suit.</li>
+          <li>The pluckee looks at it.</li>
+          <li>The pluckee must return their highest card of that same suit.</li>
+        </ol>
+
+        <div class="callout">
+          <strong>Example:</strong> You pass a 5♦. They must hand back their highest diamond.
+          That is Pluck saying, “Thank you for your cooperation.”
+        </div>
+      </article>
+
+      <article class="panel col-5">
+        <h2>Joker Rules</h2>
+        <ul class="note-list">
+          <li>Jokers do not belong to a normal suit.</li>
+          <li>When trump is declared, the Jokers count as trump for trick play.</li>
+          <li>They are always the two highest trump cards.</li>
+          <li>They cannot be forced out during a pluck.</li>
+        </ul>
+        <p>
+          In plain English: nobody smart gives away a Joker, and nobody gets bullied into returning one during a pluck.
+        </p>
+      </article>
+
+      <article class="panel col-6">
+        <h2>Dealer Declares Trump</h2>
+        <p>
+          After plucks are finished, the dealer names the trump suit.
+          This is the dealer’s built-in advantage, because the dealer has the toughest target.
+        </p>
+        <p>
+          Good dealers usually choose the suit they hold the most of, or the one with the most muscle.
+          Just remember: the Big Joker and Little Joker still sit above all regular trump cards.
+        </p>
+      </article>
+
+      <article class="panel col-6">
+        <h2>The Hand Always Opens the Same Way</h2>
+        <p>
+          The player holding the <strong>2♣</strong> leads the first trick.
+        </p>
+        <ul class="note-list">
+          <li>That card is a guaranteed loser.</li>
+          <li>If clubs were named trump, then trump is open immediately.</li>
+        </ul>
+      </article>
+
+      <article class="panel col-12">
+        <h2>Playing the 17 Tricks</h2>
+        <ul class="rule-list">
+          <li>The winner of each trick leads the next trick.</li>
+          <li>You must follow suit if you can.</li>
+          <li>If you are void in that suit, you may throw off or play trump.</li>
+          <li>You cannot lead trump until trump has been opened.</li>
+          <li>If clubs are trump, the opening 2♣ already opened trump.</li>
+        </ul>
+
+        <h3>Who Wins a Trick?</h3>
+        <p>
+          The trick is taken by the highest card in the led suit,
+          unless a trump card is played. Any trump beats any non-trump.
+          The Big Joker is highest, the Little Joker is next, and then the rest of the trump suit follows in order.
+        </p>
+      </article>
+
+      <article class="panel col-12">
+        <h2>Determining Plucks for the Next Hand</h2>
+        <p>
+          After all 17 tricks are played, compare what each player won against what their seat required.
+        </p>
+        <table aria-label="Example of earned plucks">
+          <thead>
+            <tr>
+              <th>Seat</th>
+              <th>Target</th>
+              <th>Won</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dealer</td>
+              <td>7</td>
+              <td>9</td>
+              <td>Earns 2 plucks</td>
+            </tr>
+            <tr>
+              <td>Left of Dealer</td>
+              <td>6</td>
+              <td>5</td>
+              <td>Short by 1</td>
+            </tr>
+            <tr>
+              <td>Right of Dealer</td>
+              <td>4</td>
+              <td>3</td>
+              <td>Short by 1</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <strong>Simple rule:</strong>
+          Extra tricks above your target create plucks.
+          Missing your target makes you vulnerable to getting plucked.
+        </div>
+      </article>
+
+      <article class="panel col-12">
+        <h2>Deal Passes Left</h2>
+        <p>
+          After the hand is finished and plucks are determined, the deal moves one player to the left.
+          Then everybody gets another chance to act right.
+        </p>
+      </article>
+
+      <article class="panel col-12">
+        <h2>Table-Talk Summary</h2>
+        <p>
+          Need the shortest version possible? Here it is:
+        </p>
+        <p>
+          <strong>Make your number. Protect your hand. Do not get caught short.
+          Because in Pluck, the next hand starts with consequences.</strong>
+        </p>
+      </article>
+    </section>
+
+    <p class="footer-note">
+      Pluck is easy to learn, hard to master, and real disrespectful to lazy play.
+    </p>
   </main>
-
-  <footer class="footer">© 2026 Pluck The Card Game</footer>
 </body>
 </html>
