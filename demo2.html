@@ -1,9 +1,13 @@
 <!--
 CHANGE LOG
-2026-03-05 12:55 (-0500)
-Fix: Remove extra top-left "← Home" text link. Top-left Pluck brand (logo + PLUCK text) is the homepage button.
-Fix: Add non-visual IDs required by demo2.js: #pickPanel and #trumpPanel (prevents JS from failing).
-UI NOTE: No restyle/reorder of existing UI elements beyond removing the unapproved "← Home" link.
+2026-03-06 13:10 (-0500)
+Fix: Restore continuity between demo2.html and demo2.js without changing approved UI.
+Fix: Add missing required IDs expected by demo2.js:
+  - #youHand
+  - #trumpStatus
+  - #msg
+Fix: Keep approved bottom pick panel and top-left PLUCK home button intact.
+UI NOTE: No restyle/reorder of approved elements. Additions only.
 -->
 
 <!doctype html>
@@ -19,7 +23,6 @@ UI NOTE: No restyle/reorder of existing UI elements beyond removing the unapprov
   <!-- NAV -->
   <header class="nav">
     <div class="navLeft">
-      <!-- Approved: Brand is the Home button -->
       <a class="brand" href="index.html" aria-label="Pluck Home">
         <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
         <span>PLUCK</span>
@@ -109,7 +112,7 @@ UI NOTE: No restyle/reorder of existing UI elements beyond removing the unapprov
           </div>
         </div>
 
-        <!-- YOU (label stays on table) -->
+        <!-- YOU -->
         <div class="seat seat-bottom">
           <div class="youDock">
             <div class="youRow">
@@ -127,8 +130,13 @@ UI NOTE: No restyle/reorder of existing UI elements beyond removing the unapprov
       </div><!-- /feltTable -->
     </section>
 
+    <!-- REQUIRED BY demo2.js: your hand row lives below the table -->
+    <section class="bottomPanel" aria-label="Your Hand Panel">
+      <div id="youHand" class="yourHandRow tight" aria-label="Your hand"></div>
+      <div id="msg" class="overlayStatus" style="margin-top:10px; display:none;"></div>
+    </section>
+
     <!-- APPROVED LOOK: Pick panel at bottom (NOT overlay) -->
-    <!-- IMPORTANT: give demo2.js what it expects: id="pickPanel" -->
     <section class="bottomPanel" id="pickPanel" aria-label="Pick First Panel">
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Pick First (Choose Dealer)</div>
@@ -163,8 +171,14 @@ UI NOTE: No restyle/reorder of existing UI elements beyond removing the unapprov
       </div>
     </section>
 
-    <!-- Non-visual placeholder required by demo2.js (won't show unless JS sets it) -->
-    <section id="trumpPanel" aria-hidden="true" style="display:none;"></section>
+    <!-- REQUIRED BY demo2.js -->
+    <section id="trumpPanel" aria-hidden="true" style="display:none;">
+      <div id="trumpStatus"></div>
+      <button type="button" data-trump="S" style="display:none;">Spades</button>
+      <button type="button" data-trump="H" style="display:none;">Hearts</button>
+      <button type="button" data-trump="D" style="display:none;">Diamonds</button>
+      <button type="button" data-trump="C" style="display:none;">Clubs</button>
+    </section>
 
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
