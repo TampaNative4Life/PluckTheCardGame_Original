@@ -1,12 +1,26 @@
 <!--
 CHANGE LOG
-2026-03-07 15:45 (-0500)
-Fix: Full homepage rebuild with centered logo, centered hero, and buttons for all viewable pages
-Fix: Replaced broken external image dependency with inline SVG logo
-Fix: Added black-and-white base with controlled color accents
-ROW COUNT: 365
-CURRENT FILE ROW COUNT: Unknown from current repo contents not provided in chat.
-NOTE: Full-file replacement. This rebuild prioritizes homepage presentation without changing your other pages.
+2026-03-07 15:58 (-0500)
+
+FILE
+docs/index.html
+
+ACTION
+Full clean single-file replacement.
+
+CHANGES
+• Removed mixed multi-file paste corruption
+• Standardized SVG logo and navigation
+• Rebuilt centered homepage hero
+• Added buttons for all live docs pages
+• Kept dark theme with controlled color accents
+
+ROW COUNT
+Previous: Corrupted / mixed content
+Current: Clean single-document replacement
+
+NOTE
+This file is now the live homepage version intended for GitHub Pages from /docs.
 -->
 
 <!doctype html>
@@ -21,63 +35,19 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
       --bg:#04070d;
       --bg2:#081223;
       --panel:rgba(10,16,28,.78);
-      --panel-2:rgba(255,255,255,.05);
       --line:rgba(255,255,255,.11);
       --text:#f8fafc;
       --muted:#b7c0cf;
       --soft:#94a3b8;
       --gold:#f4c542;
       --blue:#7cb7ff;
-      --blue-2:#3b82f6;
       --white:#ffffff;
       --shadow:0 12px 34px rgba(0,0,0,.34);
-      --radius:18px;
     }
 
-    *{
-      box-sizing:border-box;
-    }
+    *{ box-sizing:border-box; }
+    html, body{ margin:0; min-height:100%; }
 
-    html, body{
-      margin:0;
-      min-height:100%;
-    }
-    <header class="nav">
-
-<div class="logo">
-
-<a href="index.html" class="logoLink">
-
-<svg viewBox="0 0 100 100" class="logoIcon">
-
-<path d="M50 5 L80 40 L50 95 L20 40 Z" fill="white"/>
-
-</svg>
-
-<span class="logoText">PLUCK</span>
-
-</a>
-
-</div>
-
-
-<nav class="mainNav">
-
-<a href="index.html">Home</a>
-
-<a href="game.html">Play Demo</a>
-
-<a href="demo2.html">Demo 2</a>
-
-<a href="rules.html">Rules</a>
-
-<a href="learn-pluck.html">Learn</a>
-
-<a href="about.html">About</a>
-
-</nav>
-
-</header>
     body{
       font-family:Arial, Helvetica, sans-serif;
       color:var(--text);
@@ -148,9 +118,7 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
       padding:8px 4px;
     }
 
-    .nav a:hover{
-      color:var(--white);
-    }
+    .nav a:hover{ color:var(--white); }
 
     .hero{
       min-height:calc(100vh - 78px);
@@ -240,9 +208,7 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
       transition:transform .16s ease, background .16s ease, border-color .16s ease;
     }
 
-    .btn:hover{
-      transform:translateY(-1px);
-    }
+    .btn:hover{ transform:translateY(-1px); }
 
     .btn-main{
       background:linear-gradient(180deg, rgba(28,38,58,.95), rgba(16,23,35,.96));
@@ -277,7 +243,7 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
     .summary{
       width:min(900px, 100%);
       margin:0 auto;
-      padding:18px 18px;
+      padding:18px;
       border-radius:18px;
       background:var(--panel);
       border:1px solid var(--line);
@@ -291,13 +257,9 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
       line-height:1.7;
     }
 
-    .summary strong{
-      color:var(--white);
-    }
+    .summary strong{ color:var(--white); }
 
-    footer{
-      padding:0 18px 34px;
-    }
+    footer{ padding:0 18px 34px; }
 
     .footer-line{
       width:min(920px, calc(100% - 10px));
@@ -313,72 +275,26 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
     }
 
     @media (max-width:900px){
-      .button-grid{
-        grid-template-columns:repeat(2, minmax(0, 1fr));
-      }
+      .button-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width:700px){
-      .topbar{
-        padding:14px 14px;
-      }
-
-      .brand{
-        font-size:18px;
-      }
-
-      .brand-mark{
-        width:40px;
-        height:40px;
-        border-radius:10px;
-      }
-
-      .brand-mark svg{
-        width:26px;
-        height:26px;
-      }
-
-      .nav{
-        gap:12px;
-      }
-
-      .nav a{
-        font-size:14px;
-      }
-
-      .hero{
-        min-height:calc(100vh - 70px);
-        padding-top:34px;
-      }
-
-      .hero-logo{
-        width:124px;
-        height:124px;
-        border-radius:26px;
-      }
-
-      .hero-logo svg{
-        width:76px;
-        height:76px;
-      }
+      .topbar{ padding:14px; }
+      .brand{ font-size:18px; }
+      .brand-mark{ width:40px; height:40px; border-radius:10px; }
+      .brand-mark svg{ width:26px; height:26px; }
+      .nav{ gap:12px; }
+      .nav a{ font-size:14px; }
+      .hero{ min-height:calc(100vh - 70px); padding-top:34px; }
+      .hero-logo{ width:124px; height:124px; border-radius:26px; }
+      .hero-logo svg{ width:76px; height:76px; }
     }
 
     @media (max-width:560px){
-      .button-grid{
-        grid-template-columns:1fr;
-      }
-
-      .nav{
-        gap:10px;
-      }
-
-      .nav a{
-        font-size:13px;
-      }
-
-      .sub{
-        margin-bottom:26px;
-      }
+      .button-grid{ grid-template-columns:1fr; }
+      .nav{ gap:10px; }
+      .nav a{ font-size:13px; }
+      .sub{ margin-bottom:26px; }
     }
   </style>
 </head>
@@ -423,7 +339,6 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
       </div>
 
       <h1>Pluck</h1>
-
       <p class="catch">Three players. Seventeen tricks. Zero excuses.</p>
 
       <p class="sub">
@@ -457,4 +372,3 @@ NOTE: Full-file replacement. This rebuild prioritizes homepage presentation with
 
 </body>
 </html>
-
