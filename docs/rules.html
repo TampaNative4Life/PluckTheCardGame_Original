@@ -1,11 +1,25 @@
 <!--
 CHANGE LOG
-2026-03-06 16:25 (-0500)
-Fix: Full replacement rules page with built-in link to learn-pluck.html
-Fix: Organized rules in reading order with cleaner beginner flow
-ROW COUNT: 283
-CURRENT FILE ROW COUNT: Unknown from current repo contents not provided in chat.
-NOTE: Full-file replacement. Length comparison cannot be verified against your current local file.
+2026-03-07 15:58 (-0500)
+
+FILE
+docs/rules.html
+
+ACTION
+Full clean single-file replacement.
+
+CHANGES
+• Removed corrupted header-inside-style markup
+• Standardized SVG logo and navigation
+• Preserved rules content and structure
+• Added continuity with homepage and learn page
+
+ROW COUNT
+Previous: Corrupted / mixed content
+Current: 461
+
+NOTE
+Header and footer now match the live site template.
 -->
 
 <!doctype html>
@@ -19,51 +33,15 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
     :root{
       --bg:#0f172a;
       --panel:#111827;
-      --panel2:#1f2937;
       --text:#f8fafc;
       --muted:#cbd5e1;
       --gold:#fbbf24;
       --blue:#93c5fd;
       --line:rgba(255,255,255,.12);
+      --shadow:0 12px 36px rgba(0,0,0,.28);
     }
 
-    *{box-sizing:border-box;}
-    <header class="nav">
-
-<div class="logo">
-
-<a href="index.html" class="logoLink">
-
-<svg viewBox="0 0 100 100" class="logoIcon">
-
-<path d="M50 5 L80 40 L50 95 L20 40 Z" fill="white"/>
-
-</svg>
-
-<span class="logoText">PLUCK</span>
-
-</a>
-
-</div>
-
-
-<nav class="mainNav">
-
-<a href="index.html">Home</a>
-
-<a href="game.html">Play Demo</a>
-
-<a href="demo2.html">Demo 2</a>
-
-<a href="rules.html">Rules</a>
-
-<a href="learn-pluck.html">Learn</a>
-
-<a href="about.html">About</a>
-
-</nav>
-
-</header>
+    *{ box-sizing:border-box; }
     body{
       margin:0;
       background:linear-gradient(180deg,#08111f 0%, var(--bg) 100%);
@@ -71,6 +49,61 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
       font-family:Georgia,"Times New Roman",serif;
       line-height:1.65;
     }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      padding:16px 24px;
+      background:rgba(3,7,15,.88);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:#fff;
+      font-weight:800;
+      font-size:20px;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+    }
+
+    .brand-mark svg{ width:30px; height:30px; display:block; }
+
+    .nav{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .nav a{
+      color:#d8e0ec;
+      text-decoration:none;
+      font-size:16px;
+      font-weight:700;
+      padding:8px 4px;
+    }
+
+    .nav a:hover{ color:#fff; }
 
     .wrap{
       width:min(960px,calc(100% - 28px));
@@ -82,14 +115,12 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
       background:rgba(17,24,39,.96);
       border:1px solid var(--line);
       border-radius:18px;
-      box-shadow:0 12px 36px rgba(0,0,0,.28);
+      box-shadow:var(--shadow);
       padding:24px 20px;
       margin-bottom:18px;
     }
 
-    .hero{
-      padding:28px 22px;
-    }
+    .hero{ padding:28px 22px; }
 
     .eyebrow{
       display:inline-block;
@@ -99,39 +130,16 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
       font-weight:700;
       font-size:.82rem;
       margin-bottom:8px;
+      font-family:Arial, Helvetica, sans-serif;
     }
 
-    h1,h2,h3{
-      margin:0 0 12px;
-      line-height:1.15;
-    }
-
-    h1{
-      font-size:clamp(2rem,5vw,3.15rem);
-    }
-
-    h2{
-      color:var(--gold);
-      font-size:clamp(1.35rem,3vw,1.95rem);
-    }
-
-    h3{
-      color:var(--blue);
-      font-size:1.08rem;
-      margin-top:16px;
-    }
-
-    p{
-      margin:0 0 14px;
-    }
-
-    .muted{
-      color:var(--muted);
-    }
-
-    .button-row{
-      margin-top:16px;
-    }
+    h1,h2,h3{ margin:0 0 12px; line-height:1.15; }
+    h1{ font-size:clamp(2rem,5vw,3.15rem); }
+    h2{ color:var(--gold); font-size:clamp(1.35rem,3vw,1.95rem); }
+    h3{ color:var(--blue); font-size:1.08rem; margin-top:16px; }
+    p{ margin:0 0 14px; }
+    .muted{ color:var(--muted); }
+    .button-row{ margin-top:16px; }
 
     .btn{
       display:inline-block;
@@ -141,17 +149,10 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
       padding:11px 16px;
       margin-right:10px;
       margin-bottom:10px;
+      font-family:Arial, Helvetica, sans-serif;
     }
 
-    .btn-gold{
-      background:var(--gold);
-      color:#111827;
-    }
-
-    .btn-blue{
-      background:var(--blue);
-      color:#111827;
-    }
+    .btn-gold{ background:var(--gold); color:#111827; }
 
     .callout{
       margin-top:14px;
@@ -172,14 +173,8 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
     .col-5{grid-column:span 5;}
     .col-6{grid-column:span 6;}
 
-    ul,ol{
-      margin:10px 0 0;
-      padding-left:22px;
-    }
-
-    li{
-      margin:8px 0;
-    }
+    ul,ol{ margin:10px 0 0; padding-left:22px; }
+    li{ margin:8px 0; }
 
     table{
       width:100%;
@@ -202,34 +197,51 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
       background:rgba(255,255,255,.05);
     }
 
-    tr:last-child td{
-      border-bottom:none;
-    }
+    tr:last-child td{ border-bottom:none; }
 
-    .footer-note{
+    footer{
       text-align:center;
       color:var(--muted);
-      margin-top:8px;
+      margin:10px 0 28px;
+      font-family:Arial, Helvetica, sans-serif;
       font-size:.96rem;
     }
 
     @media (max-width:760px){
-      .col-7,.col-5,.col-6{
-        grid-column:span 12;
-      }
-
-      .wrap{
-        width:min(100% - 18px,960px);
-        padding:18px 0 34px;
-      }
-
-      .panel{
-        border-radius:14px;
-      }
+      .col-7,.col-5,.col-6{ grid-column:span 12; }
+      .wrap{ width:min(100% - 18px,960px); padding:18px 0 34px; }
+      .panel{ border-radius:14px; }
+      .topbar{ padding:14px; }
+      .nav a{ font-size:14px; }
     }
   </style>
 </head>
 <body>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+          <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
+          <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+          <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
+          <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
+        </svg>
+      </span>
+      <span>PLUCK</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
   <main class="wrap">
 
     <section class="panel hero">
@@ -256,9 +268,7 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
 
       <article class="panel col-7">
         <h2>What Makes Pluck Different</h2>
-        <p>
-          Most trick games make you track points. Pluck makes you feel consequences.
-        </p>
+        <p>Most trick games make you track points. Pluck makes you feel consequences.</p>
         <p>
           If you do not win enough tricks for your seat, another player may earn the right to
           <strong>pluck</strong> you before the next hand begins.
@@ -310,23 +320,12 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Dealer</td>
-              <td>7</td>
-            </tr>
-            <tr>
-              <td>Left of Dealer</td>
-              <td>6</td>
-            </tr>
-            <tr>
-              <td>Right of Dealer</td>
-              <td>4</td>
-            </tr>
+            <tr><td>Dealer</td><td>7</td></tr>
+            <tr><td>Left of Dealer</td><td>6</td></tr>
+            <tr><td>Right of Dealer</td><td>4</td></tr>
           </tbody>
         </table>
-        <p style="margin-top:14px;">
-          Make your number and you are safe. Miss it, and next hand may get ugly.
-        </p>
+        <p style="margin-top:14px;">Make your number and you are safe. Miss it, and next hand may get ugly.</p>
       </article>
 
       <article class="panel col-12">
@@ -341,9 +340,7 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
 
       <article class="panel col-7">
         <h2>The Pluck</h2>
-        <p>
-          Before a hand begins, any earned plucks are handled first.
-        </p>
+        <p>Before a hand begins, any earned plucks are handled first.</p>
 
         <h3>Pluck Order</h3>
         <ul>
@@ -382,9 +379,7 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
 
       <article class="panel col-6">
         <h2>Dealer Declares Trump</h2>
-        <p>
-          After plucks are finished, the dealer names the trump suit.
-        </p>
+        <p>After plucks are finished, the dealer names the trump suit.</p>
         <p>
           This is the dealer’s advantage, because the dealer also has the toughest job.
           Most dealers choose the suit they hold the most of, or the one with the most power.
@@ -393,9 +388,7 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
 
       <article class="panel col-6">
         <h2>Opening the Hand</h2>
-        <p>
-          The player holding the <strong>2♣</strong> leads the first trick.
-        </p>
+        <p>The player holding the <strong>2♣</strong> leads the first trick.</p>
         <ul>
           <li>The 2♣ is a guaranteed loser.</li>
           <li>If clubs are trump, trump is open immediately.</li>
@@ -422,9 +415,7 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
 
       <article class="panel col-12">
         <h2>Determining Plucks for the Next Hand</h2>
-        <p>
-          After all 17 tricks are played, compare each player’s trick total to their target.
-        </p>
+        <p>After all 17 tricks are played, compare each player’s trick total to their target.</p>
 
         <table>
           <thead>
@@ -436,24 +427,9 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Dealer</td>
-              <td>7</td>
-              <td>9</td>
-              <td>Earns 2 plucks</td>
-            </tr>
-            <tr>
-              <td>Left of Dealer</td>
-              <td>6</td>
-              <td>5</td>
-              <td>Short by 1</td>
-            </tr>
-            <tr>
-              <td>Right of Dealer</td>
-              <td>4</td>
-              <td>3</td>
-              <td>Short by 1</td>
-            </tr>
+            <tr><td>Dealer</td><td>7</td><td>9</td><td>Earns 2 plucks</td></tr>
+            <tr><td>Left of Dealer</td><td>6</td><td>5</td><td>Short by 1</td></tr>
+            <tr><td>Right of Dealer</td><td>4</td><td>3</td><td>Short by 1</td></tr>
           </tbody>
         </table>
 
@@ -465,9 +441,7 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
 
       <article class="panel col-12">
         <h2>Deal Passes Left</h2>
-        <p>
-          After the hand is finished and plucks are determined, the deal passes one player to the left.
-        </p>
+        <p>After the hand is finished and plucks are determined, the deal passes one player to the left.</p>
       </article>
 
       <article class="panel col-12">
@@ -479,11 +453,9 @@ NOTE: Full-file replacement. Length comparison cannot be verified against your c
       </article>
 
     </section>
-
-    <p class="footer-note">
-      Pluck is easy to learn, hard to master, and disrespectful to lazy play.
-    </p>
   </main>
+
+  <footer>© 2026 Pluck The Card Game</footer>
+
 </body>
 </html>
-
