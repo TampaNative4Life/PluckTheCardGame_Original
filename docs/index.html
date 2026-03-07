@@ -1,209 +1,411 @@
 <!--
 CHANGE LOG
-2026-03-07 17:25 (-0500)
+2026-03-07 17:40 (-0500)
 
 FILE
 docs/index.html
 
 ACTION
-Homepage layout rebuild
+Homepage redesign for more polished brand presentation.
 
 CHANGES
-• Removed broken hero grid
-• Centered Pluck logo
-• Centered headline and copy
-• Placed navigation buttons cleanly below hero
-• Uses existing site CSS without layout conflicts
-• Fits viewport properly on desktop and mobile
+• Restored real PluckTheCardGame logo in header
+• Removed oversized hero logo block
+• Upgraded homepage to a more sophisticated editorial/game-brand layout
+• Kept shared navigation usability
+• Created stronger CTA hierarchy and cleaner spacing
+• Uses ../assets/PluckTheCardGame_Logo.jpg for brand continuity
 
 ROW COUNT
-Full file replacement
+Previous: Unknown
+Current: Full replacement
 
 NOTE
-Shared navigation header structure unchanged.
+If the logo file does not load, verify that ../assets/PluckTheCardGame_Logo.jpg exists exactly with that spelling.
 -->
 
 <!doctype html>
 <html lang="en">
-
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pluck The Card Game</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pluck The Card Game</title>
+  <meta name="description" content="Pluck The Card Game official homepage." />
+  <link rel="stylesheet" href="../css/style.css?v=4" />
+  <style>
+    .heroShell{
+      padding:28px 0 18px;
+    }
 
-<link rel="stylesheet" href="../css/style.css?v=4" />
+    .heroFrame{
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:
+        radial-gradient(900px 520px at 18% 16%, rgba(124,183,255,.14), transparent 54%),
+        radial-gradient(700px 420px at 84% 78%, rgba(212,178,84,.12), transparent 48%),
+        linear-gradient(180deg, rgba(20,26,38,.98), rgba(11,14,20,.98));
+      box-shadow:
+        0 28px 54px rgba(0,0,0,.38),
+        inset 0 0 0 1px rgba(255,255,255,.03);
+      padding:34px 30px 30px;
+    }
 
-<style>
+    .heroFrame::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.03), transparent 26%),
+        linear-gradient(315deg, rgba(255,255,255,.02), transparent 24%);
+      pointer-events:none;
+    }
 
-.hero{
-max-width:900px;
-margin:60px auto 40px;
-text-align:center;
-padding:20px;
-}
+    .heroGrid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
+      gap:24px;
+      align-items:stretch;
+    }
 
-.logoWrap{
-display:flex;
-justify-content:center;
-margin-bottom:28px;
-}
+    .heroLeft{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:100%;
+    }
 
-.logoWrap svg{
-width:140px;
-height:140px;
-}
+    .eyebrow{
+      display:inline-block;
+      width:max-content;
+      margin:0 0 16px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
 
-.hero h1{
-font-size:48px;
-margin:10px 0;
-font-weight:900;
-}
+    .heroTitle{
+      margin:0 0 14px;
+      font-size:clamp(3rem, 6vw, 5.4rem);
+      line-height:.94;
+      font-weight:1000;
+      letter-spacing:-.03em;
+      max-width:780px;
+    }
 
-.tagline{
-font-size:20px;
-margin-bottom:18px;
-font-weight:700;
-}
+    .heroTitle .accent{
+      color:var(--brand);
+    }
 
-.hero p{
-max-width:720px;
-margin:0 auto 26px;
-line-height:1.6;
-}
+    .heroLead{
+      margin:0 0 14px;
+      max-width:760px;
+      color:#f4f7fc;
+      font-size:clamp(1.08rem, 2vw, 1.34rem);
+      line-height:1.55;
+      font-weight:900;
+    }
 
-.mainButtons{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:14px;
-margin-bottom:20px;
-}
+    .heroSub{
+      margin:0 0 24px;
+      max-width:760px;
+      color:rgba(233,238,246,.76);
+      font-size:1rem;
+      line-height:1.8;
+      font-weight:700;
+    }
 
-.mainButtons a{
-padding:12px 20px;
-border-radius:12px;
-font-weight:800;
-text-decoration:none;
-}
+    .ctaRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:18px;
+    }
 
-.btnPrimary{
-background:var(--brand);
-color:#000;
-}
+    .ctaPrimary,
+    .ctaSecondary{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:12px 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.2px;
+      box-shadow:0 14px 28px rgba(0,0,0,.25);
+    }
 
-.btnSecondary{
-background:#1a2232;
-color:#fff;
-border:1px solid var(--line);
-}
+    .ctaPrimary{
+      background:var(--brand);
+      color:#081018;
+      border:1px solid rgba(212,178,84,.35);
+    }
 
-.infoBlock{
-max-width:760px;
-margin:40px auto;
-text-align:center;
-}
+    .ctaSecondary{
+      background:#182131;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
 
-.infoBlock h2{
-margin-bottom:10px;
-}
+    .heroMeta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
 
-</style>
+    .metaPill{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+    }
+
+    .heroRight{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .sideCard{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:rgba(0,0,0,.16);
+      box-shadow:0 16px 30px rgba(0,0,0,.24);
+      padding:18px 18px 16px;
+    }
+
+    .sideKicker{
+      margin:0 0 8px;
+      color:var(--brand);
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+
+    .sideTitle{
+      margin:0 0 10px;
+      font-size:1.2rem;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+
+    .sideText{
+      margin:0;
+      color:rgba(233,238,246,.76);
+      font-size:.97rem;
+      line-height:1.7;
+      font-weight:700;
+    }
+
+    .featureStrip{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .featureCard{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:rgba(20,26,38,.94);
+      box-shadow:var(--shadow);
+      padding:18px 16px;
+    }
+
+    .featureCard h3{
+      margin:0 0 8px;
+      font-size:1.06rem;
+      font-weight:1000;
+      letter-spacing:.15px;
+    }
+
+    .featureCard p{
+      margin:0 0 14px;
+      color:rgba(233,238,246,.74);
+      line-height:1.7;
+      font-size:.95rem;
+      font-weight:700;
+    }
+
+    .featureCard a{
+      text-decoration:none;
+    }
+
+    .quoteBlock{
+      margin-top:18px;
+      padding:18px 18px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.16);
+      color:rgba(233,238,246,.78);
+      line-height:1.8;
+      font-weight:700;
+    }
+
+    .quoteBlock strong{
+      color:var(--text);
+    }
+
+    @media (max-width:980px){
+      .heroGrid{
+        grid-template-columns:1fr;
+      }
+
+      .featureStrip{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:700px){
+      .heroFrame{
+        padding:24px 18px 20px;
+        border-radius:22px;
+      }
+
+      .ctaRow{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .ctaPrimary,
+      .ctaSecondary{
+        width:100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<header class="nav">
+  <header class="nav">
+    <div class="navLeft">
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <img src="../assets/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" />
+        <span>PLUCK</span>
+      </a>
+    </div>
 
-<div class="navLeft">
-<a class="brand" href="index.html">
+    <nav class="navlinks" aria-label="Main navigation">
+      <a href="index.html" class="activeLink">Home</a>
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-<span class="brandMarkSvg">
+  <main class="container">
 
-<svg viewBox="0 0 100 100">
-<path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
-<path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#0b0d10"/>
-<path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
-<rect x="22" y="74" width="56" height="6" rx="3" fill="#d4b254"/>
-<rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7cb7ff"/>
-</svg>
+    <section class="heroShell">
+      <div class="heroFrame">
+        <div class="heroGrid">
 
-</span>
+          <div class="heroLeft">
+            <div class="eyebrow">Pluck The Card Game</div>
 
-<span>PLUCK</span>
+            <h1 class="heroTitle">
+              A sharper kind of
+              <span class="accent">trick-taking.</span>
+            </h1>
 
-</a>
-</div>
+            <p class="heroLead">
+              Three players. Seventeen tricks. Pressure every hand.
+              Miss your number and somebody may get stronger off your cards.
+            </p>
 
-<nav class="navlinks">
-<a href="index.html" class="activeLink">Home</a>
-<a href="game.html">Play Demo</a>
-<a href="demo2.html">Demo 2</a>
-<a href="rules.html">Rules</a>
-<a href="learn-pluck.html">Learn Pluck</a>
-<a href="about.html">About</a>
-</nav>
+            <p class="heroSub">
+              Pluck is built on table feel, timing, and consequences.
+              It moves fast, teaches clean, and punishes lazy play.
+              The score does not sit on paper — it lives in what happens next.
+            </p>
 
-</header>
+            <div class="ctaRow">
+              <a class="ctaPrimary" href="game.html">Play Demo</a>
+              <a class="ctaSecondary" href="demo2.html">Open Demo 2</a>
+              <a class="ctaSecondary" href="rules.html">Read Rules</a>
+            </div>
 
-<main class="container">
+            <div class="heroMeta">
+              <span class="metaPill">3 Players</span>
+              <span class="metaPill">17 Tricks</span>
+              <span class="metaPill">No Running Score</span>
+              <span class="metaPill">Built for Consequences</span>
+            </div>
+          </div>
 
-<section class="hero">
+          <div class="heroRight">
+            <div class="sideCard">
+              <p class="sideKicker">Quick Start</p>
+              <h2 class="sideTitle">Learn it fast. Play it hard.</h2>
+              <p class="sideText">
+                Start with the quick-learn page if you want the bones fast,
+                then move to the full rules when you are ready to understand the teeth.
+              </p>
+            </div>
 
-<div class="logoWrap">
+            <div class="sideCard">
+              <p class="sideKicker">Why It Hits</p>
+              <h2 class="sideTitle">The next hand remembers.</h2>
+              <p class="sideText">
+                In Pluck, weak play does not just cost you now.
+                It can improve somebody else’s position next hand.
+                That is where the pressure lives.
+              </p>
+            </div>
+          </div>
 
-<svg viewBox="0 0 100 100">
-<path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
-<path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#0b0d10"/>
-<path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
-<rect x="22" y="74" width="56" height="6" rx="3" fill="#d4b254"/>
-<rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7cb7ff"/>
-</svg>
+        </div>
+      </div>
 
-</div>
+      <div class="featureStrip">
+        <div class="featureCard">
+          <h3>Play the Demo</h3>
+          <p>
+            Test the game flow, core mechanics, and round rhythm in the primary playable build.
+          </p>
+          <a class="btn" href="game.html">Go to Play Demo</a>
+        </div>
 
-<h1>Pluck</h1>
+        <div class="featureCard">
+          <h3>Learn the Rules</h3>
+          <p>
+            Read the quick-start guide first or go straight to the full rules page if you already know trick-taking games.
+          </p>
+          <a class="btn btn-secondary" href="learn-pluck.html">Learn Pluck</a>
+        </div>
 
-<div class="tagline">
-Three players. Seventeen tricks. Zero excuses.
-</div>
+        <div class="featureCard">
+          <h3>See the Brand</h3>
+          <p>
+            Read what makes Pluck different and why it feels more personal than ordinary scorekeeping card games.
+          </p>
+          <a class="btn btn-secondary" href="about.html">About Pluck</a>
+        </div>
+      </div>
 
-<p>
-A sharp three-player card game built on pressure, table talk, and consequences.
-Make your number, protect your hand, and do not come up short.
-</p>
+      <div class="quoteBlock">
+        <strong>What makes Pluck different?</strong>
+        No running score. Miss your job this hand, and next hand somebody gets stronger off your cards.
+        That is not bad luck. That is the game.
+      </div>
+    </section>
 
-<div class="mainButtons">
-
-<a class="btnPrimary" href="game.html">Play Demo</a>
-
-<a class="btnSecondary" href="demo2.html">Demo 2</a>
-
-<a class="btnSecondary" href="rules.html">Rules</a>
-
-<a class="btnSecondary" href="learn-pluck.html">Learn</a>
-
-<a class="btnSecondary" href="about.html">About</a>
-
-</div>
-
-</section>
-
-<section class="infoBlock">
-
-<h2>What makes Pluck different?</h2>
-
-<p>
-No running score. Miss your job this hand and next hand somebody gets stronger off your cards.
-That is not bad luck. That is the game.
-</p>
-
-</section>
-
-<footer class="footer">
-© 2026 Pluck The Card Game
-</footer>
-
-</main>
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
 
 </body>
 </html>
