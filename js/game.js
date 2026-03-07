@@ -19,11 +19,10 @@
   const trickEl = $("trick");
   const resetBtn = $("resetBtn");
   if (!handEl || !trickEl || !resetBtn) {
-    err("Missing required elements: hand, trick, resetBtn");
-    return;
-  }
-  
-  // ---------- optional DOM ----------
+  err("Missing required elements: hand, trick, resetBtn");
+  return;
+}
+// ---------- optional DOM ----------
   const ai2HandEl = $("ai2Hand");
   const ai3HandEl = $("ai3Hand");
 
