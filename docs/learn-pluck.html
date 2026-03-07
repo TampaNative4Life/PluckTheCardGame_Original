@@ -1,25 +1,22 @@
 <!--
 CHANGE LOG
-2026-03-07 15:58 (-0500)
+2026-03-07 16:35 (-0500)
 
 FILE
 docs/learn-pluck.html
 
 ACTION
-Full clean single-file replacement.
+Standardized full-page replacement using unified header structure.
 
 CHANGES
-• Removed corrupted merged-file content
-• Standardized SVG logo and navigation
-• Preserved quick-learn purpose
-• Linked back to full rules
-• Matched site continuity
+• Unified exact header structure with navLeft + brand + navlinks
+• Uses shared SVG logo continuity
+• Uses shared ../css/style.css?v=4
+• Preserves quick-start learning page purpose
 
 ROW COUNT
-Previous: Corrupted / mixed content
-Current: 270
-NOTE
-This is the quick-start page, not the full rules page.
+Previous: Unknown
+Current: Full replacement
 -->
 
 <!doctype html>
@@ -29,241 +26,99 @@ This is the quick-start page, not the full rules page.
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Learn Pluck in 60 Seconds</title>
   <meta name="description" content="Learn Pluck fast: the quick-start page for the three-player trick-taking game.">
-  <style>
-    :root{
-      --bg:#0f172a;
-      --panel:#111827;
-      --text:#f8fafc;
-      --muted:#cbd5e1;
-      --gold:#fbbf24;
-      --blue:#93c5fd;
-      --line:rgba(255,255,255,.12);
-      --shadow:0 12px 34px rgba(0,0,0,.28);
-    }
-
-    *{ box-sizing:border-box; }
-
-    body{
-      margin:0;
-      background:linear-gradient(180deg,#08111f 0%, var(--bg) 100%);
-      color:var(--text);
-      font-family:Georgia,"Times New Roman",serif;
-      line-height:1.65;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:20;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:20px;
-      padding:16px 24px;
-      background:rgba(3,7,15,.88);
-      backdrop-filter:blur(8px);
-      border-bottom:1px solid var(--line);
-      font-family:Arial, Helvetica, sans-serif;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      text-decoration:none;
-      color:#fff;
-      font-weight:800;
-      font-size:20px;
-    }
-
-    .brand-mark{
-      width:46px;
-      height:46px;
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:var(--shadow);
-    }
-
-    .brand-mark svg{ width:30px; height:30px; display:block; }
-
-    .nav{
-      display:flex;
-      gap:16px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .nav a{
-      color:#d8e0ec;
-      text-decoration:none;
-      font-size:16px;
-      font-weight:700;
-      padding:8px 4px;
-    }
-
-    .nav a:hover{ color:#fff; }
-
-    .wrap{
-      width:min(900px,calc(100% - 28px));
-      margin:0 auto;
-      padding:28px 0 40px;
-    }
-
-    .card{
-      background:rgba(17,24,39,.96);
-      border:1px solid var(--line);
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      padding:24px 20px;
-    }
-
-    h1,h2{ margin:0 0 12px; line-height:1.15; }
-    h1{ font-size:clamp(2rem,5vw,3rem); }
-    h2{ color:var(--gold); margin-top:20px; font-size:clamp(1.2rem,3vw,1.7rem); }
-    p{ margin:0 0 12px; }
-    .muted{ color:var(--muted); }
-    ul,ol{ margin:10px 0 0; padding-left:22px; }
-    li{ margin:8px 0; }
-
-    .box{
-      margin-top:16px;
-      padding:14px 16px;
-      border-left:4px solid var(--gold);
-      background:rgba(251,191,36,.10);
-      border-radius:12px;
-    }
-
-    .button-row{
-      margin-top:24px;
-      text-align:center;
-      font-family:Arial, Helvetica, sans-serif;
-    }
-
-    .btn{
-      display:inline-block;
-      text-decoration:none;
-      font-weight:700;
-      border-radius:10px;
-      padding:11px 16px;
-      background:var(--blue);
-      color:#111827;
-    }
-
-    footer{
-      text-align:center;
-      color:var(--muted);
-      margin:18px 0 28px;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:.96rem;
-    }
-
-    @media (max-width:760px){
-      .topbar{ padding:14px; }
-      .nav a{ font-size:14px; }
-      .wrap{ width:min(100% - 18px,900px); padding:18px 0 34px; }
-    }
-  </style>
+  <link rel="stylesheet" href="../css/style.css?v=4" />
 </head>
 <body>
 
-  <header class="topbar">
-    <a class="brand" href="index.html">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
-          <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
-          <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
-          <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
-          <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
-        </svg>
-      </span>
-      <span>PLUCK</span>
-    </a>
+  <header class="nav">
+    <div class="navLeft">
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <span class="brandMarkSvg" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+            <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#0b0d10"/>
+            <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+            <rect x="22" y="74" width="56" height="6" rx="3" fill="#d4b254"/>
+            <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7cb7ff"/>
+          </svg>
+        </span>
+        <span>PLUCK</span>
+      </a>
+    </div>
 
-    <nav class="nav" aria-label="Main navigation">
+    <nav class="navlinks" aria-label="Main navigation">
       <a href="index.html">Home</a>
       <a href="game.html">Play Demo</a>
       <a href="demo2.html">Demo 2</a>
       <a href="rules.html">Rules</a>
-      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="learn-pluck.html" class="activeLink">Learn Pluck</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
-  <main class="wrap">
-    <section class="card">
-      <h1>Learn Pluck in 60 Seconds</h1>
-      <p class="muted">
-        Three players. Seventeen tricks. No running score.
-        Miss your number and somebody may get stronger off your hand next round.
-      </p>
-
-      <h2>1) The Deck</h2>
-      <ul>
-        <li>Start with a standard deck.</li>
-        <li>Remove 2♦, 2♥, and 2♠.</li>
-        <li>Keep 2♣.</li>
-        <li>Add both Jokers.</li>
-        <li>Total cards: 51.</li>
-      </ul>
-
-      <h2>2) The Job for Each Seat</h2>
-      <ul>
-        <li>Dealer needs 7 tricks.</li>
-        <li>Left of dealer needs 6.</li>
-        <li>Right of dealer needs 4.</li>
-      </ul>
-
-      <h2>3) How the Hand Starts</h2>
-      <ol>
-        <li>First round has no plucks.</li>
-        <li>After that, earned plucks happen before play begins.</li>
-        <li>The dealer declares trump.</li>
-        <li>The player with the 2♣ leads the first trick.</li>
-      </ol>
-
-      <h2>4) What a Pluck Is</h2>
-      <p>
-        If you finished above your target last hand, you may have earned plucks.
-        A pluck means you pass a card face down to another player, and they must return their highest card in that same suit.
-      </p>
-
-      <div class="box">
-        <strong>Example:</strong>
-        You pass a low heart. They owe you their highest heart.
-        That is not a misunderstanding. That is the game.
-      </div>
-
-      <h2>5) Trick Play</h2>
-      <ul>
-        <li>Follow suit if you can.</li>
-        <li>If you cannot, you may throw off or play trump.</li>
-        <li>You cannot lead trump until trump has been opened.</li>
-        <li>If clubs are trump, the 2♣ opens trump immediately.</li>
-        <li>The Big Joker and Little Joker are the highest trump cards.</li>
-      </ul>
-
-      <h2>6) The Whole Point</h2>
-      <p>
-        Make your number and stay safe.
-        Fall short and next hand somebody may upgrade their hand using yours.
-      </p>
-
-      <div class="box">
-        <strong>One-line summary:</strong>
-        In Pluck, you are not just trying to win tricks. You are trying to avoid consequences.
-      </div>
-
-      <div class="button-row">
-        <a class="btn" href="rules.html">Read Full Rules →</a>
+  <main class="container">
+    <section class="pageSection">
+      <div class="card">
+        <h1 class="pageTitle">Learn Pluck in 60 Seconds</h1>
+        <p class="pageText">
+          Three players. Seventeen tricks. No running score.
+          Miss your number and somebody may get stronger off your hand next round.
+        </p>
       </div>
     </section>
-  </main>
 
-  <footer>© 2026 Pluck The Card Game</footer>
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">1) The Deck</h2>
+        <p class="pageText">
+          Start with a standard deck. Remove 2♦, 2♥, and 2♠. Keep 2♣.
+          Add both Jokers. Total cards: 51.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">2) The Job for Each Seat</h2>
+        <p class="pageText">
+          Dealer needs 7 tricks. Left of dealer needs 6. Right of dealer needs 4.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">3) How the Hand Starts</h2>
+        <p class="pageText">
+          First round has no plucks. After that, earned plucks happen before play begins.
+          The dealer declares trump. The player with the 2♣ leads the first trick.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">4) What a Pluck Is</h2>
+        <p class="pageText">
+          A pluck means you pass a card face down to another player, and they must return their highest card in that same suit.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">One-line Summary</h2>
+        <p class="pageText">
+          In Pluck, you are not just trying to win tricks. You are trying to avoid consequences.
+        </p>
+        <div class="pageButtons">
+          <a class="btn" href="rules.html">Read Full Rules</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
 
 </body>
 </html>
