@@ -1,11 +1,25 @@
 <!--
 CHANGE LOG
-2026-03-06 16:25 (-0500)
-Fix: Full replacement quick-learn page with built-in link back to rules.html
-Fix: Simple onboarding page for first-time players
-ROW COUNT: 149
-CURRENT FILE ROW COUNT: Unknown from current repo contents not provided in chat.
-NOTE: Full-file replacement. If this file already exists, replace all contents.
+2026-03-07 15:58 (-0500)
+
+FILE
+docs/learn-pluck.html
+
+ACTION
+Full clean single-file replacement.
+
+CHANGES
+• Removed corrupted merged-file content
+• Standardized SVG logo and navigation
+• Preserved quick-learn purpose
+• Linked back to full rules
+• Matched site continuity
+
+ROW COUNT
+Previous: Corrupted / mixed content
+Current: 270
+NOTE
+This is the quick-start page, not the full rules page.
 -->
 
 <!doctype html>
@@ -24,45 +38,11 @@ NOTE: Full-file replacement. If this file already exists, replace all contents.
       --gold:#fbbf24;
       --blue:#93c5fd;
       --line:rgba(255,255,255,.12);
+      --shadow:0 12px 34px rgba(0,0,0,.28);
     }
 
-    *{box-sizing:border-box;}
-    <header class="nav">
+    *{ box-sizing:border-box; }
 
-<div class="logo">
-
-<a href="index.html" class="logoLink">
-
-<svg viewBox="0 0 100 100" class="logoIcon">
-
-<path d="M50 5 L80 40 L50 95 L20 40 Z" fill="white"/>
-
-</svg>
-
-<span class="logoText">PLUCK</span>
-
-</a>
-
-</div>
-
-
-<nav class="mainNav">
-
-<a href="index.html">Home</a>
-
-<a href="game.html">Play Demo</a>
-
-<a href="demo2.html">Demo 2</a>
-
-<a href="rules.html">Rules</a>
-
-<a href="learn-pluck.html">Learn</a>
-
-<a href="about.html">About</a>
-
-</nav>
-
-</header>
     body{
       margin:0;
       background:linear-gradient(180deg,#08111f 0%, var(--bg) 100%);
@@ -70,6 +50,61 @@ NOTE: Full-file replacement. If this file already exists, replace all contents.
       font-family:Georgia,"Times New Roman",serif;
       line-height:1.65;
     }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      padding:16px 24px;
+      background:rgba(3,7,15,.88);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:#fff;
+      font-weight:800;
+      font-size:20px;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+    }
+
+    .brand-mark svg{ width:30px; height:30px; display:block; }
+
+    .nav{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .nav a{
+      color:#d8e0ec;
+      text-decoration:none;
+      font-size:16px;
+      font-weight:700;
+      padding:8px 4px;
+    }
+
+    .nav a:hover{ color:#fff; }
 
     .wrap{
       width:min(900px,calc(100% - 28px));
@@ -81,41 +116,17 @@ NOTE: Full-file replacement. If this file already exists, replace all contents.
       background:rgba(17,24,39,.96);
       border:1px solid var(--line);
       border-radius:18px;
-      box-shadow:0 12px 34px rgba(0,0,0,.28);
+      box-shadow:var(--shadow);
       padding:24px 20px;
     }
 
-    h1,h2{
-      margin:0 0 12px;
-      line-height:1.15;
-    }
-
-    h1{
-      font-size:clamp(2rem,5vw,3rem);
-    }
-
-    h2{
-      color:var(--gold);
-      margin-top:20px;
-      font-size:clamp(1.2rem,3vw,1.7rem);
-    }
-
-    p{
-      margin:0 0 12px;
-    }
-
-    .muted{
-      color:var(--muted);
-    }
-
-    ul,ol{
-      margin:10px 0 0;
-      padding-left:22px;
-    }
-
-    li{
-      margin:8px 0;
-    }
+    h1,h2{ margin:0 0 12px; line-height:1.15; }
+    h1{ font-size:clamp(2rem,5vw,3rem); }
+    h2{ color:var(--gold); margin-top:20px; font-size:clamp(1.2rem,3vw,1.7rem); }
+    p{ margin:0 0 12px; }
+    .muted{ color:var(--muted); }
+    ul,ol{ margin:10px 0 0; padding-left:22px; }
+    li{ margin:8px 0; }
 
     .box{
       margin-top:16px;
@@ -128,6 +139,7 @@ NOTE: Full-file replacement. If this file already exists, replace all contents.
     .button-row{
       margin-top:24px;
       text-align:center;
+      font-family:Arial, Helvetica, sans-serif;
     }
 
     .btn{
@@ -139,9 +151,48 @@ NOTE: Full-file replacement. If this file already exists, replace all contents.
       background:var(--blue);
       color:#111827;
     }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      margin:18px 0 28px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:.96rem;
+    }
+
+    @media (max-width:760px){
+      .topbar{ padding:14px; }
+      .nav a{ font-size:14px; }
+      .wrap{ width:min(100% - 18px,900px); padding:18px 0 34px; }
+    }
   </style>
 </head>
 <body>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+          <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
+          <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+          <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
+          <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
+        </svg>
+      </span>
+      <span>PLUCK</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
   <main class="wrap">
     <section class="card">
       <h1>Learn Pluck in 60 Seconds</h1>
@@ -211,5 +262,8 @@ NOTE: Full-file replacement. If this file already exists, replace all contents.
       </div>
     </section>
   </main>
+
+  <footer>© 2026 Pluck The Card Game</footer>
+
 </body>
 </html>
