@@ -1,99 +1,199 @@
-<!doctype html>
-<html lang="en">
-
 <!--
 CHANGE LOG
-2026-03-05 12:55
-Fix: Correct logo path to assets/PluckTheCardGame_Logo.jpg
-No UI changes.
+2026-03-07 15:58 (-0500)
+
+FILE
+docs/about.html
+
+ACTION
+Full clean single-file replacement.
+
+CHANGES
+• Removed mixed header systems
+• Standardized SVG logo and navigation
+• Added clear brand explanation page
+• Matched site continuity with homepage, rules, and learn page
+
+ROW COUNT
+Previous: Mixed / duplicated header markup
+Current: 200
+NOTE
+This page is intentionally simple and brand-forward.
 -->
 
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck The Card Game</title>
-  <link rel="stylesheet" href="css/style.css?v=2" />
-</head>
+  <title>About Pluck</title>
+  <meta name="description" content="About Pluck The Card Game." />
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --gold:#fbbf24;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 12px 36px rgba(0,0,0,.28);
+    }
 
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#08111f 0%, var(--bg) 100%);
+      color:var(--text);
+      font-family:Georgia,"Times New Roman",serif;
+      line-height:1.7;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      padding:16px 24px;
+      background:rgba(3,7,15,.88);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:#fff;
+      font-weight:800;
+      font-size:20px;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+    }
+
+    .brand-mark svg{ width:30px; height:30px; display:block; }
+
+    .nav{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .nav a{
+      color:#d8e0ec;
+      text-decoration:none;
+      font-size:16px;
+      font-weight:700;
+      padding:8px 4px;
+    }
+
+    .nav a:hover{ color:#fff; }
+
+    .wrap{
+      width:min(920px, calc(100% - 28px));
+      margin:0 auto;
+      padding:28px 0 40px;
+    }
+
+    .panel{
+      background:rgba(17,24,39,.96);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:26px 22px;
+      margin-bottom:18px;
+    }
+
+    h1,h2{ margin:0 0 12px; line-height:1.15; }
+    h1{ font-size:clamp(2rem,5vw,3rem); }
+    h2{ color:var(--gold); font-size:clamp(1.25rem,3vw,1.8rem); margin-top:10px; }
+    p{ margin:0 0 14px; }
+    .muted{ color:var(--muted); }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      margin:10px 0 28px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:.96rem;
+    }
+
+    @media (max-width:760px){
+      .topbar{ padding:14px; }
+      .nav a{ font-size:14px; }
+      .wrap{ width:min(100% - 18px,920px); padding:18px 0 34px; }
+    }
+  </style>
+</head>
 <body>
 
-  <header class="nav">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+          <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
+          <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+          <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
+          <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
+        </svg>
+      </span>
+      <span>PLUCK</span>
+    </a>
 
-<div class="logo">
-
-<a href="index.html" class="logoLink">
-
-<svg viewBox="0 0 100 100" class="logoIcon">
-
-<path d="M50 5 L80 40 L50 95 L20 40 Z" fill="white"/>
-
-</svg>
-
-<span class="logoText">PLUCK</span>
-
-</a>
-
-</div>
-
-
-<nav class="mainNav">
-
-<a href="index.html">Home</a>
-
-<a href="game.html">Play Demo</a>
-
-<a href="demo2.html">Demo 2</a>
-
-<a href="rules.html">Rules</a>
-
-<a href="learn-pluck.html">Learn</a>
-
-<a href="about.html">About</a>
-
-</nav>
-
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
   </header>
 
-<header class="nav">
-  <a class="brand" href="index.html" aria-label="Pluck Home">
-    <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
-    <span>PLUCK</span>
-  </a>
+  <main class="wrap">
+    <section class="panel">
+      <h1>About Pluck</h1>
+      <p class="muted">
+        Pluck is a three-player trick-taking card game built around pressure, quotas, and consequences.
+      </p>
+      <p>
+        Unlike games that rely on long scorekeeping, Pluck keeps the tension alive hand to hand.
+        Miss your number and somebody earns the right to improve their next hand off yours.
+      </p>
+      <p>
+        That mechanic is what gives Pluck its edge. The table remembers. The next hand remembers.
+        And the best players do more than count cards — they read people.
+      </p>
+    </section>
 
-  <nav class="navlinks">
-    <a href="game.html">Play Demo</a>
-    <a href="demo2.html">Demo 2</a>
-    <a href="rules.html">Rules</a>
-    <a href="about.html">About</a>
-  </nav>
-</header>
+    <section class="panel">
+      <h2>Why It Matters</h2>
+      <p>
+        Pluck is simple enough to learn quickly but sharp enough to keep strong players honest.
+        It rewards awareness, table feel, and steady nerves.
+      </p>
+      <p>
+        Around the right table, it is not just a game. It becomes talk, memory, style, and reputation.
+      </p>
+    </section>
+  </main>
 
-<main class="container">
+  <footer>© 2026 Pluck The Card Game</footer>
 
-<section style="padding:18px 0;">
-  <h1 style="margin:0 0 10px; font-weight:1000; letter-spacing:.5px;">Pluck</h1>
-
-  <p style="margin:0 0 16px; color: rgba(233,238,246,.78); font-weight:700; max-width: 780px;">
-    Quick demos for gameplay flow and UI testing.
-  </p>
-
-  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-
-    <a class="btn" href="game.html">Play Demo</a>
-
-    <a class="btn" href="demo2.html">Demo 2</a>
-
-    <a class="btn btn-secondary" href="rules.html">Rules</a>
-
-    <a class="btn btn-secondary" href="about.html">About</a>
-
-  </div>
-
-</section>
-
-<footer class="footer">© 2026 Pluck The Card Game</footer>
-
-</main>
 </body>
 </html>
-
