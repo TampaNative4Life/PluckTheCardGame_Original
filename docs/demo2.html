@@ -1,13 +1,26 @@
 <!--
 CHANGE LOG
-2026-03-06 13:10 (-0500)
-Fix: Restore continuity between demo2.html and demo2.js without changing approved UI.
-Fix: Add missing required IDs expected by demo2.js:
-  - #youHand
-  - #trumpStatus
-  - #msg
-Fix: Keep approved bottom pick panel and top-left PLUCK home button intact.
-UI NOTE: No restyle/reorder of approved elements. Additions only.
+2026-03-07 15:58 (-0500)
+
+FILE
+docs/demo2.html
+
+ACTION
+Full clean single-file replacement preserving demo2.js continuity.
+
+CHANGES
+• Removed duplicate headers
+• Removed mixed image-logo and SVG-logo systems
+• Corrected docs-relative paths to ../css and ../js
+• Preserved required IDs for demo2.js
+• Standardized top navigation for site continuity
+
+ROW COUNT
+Previous: Corrupted / duplicate-header version
+Current: 207
+
+NOTE
+This replacement preserves required IDs such as #youHand, #pickPanel, #trumpPanel, #trumpStatus, and #msg.
 -->
 
 <!doctype html>
@@ -16,67 +29,44 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link rel="stylesheet" href="../css/style.css?v=3" />
+  <style>
+    .brandMarkSvg{
+      width:36px;
+      height:36px;
+      display:block;
+      flex:0 0 auto;
+    }
+  </style>
 </head>
-
-  <header class="nav">
-
-<div class="logo">
-
-<a href="index.html" class="logoLink">
-
-<svg viewBox="0 0 100 100" class="logoIcon">
-
-<path d="M50 5 L80 40 L50 95 L20 40 Z" fill="white"/>
-
-</svg>
-
-<span class="logoText">PLUCK</span>
-
-</a>
-
-</div>
-
-
-<nav class="mainNav">
-
-<a href="index.html">Home</a>
-
-<a href="game.html">Play Demo</a>
-
-<a href="demo2.html">Demo 2</a>
-
-<a href="rules.html">Rules</a>
-
-<a href="learn-pluck.html">Learn</a>
-
-<a href="about.html">About</a>
-
-</nav>
-
-</header>
-
 <body class="demo2">
-  <!-- NAV -->
+
   <header class="nav">
-    <div class="navLeft">
-      <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
-        <span>PLUCK</span>
-      </a>
-    </div>
+    <a class="brand" href="index.html" aria-label="Pluck Home">
+      <span class="brandMarkSvg" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+          <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
+          <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+          <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
+          <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
+        </svg>
+      </span>
+      <span>PLUCK</span>
+    </a>
 
     <nav class="navlinks">
+      <a href="index.html">Home</a>
       <a href="game.html">Play Demo</a>
       <a href="demo2.html" class="activeLink">Demo 2</a>
       <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
   <main class="container">
 
-    <!-- TOP HUD -->
     <section class="topHud" aria-label="Game status">
       <div class="statusBar">
         <div class="statusItem">
@@ -107,7 +97,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
       </div>
     </section>
 
-    <!-- TABLE + RESET ABOVE IT -->
     <section class="tableStage">
       <div class="tableTopBar">
         <button class="btn" id="resetBtn">Reset (New Deal)</button>
@@ -116,7 +105,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
       <div class="feltTable" aria-label="3-player table">
         <div class="feltInset" aria-hidden="true"></div>
 
-        <!-- LEFT AI -->
         <div class="seat seat-left">
           <div class="avatarWrap">
             <div class="avatar" aria-hidden="true"></div>
@@ -127,7 +115,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
           </div>
         </div>
 
-        <!-- RIGHT AI -->
         <div class="seat seat-right">
           <div class="avatarWrap">
             <div class="avatar" aria-hidden="true"></div>
@@ -138,7 +125,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
           </div>
         </div>
 
-        <!-- CENTER TRICK -->
         <div class="trickCenter" id="trickArea">
           <div class="trickInner">
             <div class="trickTitle">Trick Area</div>
@@ -149,7 +135,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
           </div>
         </div>
 
-        <!-- YOU -->
         <div class="seat seat-bottom">
           <div class="youDock">
             <div class="youRow">
@@ -164,16 +149,14 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
           </div>
         </div>
 
-      </div><!-- /feltTable -->
+      </div>
     </section>
 
-    <!-- REQUIRED BY demo2.js: your hand row lives below the table -->
     <section class="bottomPanel" aria-label="Your Hand Panel">
       <div id="youHand" class="yourHandRow tight" aria-label="Your hand"></div>
       <div id="msg" class="overlayStatus" style="margin-top:10px; display:none;"></div>
     </section>
 
-    <!-- APPROVED LOOK: Pick panel at bottom (NOT overlay) -->
     <section class="bottomPanel" id="pickPanel" aria-label="Pick First Panel">
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Pick First (Choose Dealer)</div>
@@ -208,7 +191,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
       </div>
     </section>
 
-    <!-- REQUIRED BY demo2.js -->
     <section id="trumpPanel" aria-hidden="true" style="display:none;">
       <div id="trumpStatus"></div>
       <button type="button" data-trump="S" style="display:none;">Spades</button>
@@ -220,6 +202,6 @@ UI NOTE: No restyle/reorder of approved elements. Additions only.
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <script src="js/demo2.js?v=2"></script>
+  <script src="../js/demo2.js?v=3"></script>
 </body>
 </html>
