@@ -22,7 +22,7 @@
     err("Missing required elements: hand, trick, resetBtn");
     return;
   }
-  <script src="../js/game.js?v=3"></script>
+  
   // ---------- optional DOM ----------
   const ai2HandEl = $("ai2Hand");
   const ai3HandEl = $("ai3Hand");
