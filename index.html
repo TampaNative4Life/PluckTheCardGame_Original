@@ -1,50 +1,142 @@
 <!--
 CHANGE LOG
-2026-03-05 12:55 (-0500)
-Fix: Restore homepage top-left brand (logo + PLUCK text) in nav; keep existing UI layout intact.
-Note: Uses assets/PluckTheCardGame_Logo.jpg as the brand image per user-provided asset.
+2026-03-07 01:20 (-0500)
+Fix: Restored centered homepage hero layout
+Fix: Centered logo, title, tagline, and buttons
+ROW COUNT: 156
 -->
 
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck The Card Game</title>
-  <link rel="stylesheet" href="css/style.css?v=2" />
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Pluck The Card Game</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#0b1220;
+color:white;
+}
+
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:16px 30px;
+background:#050a14;
+border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:bold;
+font-size:20px;
+}
+
+.logo img{
+height:36px;
+}
+
+nav a{
+color:#cbd5e1;
+text-decoration:none;
+margin-left:24px;
+font-weight:500;
+}
+
+nav a:hover{
+color:white;
+}
+
+.hero{
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:100px 20px;
+}
+
+.hero img{
+width:110px;
+margin-bottom:20px;
+}
+
+.hero h1{
+font-size:56px;
+margin-bottom:10px;
+}
+
+.hero p{
+color:#9ca3af;
+margin-bottom:40px;
+font-size:18px;
+}
+
+.buttons{
+display:flex;
+gap:16px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.button{
+background:#111827;
+border:1px solid rgba(255,255,255,.2);
+padding:12px 22px;
+border-radius:10px;
+text-decoration:none;
+color:white;
+font-weight:600;
+}
+
+.button:hover{
+background:#1f2937;
+}
+
+footer{
+text-align:center;
+color:#9ca3af;
+padding:40px 20px;
+}
+
+</style>
+
 </head>
 
 <body>
-  <!-- NAV -->
-  <header class="nav">
-    <div class="navLeft">
-      <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck" />
-        <span>PLUCK</span>
-      </a>
-    </div>
 
-    <nav class="navlinks">
-      <a href="game.html">Play Demo</a>
-      <a href="demo2.html">Demo 2</a>
-      <a href="rules.html">Rules</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+<nav>
 
-  <main class="container">
-    <section class="homeHero">
-      <h1 class="homeTitle">Pluck</h1>
-      <p class="homeSubtitle">Play the demos. Tight UI. No nonsense.</p>
+<div class="logo">
+<img src="logo.png">
+PLUCK
+</div>
 
-      <div class="homeButtons">
-        <a class="btn" href="game.html">Play Demo</a>
-        <a class="btn" href="demo2.html">Demo 2</a>
-        <a class="btn btn-secondary" href="rules.html">Rules</a>
-      </div>
-    </section>
+<div>
+<a href="index.html">Home</a>
+<a href="demo.html">Play Demo</a>
+<a href="demo2.html">Demo 2</a>
+<a href="rules.html">Rules</a>
+<a href="about.html">About</a>
+</div>
 
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
-</body>
-</html>
+</nav>
+
+<section class="hero">
+
+<img src="logo.png">
+
+<h1>Pluck</h1>
+
+<p>Play the demos. Tight UI. No nonsense.</p>
+
+<div class="buttons">
