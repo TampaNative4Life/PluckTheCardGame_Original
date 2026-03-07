@@ -1,0 +1,425 @@
+<!--
+CHANGE LOG
+2026-03-07 15:45 (-0500)
+Fix: Full homepage rebuild with centered logo, centered hero, and buttons for all viewable pages
+Fix: Replaced broken external image dependency with inline SVG logo
+Fix: Added black-and-white base with controlled color accents
+ROW COUNT: 365
+CURRENT FILE ROW COUNT: Unknown from current repo contents not provided in chat.
+NOTE: Full-file replacement. This rebuild prioritizes homepage presentation without changing your other pages.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pluck The Card Game</title>
+  <meta name="description" content="Pluck The Card Game official homepage." />
+  <style>
+    :root{
+      --bg:#04070d;
+      --bg2:#081223;
+      --panel:rgba(10,16,28,.78);
+      --panel-2:rgba(255,255,255,.05);
+      --line:rgba(255,255,255,.11);
+      --text:#f8fafc;
+      --muted:#b7c0cf;
+      --soft:#94a3b8;
+      --gold:#f4c542;
+      --blue:#7cb7ff;
+      --blue-2:#3b82f6;
+      --white:#ffffff;
+      --shadow:0 12px 34px rgba(0,0,0,.34);
+      --radius:18px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html, body{
+      margin:0;
+      min-height:100%;
+    }
+
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 18% 20%, rgba(59,130,246,.16), transparent 25%),
+        radial-gradient(circle at 80% 76%, rgba(244,197,66,.12), transparent 24%),
+        linear-gradient(180deg, #081223 0%, #050913 38%, #02050b 100%);
+      overflow-x:hidden;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      padding:16px 24px;
+      background:rgba(3,7,15,.88);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:var(--white);
+      font-weight:800;
+      letter-spacing:.02em;
+      font-size:20px;
+      white-space:nowrap;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+      flex:0 0 auto;
+    }
+
+    .brand-mark svg{
+      width:30px;
+      height:30px;
+      display:block;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .nav a{
+      color:#d8e0ec;
+      text-decoration:none;
+      font-size:16px;
+      font-weight:700;
+      padding:8px 4px;
+    }
+
+    .nav a:hover{
+      color:var(--white);
+    }
+
+    .hero{
+      min-height:calc(100vh - 78px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 18px 54px;
+    }
+
+    .hero-inner{
+      width:min(1100px, 100%);
+      text-align:center;
+    }
+
+    .hero-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin-bottom:20px;
+    }
+
+    .hero-logo{
+      width:150px;
+      height:150px;
+      border-radius:32px;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(124,183,255,.18), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:
+        0 18px 48px rgba(0,0,0,.42),
+        0 0 0 1px rgba(255,255,255,.02) inset;
+      margin:0 auto;
+    }
+
+    .hero-logo svg{
+      width:92px;
+      height:92px;
+      display:block;
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-size:clamp(3.2rem, 8vw, 5.2rem);
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.04em;
+    }
+
+    .catch{
+      margin:0 0 12px;
+      font-size:clamp(1.2rem, 2.8vw, 1.95rem);
+      font-weight:800;
+      color:var(--white);
+    }
+
+    .sub{
+      width:min(760px, 100%);
+      margin:0 auto 34px;
+      color:var(--muted);
+      font-size:clamp(1rem, 2vw, 1.18rem);
+      line-height:1.7;
+    }
+
+    .button-grid{
+      width:min(900px, 100%);
+      margin:0 auto 28px;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:14px;
+    }
+
+    .btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:58px;
+      padding:14px 16px;
+      border-radius:16px;
+      text-decoration:none;
+      font-size:17px;
+      font-weight:800;
+      letter-spacing:.01em;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      transition:transform .16s ease, background .16s ease, border-color .16s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn-main{
+      background:linear-gradient(180deg, rgba(28,38,58,.95), rgba(16,23,35,.96));
+      color:var(--white);
+    }
+
+    .btn-main:hover{
+      background:linear-gradient(180deg, rgba(36,50,79,.98), rgba(19,28,43,.98));
+      border-color:rgba(124,183,255,.28);
+    }
+
+    .btn-accent{
+      background:linear-gradient(180deg, rgba(244,197,66,.98), rgba(223,175,39,.96));
+      color:#111827;
+      border-color:rgba(244,197,66,.55);
+    }
+
+    .btn-accent:hover{
+      background:linear-gradient(180deg, rgba(250,206,88,.98), rgba(230,182,46,.98));
+    }
+
+    .btn-alt{
+      background:linear-gradient(180deg, rgba(124,183,255,.96), rgba(77,139,226,.94));
+      color:#081223;
+      border-color:rgba(124,183,255,.48);
+    }
+
+    .btn-alt:hover{
+      background:linear-gradient(180deg, rgba(144,196,255,.98), rgba(89,150,235,.96));
+    }
+
+    .summary{
+      width:min(900px, 100%);
+      margin:0 auto;
+      padding:18px 18px;
+      border-radius:18px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .summary p{
+      margin:0;
+      color:var(--soft);
+      font-size:1rem;
+      line-height:1.7;
+    }
+
+    .summary strong{
+      color:var(--white);
+    }
+
+    footer{
+      padding:0 18px 34px;
+    }
+
+    .footer-line{
+      width:min(920px, calc(100% - 10px));
+      height:1px;
+      margin:0 auto 18px;
+      background:var(--line);
+    }
+
+    .footer-text{
+      text-align:center;
+      color:#8a95a6;
+      font-size:16px;
+    }
+
+    @media (max-width:900px){
+      .button-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width:700px){
+      .topbar{
+        padding:14px 14px;
+      }
+
+      .brand{
+        font-size:18px;
+      }
+
+      .brand-mark{
+        width:40px;
+        height:40px;
+        border-radius:10px;
+      }
+
+      .brand-mark svg{
+        width:26px;
+        height:26px;
+      }
+
+      .nav{
+        gap:12px;
+      }
+
+      .nav a{
+        font-size:14px;
+      }
+
+      .hero{
+        min-height:calc(100vh - 70px);
+        padding-top:34px;
+      }
+
+      .hero-logo{
+        width:124px;
+        height:124px;
+        border-radius:26px;
+      }
+
+      .hero-logo svg{
+        width:76px;
+        height:76px;
+      }
+    }
+
+    @media (max-width:560px){
+      .button-grid{
+        grid-template-columns:1fr;
+      }
+
+      .nav{
+        gap:10px;
+      }
+
+      .nav a{
+        font-size:13px;
+      }
+
+      .sub{
+        margin-bottom:26px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+          <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
+          <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+          <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
+          <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
+        </svg>
+      </span>
+      <span>PLUCK</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="game.html">Play Demo</a>
+      <a href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <section class="hero-inner">
+      <div class="hero-logo-wrap">
+        <div class="hero-logo" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 8L76 36C83 43 86 52 84 62C81 79 67 92 50 92C33 92 19 79 16 62C14 52 17 43 24 36L50 8Z" fill="white"/>
+            <path d="M50 19L68 39C73 44 75 50 74 57C72 69 62 78 50 78C38 78 28 69 26 57C25 50 27 44 32 39L50 19Z" fill="#050913"/>
+            <path d="M50 25L62 40C65 44 66 47 66 52C66 61 59 68 50 68C41 68 34 61 34 52C34 47 35 44 38 40L50 25Z" fill="white"/>
+            <rect x="22" y="74" width="56" height="6" rx="3" fill="#F4C542"/>
+            <rect x="28" y="82" width="44" height="5" rx="2.5" fill="#7CB7FF"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1>Pluck</h1>
+
+      <p class="catch">Three players. Seventeen tricks. Zero excuses.</p>
+
+      <p class="sub">
+        A sharp three-player card game built on pressure, talk, and consequences.
+        Make your number, protect your hand, and do not come up short.
+      </p>
+
+      <div class="button-grid">
+        <a class="btn btn-main" href="index.html">Home</a>
+        <a class="btn btn-accent" href="game.html">Play Demo</a>
+        <a class="btn btn-alt" href="demo2.html">Demo 2</a>
+        <a class="btn btn-main" href="rules.html">Rules</a>
+        <a class="btn btn-main" href="learn-pluck.html">Learn Pluck</a>
+        <a class="btn btn-main" href="about.html">About</a>
+      </div>
+
+      <div class="summary">
+        <p>
+          <strong>What makes Pluck different?</strong>
+          No running score. Miss your job this hand, and next hand somebody gets stronger off your cards.
+          That is not bad luck. That is the game.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-line"></div>
+    <div class="footer-text">© 2026 Pluck The Card Game</div>
+  </footer>
+
+</body>
+</html>
+
