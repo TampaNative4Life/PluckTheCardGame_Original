@@ -1,231 +1,84 @@
-<!--
+<!-- =========================================================
 CHANGE LOG
-2026-03-07 18:05 (-0500)
+2026-03-12
 
-FILE
-docs/index.html
+Fixes
+• Restores PluckTheCardGame_Logo.jpg
+• Uses docs/css/styles.css
+• Switches font to Times New Roman
+========================================================= -->
 
-ACTION
-Pinpoint homepage rollback and cleanup.
-
-CHANGES
-• Removed editorial/two-column homepage redesign
-• Restored goth black-and-white homepage tone
-• Centered hero logo
-• Kept shared header structure unchanged
-• Placed buttons cleanly and simply for easy use
-• Removed oversized visual noise and extra feature clutter
-
-ROW COUNT
-Previous: Unknown
-Current: Full replacement
-
-NOTE
-This change is intentionally limited to the homepage only.
--->
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck The Card Game</title>
-  <meta name="description" content="Pluck The Card Game official homepage." />
-  <link rel="stylesheet" href="css/style.css?v=4" />
-  <style>
-    .homeStage{
-      min-height:calc(100vh - 110px);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 0 20px;
-    }
 
-    .homeHeroCard{
-      width:min(980px, 100%);
-      margin:0 auto;
-      padding:42px 24px 30px;
-      border:1px solid var(--line);
-      border-radius:28px;
-      background:
-        radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.035), transparent 55%),
-        linear-gradient(180deg, rgba(20,26,38,.96), rgba(10,12,16,.98));
-      box-shadow:
-        0 26px 52px rgba(0,0,0,.42),
-        inset 0 0 0 1px rgba(255,255,255,.02);
-      text-align:center;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    .heroLogoWrap{
-      display:flex;
-      justify-content:center;
-      margin-bottom:18px;
-    }
+<title>Pluck The Card Game</title>
 
-    .heroLogoBadge{
-      width:108px;
-      height:108px;
-      border-radius:24px;
-      display:grid;
-      place-items:center;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.10), transparent 48%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:
-        0 18px 34px rgba(0,0,0,.35),
-        inset 0 0 0 1px rgba(255,255,255,.02);
-    }
+<link rel="stylesheet" href="docs/css/styles.css">
 
-    .heroLogoBadge svg{
-      width:68px;
-      height:68px;
-      display:block;
-    }
-
-    .homeHeroTitle{
-      margin:0 0 10px;
-      font-size:clamp(3rem, 7vw, 5rem);
-      line-height:.95;
-      font-weight:1000;
-      letter-spacing:-.03em;
-      color:#ffffff;
-    }
-
-    .homeHeroSub{
-      margin:0 auto 16px;
-      max-width:760px;
-      color:rgba(233,238,246,.88);
-      font-size:clamp(1.06rem, 2vw, 1.25rem);
-      line-height:1.6;
-      font-weight:900;
-    }
-
-    .homeHeroText{
-      margin:0 auto 24px;
-      max-width:760px;
-      color:rgba(233,238,246,.70);
-      line-height:1.8;
-      font-weight:700;
-      font-size:1rem;
-    }
-
-    .homeHeroButtons{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:12px;
-      margin-bottom:22px;
-    }
-
-    .homeHeroButtons .btn{
-      min-width:150px;
-    }
-
-    .homeCallout{
-      width:min(760px, 100%);
-      margin:0 auto;
-      padding:16px 18px;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:18px;
-      background:rgba(255,255,255,.03);
-      color:rgba(233,238,246,.74);
-      line-height:1.75;
-      font-weight:700;
-    }
-
-    .homeCallout strong{
-      color:#ffffff;
-    }
-
-    @media (max-width:700px){
-      .homeHeroCard{
-        padding:30px 16px 22px;
-        border-radius:22px;
-      }
-
-      .homeHeroButtons{
-        flex-direction:column;
-        align-items:stretch;
-      }
-
-      .homeHeroButtons .btn{
-        width:100%;
-        min-width:0;
-      }
-
-      .heroLogoBadge{
-        width:92px;
-        height:92px;
-        border-radius:20px;
-      }
-
-      .heroLogoBadge svg{
-        width:58px;
-        height:58px;
-      }
-    }
-  </style>
 </head>
+
+
 <body>
 
-  <header class="nav">
-    <div class="navLeft">
-      <a class="brand" href="index.html" aria-label="Pluck Home">
-  <img src="images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" />
-  <span>PLUCK</span>
-</a>
-    </div>
+<header>
 
-    <nav class="navlinks" aria-label="Main navigation">
-      <a href="index.html" class="activeLink">Home</a>
-      <a href="game.html">Play Demo</a>
-      <a href="demo2.html">Demo 2</a>
-      <a href="rules.html">Rules</a>
-      <a href="learn-pluck.html">Learn Pluck</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+<div class="brand">
 
-  <main class="container">
-    <section class="homeStage">
-      <div class="homeHeroCard">
+<img src="docs/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo">
 
-        <a class="brand" href="index.html" aria-label="Pluck Home">
-  <img src="images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" />
-  <span>PLUCK</span>
-</a>
+<span>PLUCK</span>
 
-        <h1 class="homeHeroTitle">Pluck</h1>
+</div>
 
-        <p class="homeHeroSub">
-          Three players. Seventeen tricks. Zero excuses.
-        </p>
+<nav>
 
-        <p class="homeHeroText">
-          A sharp three-player card game built on pressure, table feel, and consequences.
-          Make your number, protect your hand, and do not come up short.
-        </p>
+<a href="index.html">Home</a>
+<a href="docs/play_demo.html">Play Demo</a>
+<a href="docs/demo2.html">Demo 2</a>
+<a href="docs/rules.html">Rules</a>
+<a href="docs/learn.html">Learn Pluck</a>
+<a href="docs/about.html">About</a>
 
-        <div class="homeHeroButtons">
-          <a class="btn" href="game.html">Play Demo</a>
-          <a class="btn btn-secondary" href="demo2.html">Demo 2</a>
-          <a class="btn btn-secondary" href="rules.html">Rules</a>
-          <a class="btn btn-secondary" href="learn-pluck.html">Learn Pluck</a>
-          <a class="btn btn-secondary" href="about.html">About</a>
-        </div>
+</nav>
 
-        <div class="homeCallout">
-          <strong>What makes Pluck different?</strong>
-          No running score. Miss your job this hand, and next hand somebody may get stronger off your cards.
-          That is not bad luck. That is the game.
-        </div>
+</header>
 
-      </div>
-    </section>
 
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
+<section class="hero">
+
+<h1>Pluck</h1>
+
+<p><strong>Three players. Seventeen tricks. Zero excuses.</strong></p>
+
+<p>
+A sharp three-player card game built on pressure, table feel, and consequences.
+Make your number, protect your hand, and do not come up short.
+</p>
+
+<div class="buttons">
+
+<a href="docs/play_demo.html">Play Demo</a>
+<a href="docs/demo2.html">Demo 2</a>
+<a href="docs/rules.html">Rules</a>
+<a href="docs/learn.html">Learn Pluck</a>
+<a href="docs/about.html">About</a>
+
+</div>
+
+</section>
+
+
+<footer>
+
+© 2026 Pluck The Card Game
+
+</footer>
+
 
 </body>
 </html>
