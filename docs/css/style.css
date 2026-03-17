@@ -1,380 +1,895 @@
 /* =========================================
-   PLUCK MASTER STYLE SHEET (FULL REPLACEMENT)
-   Date: 2026-03-17
-   Purpose: Clean hierarchy, brand-first layout,
-            premium feel, stable foundation
-   Row Count: FULL FILE REPLACEMENT
+   CHANGE LOG
+   2026-03-17
+
+   FILE
+   docs/css/style.css
+
+   ACTION
+   Full stable rollback + rebuild for all docs pages.
+
+   CHANGES
+   • Restores prominent centered homepage hero with large "Pluck"
+   • Restores shared dark brand styling across all docs pages
+   • Keeps small header logo only
+   • Supports about / rules / learn pages
+   • Supports game.html and demo2.html layouts required by current JS
+   • Docs-only paths assumed
+
+   NOTE
+   This is a full-file replacement intended to stabilize the site.
    ========================================= */
 
-/* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root{
+  --bg:#05070d;
+  --bg2:#0b1220;
+  --panel:#0f172a;
+  --panel2:#111827;
+  --text:#e8ecf1;
+  --muted:#b8c2d6;
+  --line:#22314d;
+  --gold:#d4b254;
+  --blue:#7cb7ff;
+  --shadow:0 16px 40px rgba(0,0,0,.35);
+  --radius:18px;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  background: radial-gradient(circle at top, #0b1220, #05070d 70%);
-  color: #e8ecf1;
-  padding-top: 8px;
+*{
+  box-sizing:border-box;
 }
 
-/* ===== HEADER / NAV ===== */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 40px;
-  background: rgba(5, 7, 13, 0.95);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.35);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+html,
+body{
+  margin:0;
+  min-height:100%;
 }
 
-/* ===== BRAND ===== */
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo {
-  height: 64px;
-  border-radius: 8px;
-  filter:
-    drop-shadow(0 0 8px rgba(212,178,84,.2))
-    drop-shadow(0 0 18px rgba(124,183,255,.12));
-  transition: all 0.25s ease;
-}
-
-.logo:hover {
-  transform: scale(1.05);
-}
-
-.brand span {
-  font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-}
-
-/* ===== NAV LINKS ===== */
-nav a {
-  color: #d4b254;
-  text-decoration: none;
-  margin-left: 24px;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-nav a:hover {
-  color: #ffffff;
-}
-
-/* ===== HERO SECTION ===== */
-.hero {
-  margin-top: 100px;
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-}
-
-/* ===== HERO CARD ===== */
-.hero-card {
-  max-width: 900px;
-  width: 100%;
-  background: linear-gradient(145deg, #0f172a, #0b1220);
-  border-radius: 18px;
-  padding: 35px 45px;
-  text-align: center;
-
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.02) inset,
-    0 0 40px rgba(124,183,255,.06);
-
-  position: relative;
-  overflow: hidden;
-
-  animation: floatHero 5s ease-in-out infinite;
-}
-
-/* subtle glow overlay */
-.hero-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+body{
+  font-family:"Times New Roman", Times, serif;
+  color:var(--text);
   background:
-    radial-gradient(circle at 20% 20%, rgba(124,183,255,.08), transparent 30%),
-    radial-gradient(circle at 80% 80%, rgba(212,178,84,.05), transparent 30%);
-  pointer-events: none;
+    radial-gradient(circle at 18% 18%, rgba(124,183,255,.08), transparent 26%),
+    radial-gradient(circle at 84% 74%, rgba(212,178,84,.05), transparent 24%),
+    linear-gradient(180deg, #07101d 0%, #04070d 55%, #02040a 100%);
 }
 
-/* ===== HERO TEXT ===== */
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  text-shadow: 0 10px 25px rgba(0,0,0,.3);
-}
-
-.hero p {
-  font-size: 1rem;
-  line-height: 1.7;
-  margin-bottom: 20px;
-}
-
-/* ===== BUTTONS ===== */
-.buttons {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.buttons a {
-  padding: 12px 22px;
-  border-radius: 12px;
-  background: linear-gradient(145deg, #1e293b, #111827);
-  color: #e8ecf1;
-  text-decoration: none;
-  font-weight: 600;
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.03) inset;
-
-  transition: all 0.2s ease;
-}
-
-.buttons a:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 30px rgba(0,0,0,.4),
-    0 0 15px rgba(124,183,255,.08);
-}
-
-/* ===== FOOTER ===== */
-footer {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 0.85rem;
-  color: #8a94a6;
-}
-
-/* ===== ANIMATION ===== */
-@keyframes floatHero {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-  100% { transform: translateY(0); }
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  nav {
-    text-align: center;
-  }
-
-  .hero {
-    margin-top: 70px;
-  }
-
-  .hero h1 {
-    font-size: 2.4rem;
-  }
-
-  .logo {
-    height: 56px;
-  }
-}
 /* =========================================
-   EMERGENCY HOMEPAGE ROLLBACK
-   Date: 2026-03-17
-   Purpose: Restore prior accepted centered homepage layout
-   Scope: Homepage visual rollback only
+   SHARED HEADER
    ========================================= */
 
-/* Restore header/logo balance */
-.logo {
-  height: 42px !important;
-  width: auto !important;
-  border-radius: 6px !important;
-  filter: none !important;
-  transform: none !important;
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:14px 18px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(4,7,13,.95);
+  backdrop-filter:blur(8px);
+  position:sticky;
+  top:0;
+  z-index:999;
 }
 
-.logo:hover {
-  transform: none !important;
-  filter: none !important;
+.navLeft{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:0 0 auto;
 }
 
-.brand {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:800;
+  letter-spacing:.7px;
+  flex:0 0 auto;
 }
 
-.brand span,
-.brand-text {
-  font-size: 1.2rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 1px !important;
-  color: #ffffff !important;
+.brand img,
+.logo{
+  height:42px;
+  width:auto;
+  display:block;
+  border-radius:6px;
 }
 
-/* Restore clean header */
-.nav,
-header {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 14px 40px !important;
-  background: rgba(5, 7, 13, 0.95) !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,.35) !important;
+.navlinks{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
 }
 
-/* Restore centered homepage hero */
-.hero {
-  margin-top: 48px !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: flex-start !important;
-  padding: 40px 20px !important;
-  animation: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-  overflow: visible !important;
+.navlinks a{
+  color:var(--gold);
+  text-decoration:none;
+  font-weight:700;
+  font-size:1rem;
 }
 
-.hero::before {
-  content: none !important;
+.navlinks a:hover{
+  color:#fff;
 }
 
-/* Restore centered hero card */
-.hero-card {
-  max-width: 980px !important;
-  width: 100% !important;
-  background: linear-gradient(145deg, #0f172a, #0b1220) !important;
-  border-radius: 18px !important;
-  padding: 35px 45px !important;
-  text-align: center !important;
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.02) inset !important;
-  position: relative !important;
-  overflow: hidden !important;
-  margin: 0 auto !important;
-  animation: none !important;
-  transform: none !important;
+.navlinks .activeLink{
+  color:#fff;
 }
 
-.hero-card::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
+.container{
+  max-width:1280px;
+  margin:0 auto;
+  padding:22px 16px 28px;
+}
+
+/* =========================================
+   HOMEPAGE
+   ========================================= */
+
+.hero{
+  display:flex;
+  justify-content:center;
+  padding:48px 0 20px;
+}
+
+.hero-card{
+  width:min(980px, 100%);
+  border-radius:24px;
   background:
-    radial-gradient(circle at 20% 20%, rgba(124,183,255,.08), transparent 30%),
-    radial-gradient(circle at 80% 80%, rgba(212,178,84,.05), transparent 30%) !important;
-  pointer-events: none !important;
-}
-
-.hero-card > * {
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* Restore centered title/text */
-.hero h1 {
-  font-size: 4.4rem !important;
-  line-height: 1 !important;
-  margin: 0 0 18px !important;
-  text-align: center !important;
-}
-
-.hero p {
-  font-size: 1.05rem !important;
-  line-height: 1.75 !important;
-  margin: 0 0 18px !important;
-  text-align: center !important;
-  max-width: 860px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* Restore centered button row */
-.buttons {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 15px !important;
-  margin-top: 28px !important;
-}
-
-.buttons a {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 170px !important;
-  padding: 12px 22px !important;
-  border-radius: 12px !important;
-  background: linear-gradient(145deg, #1e293b, #111827) !important;
-  color: #e8ecf1 !important;
-  text-decoration: none !important;
-  font-weight: 600 !important;
+    radial-gradient(circle at 22% 18%, rgba(124,183,255,.09), transparent 28%),
+    radial-gradient(circle at 82% 78%, rgba(212,178,84,.06), transparent 24%),
+    linear-gradient(145deg, rgba(15,23,42,.98), rgba(7,14,27,.98));
+  border:1px solid rgba(124,183,255,.16);
   box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.03) inset !important;
-  transform: none !important;
+    0 24px 60px rgba(0,0,0,.42),
+    0 0 0 1px rgba(255,255,255,.02) inset;
+  padding:52px 42px 40px;
+  text-align:center;
 }
 
-.buttons a:hover {
-  transform: none !important;
+.hero h1{
+  margin:0 0 18px;
+  font-size:5rem;
+  line-height:1;
+  font-weight:900;
+  color:#f2f4f8;
+}
+
+.hero .hero-subtitle{
+  margin:0 0 24px;
+  font-size:1.3rem;
+  font-weight:800;
+  color:#f0f3f8;
+}
+
+.hero .hero-text{
+  width:min(840px, 100%);
+  margin:0 auto 28px;
+  font-size:1.05rem;
+  line-height:1.75;
+  color:#f0f3f8;
+}
+
+.buttons{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:8px;
+}
+
+.buttons a,
+.buttons button,
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:12px 22px;
+  border-radius:14px;
+  border:1px solid rgba(124,183,255,.16);
+  background:linear-gradient(145deg, #1a2741, #121c31);
+  color:#f2f4f8;
+  text-decoration:none;
+  font-weight:700;
+  font-family:inherit;
+  box-shadow:0 10px 24px rgba(0,0,0,.28);
+  cursor:pointer;
+}
+
+.buttons a:hover,
+.btn:hover{
+  filter:brightness(1.06);
+}
+
+.btn-secondary{
+  background:linear-gradient(145deg, #131d31, #0f1727);
+}
+
+.home-callout{
+  width:min(860px, 100%);
+  margin:30px auto 0;
+  padding:20px 22px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:#dbe2ee;
+  line-height:1.7;
+  font-size:1rem;
+}
+
+.footer{
+  text-align:center;
+  color:#93a1ba;
+  font-size:.95rem;
+  padding:18px 0 6px;
+  margin-top:18px;
+}
+
+/* =========================================
+   SIMPLE CONTENT PAGES
+   ========================================= */
+
+.pageSection{
+  padding:14px 0;
+}
+
+.card{
+  background:rgba(15,23,42,.92);
+  border:1px solid rgba(124,183,255,.14);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:24px 22px;
+}
+
+.pageTitle{
+  margin:0 0 14px;
+  font-size:2.2rem;
+  font-weight:900;
+  color:#f3f5f8;
+}
+
+.pageText{
+  margin:0 0 14px;
+  color:#e7ecf5;
+  line-height:1.8;
+  font-size:1.04rem;
+}
+
+.pageButtons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:16px;
+}
+
+/* =========================================
+   GAME PAGE
+   ========================================= */
+
+.playLayout{
+  display:grid;
+  grid-template-columns:330px minmax(0,1fr);
+  gap:16px;
+  align-items:start;
+}
+
+.sidePanel{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.sideRow{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+.cardTight{
+  padding:16px;
+}
+
+.pmeta{
+  color:#dbe3ef;
+  line-height:1.6;
+}
+
+.pickRowWide{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.pickSlot{
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  padding:10px;
+}
+
+.pickName{
+  font-size:.95rem;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.pickCardSlot,
+.pickCard{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#dbe3ef;
+}
+
+.quotaRow{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+.quotaRow2{
+  margin-top:12px;
+}
+
+.quotaPill{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+  padding:10px;
+  text-align:center;
+}
+
+.quotaName{
+  display:block;
+  color:#c4cfdf;
+  font-size:.9rem;
+  margin-bottom:4px;
+}
+
+.quotaVal{
+  font-size:1.25rem;
+  font-weight:800;
+}
+
+.phaseRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.phaseChip{
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  border-radius:999px;
+  padding:8px 12px;
+  color:#d9e2f0;
+  font-weight:700;
+}
+
+.activeChip{
+  background:var(--gold);
+  color:#101624;
+  border-color:rgba(212,178,84,.5);
+}
+
+.phaseArrow{
+  color:#d0d8e6;
+  font-weight:700;
+}
+
+.turnBanner,
+.msg{
+  color:#dce4f0;
+  line-height:1.6;
+}
+
+.grid{
+  display:grid;
+  gap:14px;
+}
+
+.handRow,
+.hand{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.trickBox{
+  min-height:120px;
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:16px;
+  padding:12px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.trickSeat{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+.trickLabel{
+  font-size:.88rem;
+  color:#d0d8e6;
+}
+
+.hint{
+  color:#c4cfdf;
+  font-size:.92rem;
+}
+
+/* Full card face for game.html */
+.cardFace{
+  width:76px;
+  height:108px;
+  border-radius:14px;
+  background:#f6f7fa;
+  color:#10131a;
+  position:relative;
+  border:1px solid rgba(0,0,0,.12);
+  box-shadow:0 10px 22px rgba(0,0,0,.32);
+  user-select:none;
+}
+
+.cardFace.disabled{
+  opacity:.46;
+  filter:grayscale(.18);
+  cursor:not-allowed;
+}
+
+.cardFace .corner{
+  position:absolute;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.05;
+  text-align:center;
+}
+
+.cardFace .corner.tl{
+  top:8px;
+  left:8px;
+}
+
+.cardFace .corner.br{
+  right:8px;
+  bottom:8px;
+  transform:rotate(180deg);
+}
+
+.cardFace .suitBig{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  font-size:28px;
+  font-weight:800;
+}
+
+.cardFace .red{
+  color:#b3122d;
+}
+
+.cardFace .black{
+  color:#111827;
+}
+
+.cardFace.joker{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:6px;
+}
+
+.jokerTag{
+  font-size:11px;
+  font-weight:800;
+}
+
+/* =========================================
+   DEMO 2 PAGE
+   ========================================= */
+
+.topHud{
+  margin-top:6px;
+}
+
+.statusBar{
+  width:min(1100px, 100%);
+  margin:0 auto 14px;
+  padding:12px 14px;
+  border-radius:16px;
+  border:1px solid rgba(124,183,255,.14);
+  background:rgba(15,23,42,.9);
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.statusItem{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.statusLabel{
+  color:#c5d0e1;
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.4px;
+}
+
+.statusValue{
+  color:#f3f6fa;
+  font-weight:700;
+}
+
+.statusDivider{
+  width:1px;
+  height:18px;
+  background:rgba(255,255,255,.12);
+}
+
+.tableStage{
+  margin-top:10px;
+  min-height:620px;
+  position:relative;
+}
+
+.tableTopBar{
+  width:min(1100px, 100%);
+  margin:0 auto 10px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+.feltTable{
+  width:min(1100px, 100%);
+  min-height:560px;
+  margin:0 auto;
+  position:relative;
+  border-radius:26px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
   box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.03) inset !important;
+    0 20px 55px rgba(0,0,0,.45),
+    inset 0 0 0 2px rgba(255,255,255,.04);
 }
 
-/* Restore footer spacing */
-footer {
-  text-align: center !important;
-  margin-top: 40px !important;
-  font-size: 0.85rem !important;
-  color: #8a94a6 !important;
+.feltInset{
+  position:absolute;
+  inset:14px;
+  border-radius:20px;
+  border:2px solid rgba(255,255,255,.08);
 }
 
-/* Mobile rollback */
-@media (max-width: 768px) {
-  header,
-  .nav {
-    flex-direction: row !important;
-    gap: 0 !important;
+.seat{
+  position:absolute;
+  z-index:2;
+  color:#f2f5fa;
+}
+
+.seat-left{
+  left:18px;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+.seat-right{
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+.seat-bottom{
+  left:50%;
+  bottom:90px;
+  transform:translateX(-50%);
+  width:min(900px, 94%);
+}
+
+.avatarWrap{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border-radius:16px;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.avatar{
+  width:52px;
+  height:52px;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.28), transparent 52%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.38));
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    0 8px 18px rgba(0,0,0,.26);
+}
+
+.avatar-you{
+  box-shadow:
+    inset 0 0 0 2px rgba(212,178,84,.35),
+    0 8px 18px rgba(0,0,0,.26);
+}
+
+.seatName{
+  font-weight:800;
+}
+
+.seatSub{
+  font-size:.9rem;
+  color:#d7deea;
+}
+
+.trickCenter{
+  position:absolute;
+  left:50%;
+  top:46%;
+  transform:translate(-50%,-50%);
+  width:min(520px, 78%);
+  min-height:220px;
+  z-index:1;
+}
+
+.trickInner{
+  width:100%;
+  min-height:220px;
+  border-radius:22px;
+  border:2px dashed rgba(255,255,255,.22);
+  background:rgba(0,0,0,.14);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:14px;
+}
+
+.trickTitle{
+  font-weight:800;
+}
+
+.trickSlots{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  min-height:110px;
+  flex-wrap:wrap;
+}
+
+.slotHint{
+  color:#d8dfea;
+  font-size:.95rem;
+}
+
+.youDock,
+.youRow{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+.bottomPanel{
+  width:min(1100px, 100%);
+  margin:14px auto 0;
+}
+
+.overlayCard{
+  border-radius:18px;
+  border:1px solid rgba(124,183,255,.14);
+  background:rgba(15,23,42,.92);
+  box-shadow:var(--shadow);
+  padding:16px;
+}
+
+.bottomCard{
+  width:100%;
+}
+
+.overlayTitle{
+  font-size:1.15rem;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.overlaySub{
+  color:#d4dceb;
+  margin-bottom:12px;
+  line-height:1.6;
+}
+
+.overlayButtons{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.overlayStatus{
+  color:#e8edf7;
+}
+
+.pickRow{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin-top:14px;
+}
+
+/* mini cards for demo2 */
+.cardFaceMini{
+  flex:0 0 auto;
+  width:54px;
+  height:74px;
+  border-radius:12px;
+  background:#f5f7fa;
+  color:#111827;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  box-shadow:0 10px 18px rgba(0,0,0,.28);
+  border:1px solid rgba(0,0,0,.12);
+}
+
+.cardFaceMini.red{
+  color:#b3122d;
+}
+
+.cardFaceMini.black{
+  color:#111827;
+}
+
+.cardFaceMini.disabled{
+  opacity:.45;
+  filter:grayscale(.22);
+}
+
+.yourHandRow{
+  width:min(1040px, 100%);
+  max-width:100%;
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-start;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:18px;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 14px 34px rgba(0,0,0,.28);
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+
+.yourHandRow.tight .cardFaceMini{
+  width:50px;
+  height:70px;
+}
+
+.trickSlotWrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+.trickSlotLabel{
+  font-size:.88rem;
+  color:#ecf1f7;
+}
+
+.trickMini{
+  width:54px;
+  height:74px;
+  border-radius:12px;
+  background:#f5f7fa;
+  color:#111827;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  border:1px solid rgba(0,0,0,.12);
+  box-shadow:0 10px 18px rgba(0,0,0,.28);
+}
+
+.trickMini.red{
+  color:#b3122d;
+}
+
+.trickMini.black{
+  color:#111827;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width:980px){
+  .playLayout{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:860px){
+  .feltTable{
+    min-height:520px;
   }
 
-  .hero {
-    margin-top: 32px !important;
-    padding: 24px 14px !important;
+  .seat-bottom{
+    bottom:82px;
+  }
+}
+
+@media (max-width:700px){
+  .nav{
+    flex-direction:column;
+    align-items:flex-start;
   }
 
-  .hero-card {
-    padding: 24px 18px !important;
+  .hero{
+    padding-top:28px;
   }
 
-  .hero h1 {
-    font-size: 3rem !important;
+  .hero-card{
+    padding:32px 18px 28px;
   }
 
-  .hero p {
-    font-size: 1rem !important;
+  .hero h1{
+    font-size:3.3rem;
   }
 
-  .logo {
-    height: 40px !important;
+  .hero .hero-subtitle{
+    font-size:1.1rem;
+  }
+
+  .pickRow,
+  .pickRowWide,
+  .quotaRow{
+    grid-template-columns:1fr;
+  }
+
+  .brand img,
+  .logo{
+    height:38px;
+  }
+}
+
+@media (max-width:520px){
+  .navlinks{
+    gap:10px;
+  }
+
+  .navlinks a{
+    font-size:.95rem;
+  }
+
+  .hero h1{
+    font-size:2.7rem;
+  }
+
+  .yourHandRow.tight .cardFaceMini{
+    width:46px;
+    height:66px;
   }
 }
