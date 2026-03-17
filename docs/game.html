@@ -1,44 +1,19 @@
-<!--
-CHANGE LOG
-2026-03-07 16:35 (-0500)
-
-FILE
-docs/game.html
-
-ACTION
-Standardized full-page replacement using unified header structure.
-
-CHANGES
-• Unified exact header structure with navLeft + brand + navlinks
-• Uses shared SVG logo continuity
-• Uses shared /css/style.css?v=4
-• Preserves IDs required by ../js/game.js
-• Removes duplicate header confusion
-
-ROW COUNT
-Previous: Unknown
-Current: 238
-
-NOTE
-This file is matched to the current game.js requirements.
--->
-
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo</title>
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
   <header class="nav">
     <div class="navLeft">
-    <a class="brand" href="index.html" aria-label="Pluck Home">
-  <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo">
-  <span>PLUCK</span>
-</a>
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
+        <span>PLUCK</span>
+      </a>
     </div>
 
     <nav class="navlinks" aria-label="Main navigation">
@@ -52,7 +27,6 @@ This file is matched to the current game.js requirements.
   </header>
 
   <main class="container">
-
     <div class="playLayout">
 
       <aside class="sidePanel">
@@ -128,27 +102,24 @@ This file is matched to the current game.js requirements.
             </div>
 
             <div class="quotaRow quotaRow2">
-              <div class="quotaPill faint">
+              <div class="quotaPill">
                 <span class="quotaName">AI2 Tricks</span>
                 <span class="quotaVal" id="ai2Tricks">0</span>
               </div>
-              <div class="quotaPill faint">
+              <div class="quotaPill">
                 <span class="quotaName">AI3 Tricks</span>
                 <span class="quotaVal" id="ai3Tricks">0</span>
               </div>
-              <div class="quotaPill faint">
+              <div class="quotaPill">
                 <span class="quotaName">YOU Tricks</span>
                 <span class="quotaVal" id="youTricks">0</span>
               </div>
             </div>
-
           </div>
         </div>
-
       </aside>
 
       <section class="mainPlay">
-
         <div class="card" style="padding:14px;">
           <div class="phaseRow">
             <div id="pDeal" class="phaseChip">Deal</div>
@@ -160,7 +131,7 @@ This file is matched to the current game.js requirements.
             <div id="pPlay" class="phaseChip">Play</div>
           </div>
 
-          <div style="margin-top:10px;color:#a6b0c3;">
+          <div style="margin-top:10px;color:#dce3ef;">
             <strong>Phase:</strong> <span id="phaseLabel">PICK_DEALER</span>
             &nbsp;•&nbsp; <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
             &nbsp;•&nbsp; <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
@@ -168,12 +139,12 @@ This file is matched to the current game.js requirements.
 
           <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
 
-          <div class="buttons" style="margin-top:12px;">
+          <div class="buttons" style="margin-top:12px; justify-content:flex-start;">
             <button class="btn btn-secondary" id="resetBtn">Reset (New Deal)</button>
           </div>
         </div>
 
-        <div class="grid" style="margin-top:14px;">
+        <div class="grid" style="margin-top:14px; grid-template-columns:repeat(2,minmax(0,1fr));">
           <div class="card">
             <h3>AI2 (hidden hand)</h3>
             <div id="ai2Hand" class="handRow"></div>
@@ -185,18 +156,18 @@ This file is matched to the current game.js requirements.
           </div>
         </div>
 
-        <div class="card pluckPanel" id="pluckPanel" style="display:none;">
+        <div class="card pluckPanel" id="pluckPanel" style="display:none; margin-top:14px;">
           <h3>Pluck Phase</h3>
           <p id="pluckStatus" class="msg"></p>
-          <div id="pluckChoices" class="buttons" style="flex-wrap:wrap;"></div>
+          <div id="pluckChoices" class="buttons" style="justify-content:flex-start; flex-wrap:wrap;"></div>
           <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
           <p class="hint">Failed suit attempt = pluck LOST (no re-pick).</p>
         </div>
 
-        <div class="card" id="trumpPanel" style="display:none;">
+        <div class="card" id="trumpPanel" style="display:none; margin-top:14px;">
           <h3>Select Trump</h3>
           <p id="trumpStatus" class="msg"></p>
-          <div class="buttons" style="flex-wrap:wrap;">
+          <div class="buttons" style="justify-content:flex-start; flex-wrap:wrap;">
             <button class="btn" data-trump="S">Spades</button>
             <button class="btn" data-trump="H">Hearts</button>
             <button class="btn" data-trump="D">Diamonds</button>
@@ -204,7 +175,7 @@ This file is matched to the current game.js requirements.
           </div>
         </div>
 
-        <div class="grid" style="margin-top:14px;">
+        <div class="grid" style="margin-top:14px; grid-template-columns:repeat(2,minmax(0,1fr));">
           <div class="card">
             <h3>Your Hand</h3>
             <div id="hand" class="hand"></div>
@@ -218,17 +189,12 @@ This file is matched to the current game.js requirements.
             <p class="hint">Winner leads next trick.</p>
           </div>
         </div>
-
       </section>
     </div>
 
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
-  <script src="js/game.js?v=4"></script>>
+  <script src="js/game.js"></script>
 </body>
 </html>
-
-
-
-
