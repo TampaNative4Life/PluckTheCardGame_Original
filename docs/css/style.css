@@ -193,3 +193,188 @@ footer {
     height: 56px;
   }
 }
+/* =========================================
+   EMERGENCY HOMEPAGE ROLLBACK
+   Date: 2026-03-17
+   Purpose: Restore prior accepted centered homepage layout
+   Scope: Homepage visual rollback only
+   ========================================= */
+
+/* Restore header/logo balance */
+.logo {
+  height: 42px !important;
+  width: auto !important;
+  border-radius: 6px !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+.logo:hover {
+  transform: none !important;
+  filter: none !important;
+}
+
+.brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.brand span,
+.brand-text {
+  font-size: 1.2rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1px !important;
+  color: #ffffff !important;
+}
+
+/* Restore clean header */
+.nav,
+header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 14px 40px !important;
+  background: rgba(5, 7, 13, 0.95) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35) !important;
+}
+
+/* Restore centered homepage hero */
+.hero {
+  margin-top: 48px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 40px 20px !important;
+  animation: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.hero::before {
+  content: none !important;
+}
+
+/* Restore centered hero card */
+.hero-card {
+  max-width: 980px !important;
+  width: 100% !important;
+  background: linear-gradient(145deg, #0f172a, #0b1220) !important;
+  border-radius: 18px !important;
+  padding: 35px 45px !important;
+  text-align: center !important;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.45),
+    0 0 0 1px rgba(255,255,255,.02) inset !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin: 0 auto !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.hero-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124,183,255,.08), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(212,178,84,.05), transparent 30%) !important;
+  pointer-events: none !important;
+}
+
+.hero-card > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Restore centered title/text */
+.hero h1 {
+  font-size: 4.4rem !important;
+  line-height: 1 !important;
+  margin: 0 0 18px !important;
+  text-align: center !important;
+}
+
+.hero p {
+  font-size: 1.05rem !important;
+  line-height: 1.75 !important;
+  margin: 0 0 18px !important;
+  text-align: center !important;
+  max-width: 860px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Restore centered button row */
+.buttons {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+  margin-top: 28px !important;
+}
+
+.buttons a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 170px !important;
+  padding: 12px 22px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, #1e293b, #111827) !important;
+  color: #e8ecf1 !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.03) inset !important;
+  transform: none !important;
+}
+
+.buttons a:hover {
+  transform: none !important;
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.03) inset !important;
+}
+
+/* Restore footer spacing */
+footer {
+  text-align: center !important;
+  margin-top: 40px !important;
+  font-size: 0.85rem !important;
+  color: #8a94a6 !important;
+}
+
+/* Mobile rollback */
+@media (max-width: 768px) {
+  header,
+  .nav {
+    flex-direction: row !important;
+    gap: 0 !important;
+  }
+
+  .hero {
+    margin-top: 32px !important;
+    padding: 24px 14px !important;
+  }
+
+  .hero-card {
+    padding: 24px 18px !important;
+  }
+
+  .hero h1 {
+    font-size: 3rem !important;
+  }
+
+  .hero p {
+    font-size: 1rem !important;
+  }
+
+  .logo {
+    height: 40px !important;
+  }
+}
