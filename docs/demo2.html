@@ -1,44 +1,19 @@
-<!--
-CHANGE LOG
-2026-03-07 16:35 (-0500)
-
-FILE
-docs/demo2.html
-
-ACTION
-Standardized full-page replacement using unified header structure.
-
-CHANGES
-• Unified exact header structure with navLeft + brand + navlinks
-• Uses shared SVG logo continuity
-• Uses shared /css/style.css?v=4
-• Preserves IDs required by ../js/demo2.js
-• Keeps approved Demo2 table structure
-
-ROW COUNT
-Previous: Unknown
-Current: 201
-
-NOTE
-This file is matched to the current demo2.js requirements.
--->
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
-  <link rel="stylesheet" href="/css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="demo2">
 
   <header class="nav">
     <div class="navLeft">
       <a class="brand" href="index.html" aria-label="Pluck Home">
-  <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo">
-  <span>PLUCK</span>
-</a>
+        <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
+        <span>PLUCK</span>
+      </a>
     </div>
 
     <nav class="navlinks" aria-label="Main navigation">
@@ -57,7 +32,7 @@ This file is matched to the current demo2.js requirements.
       <div class="statusBar">
         <div class="statusItem">
           <span class="statusLabel">TRUMP</span>
-          <span class="statusValue muted" id="trumpLabel">(not set)</span>
+          <span class="statusValue" id="trumpLabel">(not set)</span>
         </div>
 
         <div class="statusDivider" aria-hidden="true"></div>
@@ -78,7 +53,7 @@ This file is matched to the current demo2.js requirements.
 
         <div class="statusItem">
           <span class="statusLabel">DEALER</span>
-          <span class="statusValue muted" id="dealerVal">(not set)</span>
+          <span class="statusValue" id="dealerVal">(not set)</span>
         </div>
       </div>
     </section>
@@ -187,7 +162,7 @@ This file is matched to the current demo2.js requirements.
 
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
-<script src="js/demo2.js?v=4"></script>
-  
+
+  <script src="js/demo2.js"></script>
 </body>
 </html>
