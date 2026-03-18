@@ -942,7 +942,7 @@ body.demo2 .topHud{
 
 body.demo2 .statusBar{
   margin:0 auto 10px;
-  padding:10px 12px;
+  padding:10px 2px;
 }
 
 body.demo2 .tableStage{
@@ -951,7 +951,7 @@ body.demo2 .tableStage{
 }
 
 body.demo2 .tableTopBar{
-  margin:0 auto 8px;
+  margin:0 auto 2px;
 }
 
 body.demo2 .feltTable{
