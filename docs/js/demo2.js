@@ -329,21 +329,48 @@
   }
 
   function renderHand() {
-    youHandEl.innerHTML = "";
+  youHandEl.innerHTML = "";
 
-    const displayHand = sortHandForDisplay(players[2].hand);
-    const used = new Set();
+  const displayHand = sortHandForDisplay(players[2].hand);
 
-    function findRealIndex(cardStr) {
-      for (let i = 0; i < players[2].hand.length; i++) {
-        if (used.has(i)) continue;
-        if (players[2].hand[i] === cardStr) {
-          used.add(i);
-          return i;
-        }
+  const mapped = [];
+  const used = new Set();
+
+  for (const cardStr of displayHand) {
+    for (let i = 0; i < players[2].hand.length; i++) {
+      if (used.has(i)) continue;
+      if (players[2].hand[i] === cardStr) {
+        mapped.push({ cardStr, realIdx: i });
+        used.add(i);
+        break;
       }
-      return -1;
     }
+  }
+
+  const yourTurn = (phase === "PLAY" && turnIndex === 2);
+  const legal = yourTurn ? legalCardsFor(2) : [];
+
+  for (const item of mapped) {
+    const disabled = !yourTurn || !legal.includes(item.realIdx);
+    const cardEl = makeMiniCard(item.cardStr, disabled);
+
+    cardEl.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (disabled) return;
+
+      const legalNow = legalCardsFor(2);
+      if (!legalNow.includes(item.realIdx)) {
+        msg(illegalReason(2, item.cardStr));
+        return;
+      }
+
+      playCard(2, item.realIdx);
+      engineKick();
+    }, { passive:false });
+
+    youHandEl.appendChild(cardEl);
+  }
+}
 
     const yourTurn = (phase === "PLAY" && turnIndex === 2);
     const legal = yourTurn ? legalCardsFor(2) : [];
@@ -913,42 +940,48 @@
   }
 
   function endOfHand() {
-    computePlucksEarnedSuffered();
-    pendingPlucks = buildPluckQueue();
-    firstHandDone = true;
+  computePlucksEarnedSuffered();
+  pendingPlucks = buildPluckQueue();
+  firstHandDone = true;
 
+  const summary =
+    `Hand complete. ` +
+    `YOU ${players[2].tricks}/${players[2].quota} • ` +
+    `AI2 ${players[0].tricks}/${players[0].quota} • ` +
+    `AI3 ${players[1].tricks}/${players[1].quota}.`;
+
+  msg(summary);
+  render();
+
+  setTimeout(() => {
     rotateDealerRight();
-    msg("Hand complete. Dealing next hand...");
-    render();
-
-    setTimeout(() => {
-      toDeal();
-      engineKick();
-    }, 650);
-  }
+    toDeal();
+    engineKick();
+  }, 1200);
+}
 
   function resolveTrick() {
-    const winner = evaluateTrickWinner();
-    players[winner].tricks += 1;
+  const winner = evaluateTrickWinner();
+  players[winner].tricks += 1;
 
-    msg(`${players[winner].id} wins the trick.`);
+  msg(`${players[winner].id} wins the trick.`);
+  render();
+
+  setTimeout(() => {
+    trick = [];
+    leadSuit = null;
+    turnIndex = winner;
+
+    if (players.every(p => p.hand.length === 0)) {
+      endOfHand();
+      return;
+    }
+
+    trickNumber += 1;
     render();
-
-    setTimeout(() => {
-      trick = [];
-      leadSuit = null;
-      turnIndex = winner;
-      trickNumber += 1;
-
-      if (players.every(p => p.hand.length === 0)) {
-        endOfHand();
-        return;
-      }
-
-      render();
-      engineKick();
-    }, BETWEEN_TRICKS);
-  }
+    engineKick();
+  }, BETWEEN_TRICKS);
+}
 
   function engineStep() {
     if (engineBusy) return;
