@@ -1036,3 +1036,80 @@ body.demo2 .tableTopBar{
 body.demo2 .tableTopBar .btn{
   margin-bottom:0;
 }
+
+/* =========================================================
+   CHANGE LOG
+   2026-03-17 17:02 (-0400)
+
+   FILE
+   docs/css/style.css
+
+   ACTION
+   Additive override patch.
+
+   PURPOSE
+   Move Demo 2 Reset button above the HUD and pull the HUD
+   flush against the table for a tighter, cleaner control stack.
+
+   FIXES / CHANGES
+   • Moves Reset row above HUD visually
+   • Pulls HUD down against table
+   • Removes extra gap between HUD and table
+   • Preserves Demo 2 functionality and approved design
+
+   SCOPE
+   Additive CSS patch only.
+   No HTML changes.
+   No JS changes.
+
+   ROW COUNT
+   Added Row Count: 33
+
+   ========================================================= */
+
+body.demo2 .container{
+  display:flex;
+  flex-direction:column;
+}
+
+body.demo2 .topHud{
+  order:2 !important;
+  margin:0 !important;
+}
+
+body.demo2 .tableStage{
+  order:3 !important;
+  margin-top:0 !important;
+  min-height:500px !important;
+}
+
+body.demo2 .tableTopBar{
+  order:1 !important;
+  width:min(1100px, 100%) !important;
+  margin:0 auto 6px !important;
+  display:flex !important;
+  justify-content:flex-end !important;
+  position:static !important;
+  transform:none !important;
+  left:auto !important;
+  top:auto !important;
+  pointer-events:auto !important;
+}
+
+body.demo2 .tableTopBar .btn{
+  margin:0 !important;
+}
+
+body.demo2 .statusBar{
+  margin:0 auto 0 !important;
+  padding:10px 14px !important;
+}
+
+body.demo2 .feltTable{
+  min-height:470px !important;
+  margin-top:0 !important;
+}
+
+body.demo2 .bottomPanel{
+  margin:8px auto 0 !important;
+}
