@@ -893,3 +893,102 @@ body{
     height:66px;
   }
 }
+/* =========================================================
+   CHANGE LOG
+   2026-03-17 16:20 (-0400)
+
+   FILE
+   docs/css/style.css
+
+   ACTION
+   Additive patch.
+
+   PURPOSE
+   Tighten Demo 2 vertical layout so the top HUD and bottom
+   player hand are visible together more often without
+   changing approved design or gameplay functionality.
+
+   FIXES / CHANGES
+   • Reduces Demo 2 table height
+   • Tightens top HUD spacing
+   • Tightens gap above reset button
+   • Brings bottom hand row closer to table
+   • Preserves current Demo 2 look and functionality
+
+   SCOPE
+   Additive CSS patch only.
+   No HTML changes.
+   No JS changes.
+
+   DEPENDENCIES
+   • docs/demo2.html
+   • Existing Demo 2 classes in style.css
+
+   ROW COUNT
+   Previous File Row Count: [fill from current live file if desired]
+   Current Added Row Count: 43
+   Delta: +43
+
+   ========================================================= */
+
+body.demo2 .container{
+  padding-top:12px;
+  padding-bottom:18px;
+}
+
+body.demo2 .topHud{
+  margin-top:2px;
+}
+
+body.demo2 .statusBar{
+  margin:0 auto 10px;
+  padding:10px 12px;
+}
+
+body.demo2 .tableStage{
+  margin-top:4px;
+  min-height:520px;
+}
+
+body.demo2 .tableTopBar{
+  margin:0 auto 8px;
+}
+
+body.demo2 .feltTable{
+  min-height:470px;
+}
+
+body.demo2 .trickCenter{
+  top:44%;
+}
+
+body.demo2 .seat-bottom{
+  bottom:68px;
+}
+
+body.demo2 .bottomPanel{
+  margin:10px auto 0;
+}
+
+body.demo2 #youHand.yourHandRow{
+  padding-top:8px;
+  padding-bottom:8px;
+}
+
+@media (max-width: 860px){
+  body.demo2 .tableStage{
+    min-height:470px;
+  }
+
+  body.demo2 .feltTable{
+    min-height:420px;
+  }
+
+  body.demo2 .seat-bottom{
+    bottom:58px;
+  }
+
+  body.demo2 .trickCenter{
+    top:43%;
+  }
+}
