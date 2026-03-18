@@ -992,3 +992,47 @@ body.demo2 #youHand.yourHandRow{
     top:43%;
   }
 }
+/* =========================================================
+   CHANGE LOG
+   2026-03-17 16:32 (-0400)
+
+   FILE
+   docs/css/style.css
+
+   ACTION
+   Additive patch.
+
+   PURPOSE
+   Pull Demo 2 HUD and reset control down so the HUD feels
+   visually attached to the table instead of floating above it.
+
+   FIXES / CHANGES
+   • Reduces gap under top HUD
+   • Reduces gap above reset button
+   • Pulls table section upward
+   • No redesign
+   • No functionality changes
+
+   SCOPE
+   Additive CSS patch only.
+
+   ROW COUNT
+   Added Row Count: 18
+
+   ========================================================= */
+
+body.demo2 .statusBar{
+  margin:0 auto 4px;
+}
+
+body.demo2 .tableStage{
+  margin-top:0;
+}
+
+body.demo2 .tableTopBar{
+  margin:0 auto 4px;
+}
+
+body.demo2 .tableTopBar .btn{
+  margin-bottom:0;
+}
