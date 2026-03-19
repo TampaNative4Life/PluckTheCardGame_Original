@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 18:05 (-0400)
+   2026-03-17 18:20 (-0400)
 
    FILE
    docs/css/style.css
@@ -9,8 +9,8 @@
    Full consolidated replacement.
 
    PURPOSE
-   Restore a stable shared stylesheet for all docs pages and
-   fix Demo 2 layout cleanly without stacked overrides.
+   Restore stable shared styling for all docs pages and fix
+   Demo 2 layout without breaking click/function layers.
 
    FIXES / CHANGES
    • Preserves homepage hero with prominent "Pluck"
@@ -18,11 +18,10 @@
    • Preserves about / rules / learn page support
    • Preserves game.html layout support
    • Preserves demo2.html layout support
-   • Removes conflicting Demo 2 spacing patches
    • Hides Reset button entirely on Demo 2
    • Keeps pick panel below the table
    • Pulls Demo 2 HUD flush to the table
-   • Slightly reduces Demo 2 table height for better fit
+   • Fixes Demo 2 click-layer stacking so controls work
 
    SCOPE
    Full file replacement.
@@ -38,15 +37,13 @@
    • docs/js/demo2.js
 
    ROW COUNT
-   Previous File Row Count: 958
-   Current File Row Count: 691
-   Delta: -267
+   Previous File Row Count: 691
+   Current File Row Count: 709
+   Delta: +18
 
-   EXPLANATION OF ROW COUNT DROP
-   The new file is shorter because it removes multiple stacked
-   Demo 2 patch sections that were all trying to override each
-   other. This replacement consolidates those changes into one
-   clean Demo 2 section instead of repeating overrides.
+   EXPLANATION OF ROW COUNT CHANGE
+   Added explicit Demo 2 z-index / positioning rules so visual
+   layers do not block button and card interaction.
 
    ========================================================= */
 
@@ -533,11 +530,14 @@ body{
    Reset hidden
    HUD flush to table
    Pick panel stays below table
+   Click layers preserved
    ========================================= */
 
 .topHud{
   margin-top:0;
   margin-bottom:0;
+  position:relative;
+  z-index:3;
 }
 
 .statusBar{
@@ -582,6 +582,7 @@ body{
   margin-top:0;
   min-height:540px;
   position:relative;
+  z-index:1;
 }
 
 .tableTopBar{
@@ -593,6 +594,7 @@ body{
   min-height:500px;
   margin:0 auto;
   position:relative;
+  z-index:1;
   border-radius:26px;
   overflow:hidden;
   background:
@@ -723,6 +725,8 @@ body{
 .bottomPanel{
   width:min(1100px, 100%);
   margin:8px auto 0;
+  position:relative;
+  z-index:4;
 }
 
 .overlayCard{
@@ -926,4 +930,3 @@ body{
     height:66px;
   }
 }
-
