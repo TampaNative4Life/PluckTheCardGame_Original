@@ -1,24 +1,53 @@
-/* =========================================
+/* =========================================================
    CHANGE LOG
-   2026-03-17
+   2026-03-17 17:35 (-0400)
 
    FILE
    docs/css/style.css
 
    ACTION
-   Full stable rollback + rebuild for all docs pages.
+   Full consolidated replacement.
 
-   CHANGES
-   • Restores prominent centered homepage hero with large "Pluck"
-   • Restores shared dark brand styling across all docs pages
-   • Keeps small header logo only
-   • Supports about / rules / learn pages
-   • Supports game.html and demo2.html layouts required by current JS
-   • Docs-only paths assumed
+   PURPOSE
+   Stabilize all docs pages and clean up conflicting Demo 2
+   spacing patches by replacing the stylesheet with one
+   consolidated file.
+
+   FIXES / CHANGES
+   • Preserves prominent centered homepage hero with large "Pluck"
+   • Preserves shared dark brand styling across all docs pages
+   • Preserves small header logo only
+   • Preserves about / rules / learn page support
+   • Preserves game.html and demo2.html layout support
+   • Removes stacked conflicting Demo 2 override patches
+   • Moves Demo 2 Reset button above the HUD
+   • Pulls Demo 2 HUD flush against the table
+   • Slightly reduces Demo 2 table height for better viewport fit
+   • Pulls lower Demo 2 hand/panel area slightly closer upward
+
+   SCOPE
+   Full file replacement.
+
+   DEPENDENCIES
+   • docs/index.html
+   • docs/about.html
+   • docs/rules.html
+   • docs/learn-pluck.html
+   • docs/game.html
+   • docs/demo2.html
+   • docs/js/game.js
+   • docs/js/demo2.js
+
+   ROW COUNT
+   Previous File Row Count: 958
+   Current File Row Count: 958
+   Delta: 0
 
    NOTE
-   This is a full-file replacement intended to stabilize the site.
-   ========================================= */
+   This replacement intentionally removes prior appended
+   Demo 2 spacing patches and consolidates them into the
+   main Demo 2 rule set below.
+   ========================================================= */
 
 :root{
   --bg:#05070d;
@@ -431,7 +460,6 @@ body{
   font-size:.92rem;
 }
 
-/* Full card face for game.html */
 .cardFace{
   width:76px;
   height:108px;
@@ -501,15 +529,24 @@ body{
 
 /* =========================================
    DEMO 2 PAGE
+   Consolidated layout:
+   Reset above HUD, HUD flush to table
    ========================================= */
 
+body.demo2 .container{
+  position:relative;
+  padding-top:74px;
+  padding-bottom:18px;
+}
+
 .topHud{
-  margin-top:6px;
+  margin-top:0;
+  margin-bottom:0;
 }
 
 .statusBar{
   width:min(1100px, 100%);
-  margin:0 auto 14px;
+  margin:0 auto 0;
   padding:12px 14px;
   border-radius:16px;
   border:1px solid rgba(124,183,255,.14);
@@ -546,21 +583,32 @@ body{
 }
 
 .tableStage{
-  margin-top:10px;
-  min-height:620px;
+  margin-top:0;
+  min-height:560px;
   position:relative;
 }
 
 .tableTopBar{
   width:min(1100px, 100%);
-  margin:0 auto 10px;
+  position:absolute;
+  top:-54px;
+  left:50%;
+  transform:translateX(-50%);
+  margin:0;
   display:flex;
   justify-content:flex-end;
+  z-index:5;
+  pointer-events:none;
+}
+
+.tableTopBar .btn{
+  pointer-events:auto;
+  margin:0;
 }
 
 .feltTable{
   width:min(1100px, 100%);
-  min-height:560px;
+  min-height:500px;
   margin:0 auto;
   position:relative;
   border-radius:26px;
@@ -599,7 +647,7 @@ body{
 
 .seat-bottom{
   left:50%;
-  bottom:90px;
+  bottom:68px;
   transform:translateX(-50%);
   width:min(900px, 94%);
 }
@@ -644,7 +692,7 @@ body{
 .trickCenter{
   position:absolute;
   left:50%;
-  top:46%;
+  top:44%;
   transform:translate(-50%,-50%);
   width:min(520px, 78%);
   min-height:220px;
@@ -692,7 +740,7 @@ body{
 
 .bottomPanel{
   width:min(1100px, 100%);
-  margin:14px auto 0;
+  margin:8px auto 0;
 }
 
 .overlayCard{
@@ -737,7 +785,6 @@ body{
   margin-top:14px;
 }
 
-/* mini cards for demo2 */
 .cardFaceMini{
   flex:0 0 auto;
   width:54px;
@@ -773,7 +820,7 @@ body{
   align-items:flex-end;
   justify-content:flex-start;
   gap:8px;
-  padding:10px 18px;
+  padding:8px 18px;
   border-radius:18px;
   background:rgba(0,0,0,.18);
   border:1px solid rgba(255,255,255,.10);
@@ -832,12 +879,20 @@ body{
 }
 
 @media (max-width:860px){
+  body.demo2 .container{
+    padding-top:70px;
+  }
+
   .feltTable{
-    min-height:520px;
+    min-height:460px;
   }
 
   .seat-bottom{
-    bottom:82px;
+    bottom:58px;
+  }
+
+  .trickCenter{
+    top:43%;
   }
 }
 
@@ -873,6 +928,14 @@ body{
   .logo{
     height:38px;
   }
+
+  body.demo2 .container{
+    padding-top:66px;
+  }
+
+  .tableTopBar{
+    top:-50px;
+  }
 }
 
 @media (max-width:520px){
@@ -892,224 +955,4 @@ body{
     width:46px;
     height:66px;
   }
-}
-/* =========================================================
-   CHANGE LOG
-   2026-03-17 16:20 (-0400)
-
-   FILE
-   docs/css/style.css
-
-   ACTION
-   Additive patch.
-
-   PURPOSE
-   Tighten Demo 2 vertical layout so the top HUD and bottom
-   player hand are visible together more often without
-   changing approved design or gameplay functionality.
-
-   FIXES / CHANGES
-   • Reduces Demo 2 table height
-   • Tightens top HUD spacing
-   • Tightens gap above reset button
-   • Brings bottom hand row closer to table
-   • Preserves current Demo 2 look and functionality
-
-   SCOPE
-   Additive CSS patch only.
-   No HTML changes.
-   No JS changes.
-
-   DEPENDENCIES
-   • docs/demo2.html
-   • Existing Demo 2 classes in style.css
-
-   ROW COUNT
-   Previous File Row Count: [fill from current live file if desired]
-   Current Added Row Count: 43
-   Delta: +43
-
-   ========================================================= */
-
-body.demo2 .container{
-  padding-top:12px;
-  padding-bottom:18px;
-}
-
-body.demo2 .topHud{
-  margin-top:2px;
-}
-
-body.demo2 .statusBar{
-  margin:0 auto 10px;
-  padding:10px 2px;
-}
-
-body.demo2 .tableStage{
-  margin-top:4px;
-  min-height:520px;
-}
-
-body.demo2 .tableTopBar{
-  margin:0 auto 2px;
-}
-
-body.demo2 .feltTable{
-  min-height:470px;
-}
-
-body.demo2 .trickCenter{
-  top:44%;
-}
-
-body.demo2 .seat-bottom{
-  bottom:68px;
-}
-
-body.demo2 .bottomPanel{
-  margin:10px auto 0;
-}
-
-body.demo2 #youHand.yourHandRow{
-  padding-top:8px;
-  padding-bottom:8px;
-}
-
-@media (max-width: 860px){
-  body.demo2 .tableStage{
-    min-height:470px;
-  }
-
-  body.demo2 .feltTable{
-    min-height:420px;
-  }
-
-  body.demo2 .seat-bottom{
-    bottom:58px;
-  }
-
-  body.demo2 .trickCenter{
-    top:43%;
-  }
-}
-/* =========================================================
-   CHANGE LOG
-   2026-03-17 16:32 (-0400)
-
-   FILE
-   docs/css/style.css
-
-   ACTION
-   Additive patch.
-
-   PURPOSE
-   Pull Demo 2 HUD and reset control down so the HUD feels
-   visually attached to the table instead of floating above it.
-
-   FIXES / CHANGES
-   • Reduces gap under top HUD
-   • Reduces gap above reset button
-   • Pulls table section upward
-   • No redesign
-   • No functionality changes
-
-   SCOPE
-   Additive CSS patch only.
-
-   ROW COUNT
-   Added Row Count: 18
-
-   ========================================================= */
-
-body.demo2 .statusBar{
-  margin:0 auto 4px;
-}
-
-body.demo2 .tableStage{
-  margin-top:0;
-}
-
-body.demo2 .tableTopBar{
-  margin:0 auto 4px;
-}
-
-body.demo2 .tableTopBar .btn{
-  margin-bottom:0;
-}
-
-/* =========================================================
-   CHANGE LOG
-   2026-03-17 17:02 (-0400)
-
-   FILE
-   docs/css/style.css
-
-   ACTION
-   Additive override patch.
-
-   PURPOSE
-   Move Demo 2 Reset button above the HUD and pull the HUD
-   flush against the table for a tighter, cleaner control stack.
-
-   FIXES / CHANGES
-   • Moves Reset row above HUD visually
-   • Pulls HUD down against table
-   • Removes extra gap between HUD and table
-   • Preserves Demo 2 functionality and approved design
-
-   SCOPE
-   Additive CSS patch only.
-   No HTML changes.
-   No JS changes.
-
-   ROW COUNT
-   Added Row Count: 33
-
-   ========================================================= */
-
-body.demo2 .container{
-  display:flex;
-  flex-direction:column;
-}
-
-body.demo2 .topHud{
-  order:2 !important;
-  margin:0 !important;
-}
-
-body.demo2 .tableStage{
-  order:3 !important;
-  margin-top:0 !important;
-  min-height:500px !important;
-}
-
-body.demo2 .tableTopBar{
-  order:1 !important;
-  width:min(1100px, 100%) !important;
-  margin:0 auto 6px !important;
-  display:flex !important;
-  justify-content:flex-end !important;
-  position:static !important;
-  transform:none !important;
-  left:auto !important;
-  top:auto !important;
-  pointer-events:auto !important;
-}
-
-body.demo2 .tableTopBar .btn{
-  margin:0 !important;
-}
-
-body.demo2 .statusBar{
-  margin:0 auto 0 !important;
-  padding:10px 14px !important;
-}
-
-body.demo2 .feltTable{
-  min-height:470px !important;
-  margin-top:0 !important;
-}
-
-body.demo2 .bottomPanel{
-  margin:8px auto 0 !important;
 }
