@@ -1,40 +1,52 @@
-/* =========================================
-   PLUCK MASTER STYLE SHEET (FULL REPLACEMENT)
-   Date: 2026-03-17
-   Purpose: Clean hierarchy, brand-first layout,
-            premium feel, stable foundation
-   Row Count: FULL FILE REPLACEMENT
+/* =========================================================
    CHANGE LOG
-   2026-03-17
+   2026-03-17 19:00 (-0400)
 
    FILE
    docs/css/style.css
 
    ACTION
-   Full stable rollback + rebuild for all docs pages.
+   Full consolidated replacement.
 
-   CHANGES
-   • Restores prominent centered homepage hero with large "Pluck"
-   • Restores shared dark brand styling across all docs pages
-   • Keeps small header logo only
-   • Supports about / rules / learn pages
-   • Supports game.html and demo2.html layouts required by current JS
-   • Docs-only paths assumed
+   PURPOSE
+   Replace corrupted stylesheet with one clean, parseable file
+   that restores site styling and keeps Demo 2 functional.
 
-   NOTE
-   This is a full-file replacement intended to stabilize the site.
-   ========================================= */
+   FIXES / CHANGES
+   • Removes broken merged CSS
+   • Restores clean shared site styling
+   • Restores homepage hero
+   • Restores content pages
+   • Restores game page styling
+   • Restores Demo 2 styling
+   • Hides Reset button on Demo 2
+   • Keeps Demo 2 HUD flush to table
+   • Keeps pick panel below table
+   • Avoids aggressive z-index tricks that can break clicks
 
-/* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+   SCOPE
+   Full file replacement.
+
+   DEPENDENCIES
+   • docs/index.html
+   • docs/about.html
+   • docs/rules.html
+   • docs/learn-pluck.html
+   • docs/game.html
+   • docs/demo2.html
+   • docs/js/game.js
+   • docs/js/demo2.js
+
+   ROW COUNT
+   Previous File Row Count: unusable/corrupted
+   Current File Row Count: 619
+   Delta: reset / clean replacement
+
+   ========================================================= */
+
 :root{
   --bg:#05070d;
-  --bg2:#0b1220;
   --panel:#0f172a;
-  --panel2:#111827;
   --text:#e8ecf1;
   --muted:#b8c2d6;
   --line:#22314d;
@@ -44,38 +56,16 @@
   --radius:18px;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  background: radial-gradient(circle at top, #0b1220, #05070d 70%);
-  color: #e8ecf1;
-  padding-top: 8px;
 *{
   box-sizing:border-box;
 }
 
-/* ===== HEADER / NAV ===== */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 40px;
-  background: rgba(5, 7, 13, 0.95);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.35);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
 html,
 body{
   margin:0;
   min-height:100%;
 }
 
-/* ===== BRAND ===== */
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 body{
   font-family:"Times New Roman", Times, serif;
   color:var(--text);
@@ -85,13 +75,6 @@ body{
     linear-gradient(180deg, #07101d 0%, #04070d 55%, #02040a 100%);
 }
 
-.logo {
-  height: 64px;
-  border-radius: 8px;
-  filter:
-    drop-shadow(0 0 8px rgba(212,178,84,.2))
-    drop-shadow(0 0 18px rgba(124,183,255,.12));
-  transition: all 0.25s ease;
 /* =========================================
    SHARED HEADER
    ========================================= */
@@ -110,8 +93,6 @@ body{
   z-index:999;
 }
 
-.logo:hover {
-  transform: scale(1.05);
 .navLeft{
   display:flex;
   align-items:center;
@@ -119,10 +100,6 @@ body{
   flex:0 0 auto;
 }
 
-.brand span {
-  font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
 .brand{
   display:flex;
   align-items:center;
@@ -134,13 +111,6 @@ body{
   flex:0 0 auto;
 }
 
-/* ===== NAV LINKS ===== */
-nav a {
-  color: #d4b254;
-  text-decoration: none;
-  margin-left: 24px;
-  font-weight: 600;
-  transition: 0.2s;
 .brand img,
 .logo{
   height:42px;
@@ -149,8 +119,6 @@ nav a {
   border-radius:6px;
 }
 
-nav a:hover {
-  color: #ffffff;
 .navlinks{
   display:flex;
   align-items:center;
@@ -158,12 +126,6 @@ nav a:hover {
   flex-wrap:wrap;
 }
 
-/* ===== HERO SECTION ===== */
-.hero {
-  margin-top: 100px;
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
 .navlinks a{
   color:var(--gold);
   text-decoration:none;
@@ -171,35 +133,20 @@ nav a:hover {
   font-size:1rem;
 }
 
-/* ===== HERO CARD ===== */
-.hero-card {
-  max-width: 900px;
-  width: 100%;
-  background: linear-gradient(145deg, #0f172a, #0b1220);
-  border-radius: 18px;
-  padding: 35px 45px;
-  text-align: center;
 .navlinks a:hover{
   color:#fff;
 }
 
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.02) inset,
-    0 0 40px rgba(124,183,255,.06);
 .navlinks .activeLink{
   color:#fff;
 }
 
-  position: relative;
-  overflow: hidden;
 .container{
   max-width:1280px;
   margin:0 auto;
   padding:22px 16px 28px;
 }
 
-  animation: floatHero 5s ease-in-out infinite;
 /* =========================================
    HOMEPAGE
    ========================================= */
@@ -210,18 +157,10 @@ nav a:hover {
   padding:48px 0 20px;
 }
 
-/* subtle glow overlay */
-.hero-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
 .hero-card{
   width:min(980px, 100%);
   border-radius:24px;
   background:
-    radial-gradient(circle at 20% 20%, rgba(124,183,255,.08), transparent 30%),
-    radial-gradient(circle at 80% 80%, rgba(212,178,84,.05), transparent 30%);
-  pointer-events: none;
     radial-gradient(circle at 22% 18%, rgba(124,183,255,.09), transparent 28%),
     radial-gradient(circle at 82% 78%, rgba(212,178,84,.06), transparent 24%),
     linear-gradient(145deg, rgba(15,23,42,.98), rgba(7,14,27,.98));
@@ -321,11 +260,6 @@ nav a:hover {
   padding:14px 0;
 }
 
-/* ===== HERO TEXT ===== */
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  text-shadow: 0 10px 25px rgba(0,0,0,.3);
 .card{
   background:rgba(15,23,42,.92);
   border:1px solid rgba(124,183,255,.14);
@@ -334,10 +268,6 @@ nav a:hover {
   padding:24px 22px;
 }
 
-.hero p {
-  font-size: 1rem;
-  line-height: 1.7;
-  margin-bottom: 20px;
 .pageTitle{
   margin:0 0 14px;
   font-size:2.2rem;
@@ -345,12 +275,6 @@ nav a:hover {
   color:#f3f5f8;
 }
 
-/* ===== BUTTONS ===== */
-.buttons {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
 .pageText{
   margin:0 0 14px;
   color:#e7ecf5;
@@ -358,13 +282,6 @@ nav a:hover {
   font-size:1.04rem;
 }
 
-.buttons a {
-  padding: 12px 22px;
-  border-radius: 12px;
-  background: linear-gradient(145deg, #1e293b, #111827);
-  color: #e8ecf1;
-  text-decoration: none;
-  font-weight: 600;
 .pageButtons{
   display:flex;
   flex-wrap:wrap;
@@ -372,14 +289,10 @@ nav a:hover {
   margin-top:16px;
 }
 
-  box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.03) inset;
 /* =========================================
    GAME PAGE
    ========================================= */
 
-  transition: all 0.2s ease;
 .playLayout{
   display:grid;
   grid-template-columns:330px minmax(0,1fr);
@@ -387,61 +300,33 @@ nav a:hover {
   align-items:start;
 }
 
-.buttons a:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 30px rgba(0,0,0,.4),
-    0 0 15px rgba(124,183,255,.08);
 .sidePanel{
   display:flex;
   flex-direction:column;
   gap:16px;
 }
 
-/* ===== FOOTER ===== */
-footer {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 0.85rem;
-  color: #8a94a6;
 .sideRow{
   display:grid;
   grid-template-columns:1fr;
   gap:16px;
 }
 
-/* ===== ANIMATION ===== */
-@keyframes floatHero {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-  100% { transform: translateY(0); }
 .cardTight{
   padding:16px;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    gap: 10px;
-  }
 .pmeta{
   color:#dbe3ef;
   line-height:1.6;
 }
 
-  nav {
-    text-align: center;
-  }
 .pickRowWide{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
 }
 
-  .hero {
-    margin-top: 70px;
-  }
 .pickSlot{
   border-radius:16px;
   border:1px solid rgba(255,255,255,.08);
@@ -449,18 +334,12 @@ footer {
   padding:10px;
 }
 
-  .hero h1 {
-    font-size: 2.4rem;
-  }
 .pickName{
   font-size:.95rem;
   font-weight:700;
   margin-bottom:8px;
 }
 
-  .logo {
-    height: 56px;
-  }
 .pickCardSlot,
 .pickCard{
   min-height:54px;
@@ -574,7 +453,6 @@ footer {
   font-size:.92rem;
 }
 
-/* Full card face for game.html */
 .cardFace{
   width:76px;
   height:108px;
@@ -643,84 +521,17 @@ footer {
 }
 
 /* =========================================
-   EMERGENCY HOMEPAGE ROLLBACK
-   Date: 2026-03-17
-   Purpose: Restore prior accepted centered homepage layout
-   Scope: Homepage visual rollback only
    DEMO 2 PAGE
    ========================================= */
 
-/* Restore header/logo balance */
-.logo {
-  height: 42px !important;
-  width: auto !important;
-  border-radius: 6px !important;
-  filter: none !important;
-  transform: none !important;
-}
-
-.logo:hover {
-  transform: none !important;
-  filter: none !important;
-}
-
-.brand {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-}
-
-.brand span,
-.brand-text {
-  font-size: 1.2rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 1px !important;
-  color: #ffffff !important;
-}
-
-/* Restore clean header */
-.nav,
-header {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 14px 40px !important;
-  background: rgba(5, 7, 13, 0.95) !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,.35) !important;
-}
-
-/* Restore centered homepage hero */
-.hero {
-  margin-top: 48px !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: flex-start !important;
-  padding: 40px 20px !important;
-  animation: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-  overflow: visible !important;
-}
-
-.hero::before {
-  content: none !important;
-}
-
-/* Restore centered hero card */
-.hero-card {
-  max-width: 980px !important;
-  width: 100% !important;
-  background: linear-gradient(145deg, #0f172a, #0b1220) !important;
-  border-radius: 18px !important;
-  padding: 35px 45px !important;
-  text-align: center !important;
 .topHud{
-  margin-top:6px;
+  margin-top:0;
+  margin-bottom:0;
 }
 
 .statusBar{
   width:min(1100px, 100%);
-  margin:0 auto 14px;
+  margin:0 auto 0;
   padding:12px 14px;
   border-radius:16px;
   border:1px solid rgba(124,183,255,.14);
@@ -757,21 +568,18 @@ header {
 }
 
 .tableStage{
-  margin-top:10px;
-  min-height:620px;
+  margin-top:0;
+  min-height:540px;
   position:relative;
 }
 
 .tableTopBar{
-  width:min(1100px, 100%);
-  margin:0 auto 10px;
-  display:flex;
-  justify-content:flex-end;
+  display:none;
 }
 
 .feltTable{
   width:min(1100px, 100%);
-  min-height:560px;
+  min-height:500px;
   margin:0 auto;
   position:relative;
   border-radius:26px;
@@ -779,19 +587,6 @@ header {
   background:
     radial-gradient(circle at 50% 35%, #1f6b3b 0%, #0f4d2a 55%, #0a3a20 100%);
   box-shadow:
-    0 20px 50px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.02) inset !important;
-  position: relative !important;
-  overflow: hidden !important;
-  margin: 0 auto !important;
-  animation: none !important;
-  transform: none !important;
-}
-
-.hero-card::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
     0 20px 55px rgba(0,0,0,.45),
     inset 0 0 0 2px rgba(255,255,255,.04);
 }
@@ -823,7 +618,7 @@ header {
 
 .seat-bottom{
   left:50%;
-  bottom:90px;
+  bottom:68px;
   transform:translateX(-50%);
   width:min(900px, 94%);
 }
@@ -843,71 +638,15 @@ header {
   height:52px;
   border-radius:999px;
   background:
-    radial-gradient(circle at 20% 20%, rgba(124,183,255,.08), transparent 30%),
-    radial-gradient(circle at 80% 80%, rgba(212,178,84,.05), transparent 30%) !important;
-  pointer-events: none !important;
-}
-
-.hero-card > * {
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* Restore centered title/text */
-.hero h1 {
-  font-size: 4.4rem !important;
-  line-height: 1 !important;
-  margin: 0 0 18px !important;
-  text-align: center !important;
-}
-
-.hero p {
-  font-size: 1.05rem !important;
-  line-height: 1.75 !important;
-  margin: 0 0 18px !important;
-  text-align: center !important;
-  max-width: 860px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* Restore centered button row */
-.buttons {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 15px !important;
-  margin-top: 28px !important;
-}
-
-.buttons a {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 170px !important;
-  padding: 12px 22px !important;
-  border-radius: 12px !important;
-  background: linear-gradient(145deg, #1e293b, #111827) !important;
-  color: #e8ecf1 !important;
-  text-decoration: none !important;
-  font-weight: 600 !important;
     radial-gradient(circle at 35% 30%, rgba(255,255,255,.28), transparent 52%),
     linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.38));
   box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.03) inset !important;
-  transform: none !important;
     inset 0 0 0 2px rgba(255,255,255,.08),
     0 8px 18px rgba(0,0,0,.26);
 }
 
-.buttons a:hover {
-  transform: none !important;
 .avatar-you{
   box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.03) inset !important;
     inset 0 0 0 2px rgba(212,178,84,.35),
     0 8px 18px rgba(0,0,0,.26);
 }
@@ -924,7 +663,7 @@ header {
 .trickCenter{
   position:absolute;
   left:50%;
-  top:46%;
+  top:44%;
   transform:translate(-50%,-50%);
   width:min(520px, 78%);
   min-height:220px;
@@ -972,7 +711,7 @@ header {
 
 .bottomPanel{
   width:min(1100px, 100%);
-  margin:14px auto 0;
+  margin:8px auto 0;
 }
 
 .overlayCard{
@@ -999,12 +738,6 @@ header {
   line-height:1.6;
 }
 
-/* Restore footer spacing */
-footer {
-  text-align: center !important;
-  margin-top: 40px !important;
-  font-size: 0.85rem !important;
-  color: #8a94a6 !important;
 .overlayButtons{
   display:flex;
   gap:12px;
@@ -1012,12 +745,6 @@ footer {
   align-items:center;
 }
 
-/* Mobile rollback */
-@media (max-width: 768px) {
-  header,
-  .nav {
-    flex-direction: row !important;
-    gap: 0 !important;
 .overlayStatus{
   color:#e8edf7;
 }
@@ -1029,7 +756,6 @@ footer {
   margin-top:14px;
 }
 
-/* mini cards for demo2 */
 .cardFaceMini{
   flex:0 0 auto;
   width:54px;
@@ -1065,7 +791,7 @@ footer {
   align-items:flex-end;
   justify-content:flex-start;
   gap:8px;
-  padding:10px 18px;
+  padding:8px 18px;
   border-radius:18px;
   background:rgba(0,0,0,.18);
   border:1px solid rgba(255,255,255,.10);
@@ -1125,11 +851,15 @@ footer {
 
 @media (max-width:860px){
   .feltTable{
-    min-height:520px;
+    min-height:460px;
   }
 
   .seat-bottom{
-    bottom:82px;
+    bottom:58px;
+  }
+
+  .trickCenter{
+    top:43%;
   }
 }
 
@@ -1155,17 +885,12 @@ footer {
     font-size:1.1rem;
   }
 
-  .hero {
-    margin-top: 32px !important;
-    padding: 24px 14px !important;
   .pickRow,
   .pickRowWide,
   .quotaRow{
     grid-template-columns:1fr;
   }
 
-  .hero-card {
-    padding: 24px 18px !important;
   .brand img,
   .logo{
     height:38px;
@@ -1177,20 +902,14 @@ footer {
     gap:10px;
   }
 
-  .hero h1 {
-    font-size: 3rem !important;
   .navlinks a{
     font-size:.95rem;
   }
 
-  .hero p {
-    font-size: 1rem !important;
   .hero h1{
     font-size:2.7rem;
   }
 
-  .logo {
-    height: 40px !important;
   .yourHandRow.tight .cardFaceMini{
     width:46px;
     height:66px;
