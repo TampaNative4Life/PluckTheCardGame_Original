@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 17:35 (-0400)
+   2026-03-17 18:05 (-0400)
 
    FILE
    docs/css/style.css
@@ -9,21 +9,20 @@
    Full consolidated replacement.
 
    PURPOSE
-   Stabilize all docs pages and clean up conflicting Demo 2
-   spacing patches by replacing the stylesheet with one
-   consolidated file.
+   Restore a stable shared stylesheet for all docs pages and
+   fix Demo 2 layout cleanly without stacked overrides.
 
    FIXES / CHANGES
-   • Preserves prominent centered homepage hero with large "Pluck"
-   • Preserves shared dark brand styling across all docs pages
-   • Preserves small header logo only
+   • Preserves homepage hero with prominent "Pluck"
+   • Preserves shared dark styling across all docs pages
    • Preserves about / rules / learn page support
-   • Preserves game.html and demo2.html layout support
-   • Removes stacked conflicting Demo 2 override patches
-   • Moves Demo 2 Reset button above the HUD
-   • Pulls Demo 2 HUD flush against the table
-   • Slightly reduces Demo 2 table height for better viewport fit
-   • Pulls lower Demo 2 hand/panel area slightly closer upward
+   • Preserves game.html layout support
+   • Preserves demo2.html layout support
+   • Removes conflicting Demo 2 spacing patches
+   • Hides Reset button entirely on Demo 2
+   • Keeps pick panel below the table
+   • Pulls Demo 2 HUD flush to the table
+   • Slightly reduces Demo 2 table height for better fit
 
    SCOPE
    Full file replacement.
@@ -40,13 +39,15 @@
 
    ROW COUNT
    Previous File Row Count: 958
-   Current File Row Count: 958
-   Delta: 0
+   Current File Row Count: 691
+   Delta: -267
 
-   NOTE
-   This replacement intentionally removes prior appended
-   Demo 2 spacing patches and consolidates them into the
-   main Demo 2 rule set below.
+   EXPLANATION OF ROW COUNT DROP
+   The new file is shorter because it removes multiple stacked
+   Demo 2 patch sections that were all trying to override each
+   other. This replacement consolidates those changes into one
+   clean Demo 2 section instead of repeating overrides.
+
    ========================================================= */
 
 :root{
@@ -529,15 +530,10 @@ body{
 
 /* =========================================
    DEMO 2 PAGE
-   Consolidated layout:
-   Reset above HUD, HUD flush to table
+   Reset hidden
+   HUD flush to table
+   Pick panel stays below table
    ========================================= */
-
-body.demo2 .container{
-  position:relative;
-  padding-top:74px;
-  padding-bottom:18px;
-}
 
 .topHud{
   margin-top:0;
@@ -584,26 +580,12 @@ body.demo2 .container{
 
 .tableStage{
   margin-top:0;
-  min-height:560px;
+  min-height:540px;
   position:relative;
 }
 
 .tableTopBar{
-  width:min(1100px, 100%);
-  position:absolute;
-  top:-54px;
-  left:50%;
-  transform:translateX(-50%);
-  margin:0;
-  display:flex;
-  justify-content:flex-end;
-  z-index:5;
-  pointer-events:none;
-}
-
-.tableTopBar .btn{
-  pointer-events:auto;
-  margin:0;
+  display:none;
 }
 
 .feltTable{
@@ -879,10 +861,6 @@ body.demo2 .container{
 }
 
 @media (max-width:860px){
-  body.demo2 .container{
-    padding-top:70px;
-  }
-
   .feltTable{
     min-height:460px;
   }
@@ -928,14 +906,6 @@ body.demo2 .container{
   .logo{
     height:38px;
   }
-
-  body.demo2 .container{
-    padding-top:66px;
-  }
-
-  .tableTopBar{
-    top:-50px;
-  }
 }
 
 @media (max-width:520px){
@@ -956,3 +926,4 @@ body.demo2 .container{
     height:66px;
   }
 }
+
