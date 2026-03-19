@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 18:20 (-0400)
+   2026-03-17 18:32 (-0400)
 
    FILE
    docs/css/style.css
@@ -10,7 +10,7 @@
 
    PURPOSE
    Restore stable shared styling for all docs pages and fix
-   Demo 2 layout without breaking click/function layers.
+   Demo 2 layout while preserving click functionality.
 
    FIXES / CHANGES
    • Preserves homepage hero with prominent "Pluck"
@@ -21,7 +21,7 @@
    • Hides Reset button entirely on Demo 2
    • Keeps pick panel below the table
    • Pulls Demo 2 HUD flush to the table
-   • Fixes Demo 2 click-layer stacking so controls work
+   • Removes page-level z-index stacking that could block clicks
 
    SCOPE
    Full file replacement.
@@ -37,13 +37,14 @@
    • docs/js/demo2.js
 
    ROW COUNT
-   Previous File Row Count: 691
-   Current File Row Count: 709
-   Delta: +18
+   Previous File Row Count: 709
+   Current File Row Count: 682
+   Delta: -27
 
    EXPLANATION OF ROW COUNT CHANGE
-   Added explicit Demo 2 z-index / positioning rules so visual
-   layers do not block button and card interaction.
+   Removed aggressive Demo 2 layer-management rules that were
+   likely blocking interaction. This replacement keeps the
+   visual layout simple and the page flow normal.
 
    ========================================================= */
 
@@ -529,15 +530,12 @@ body{
    DEMO 2 PAGE
    Reset hidden
    HUD flush to table
-   Pick panel stays below table
-   Click layers preserved
+   Pick panel below table
    ========================================= */
 
 .topHud{
   margin-top:0;
   margin-bottom:0;
-  position:relative;
-  z-index:3;
 }
 
 .statusBar{
@@ -582,7 +580,6 @@ body{
   margin-top:0;
   min-height:540px;
   position:relative;
-  z-index:1;
 }
 
 .tableTopBar{
@@ -594,7 +591,6 @@ body{
   min-height:500px;
   margin:0 auto;
   position:relative;
-  z-index:1;
   border-radius:26px;
   overflow:hidden;
   background:
@@ -725,8 +721,6 @@ body{
 .bottomPanel{
   width:min(1100px, 100%);
   margin:8px auto 0;
-  position:relative;
-  z-index:4;
 }
 
 .overlayCard{
