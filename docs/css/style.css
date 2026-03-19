@@ -532,7 +532,9 @@ body{
    HUD flush to table
    Pick panel below table
    ========================================= */
-
+.tableTopBar{
+  display:none;
+}
 .topHud{
   margin-top:0;
   margin-bottom:0;
