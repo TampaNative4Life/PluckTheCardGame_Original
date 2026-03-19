@@ -1,28 +1,28 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 19:00 (-0400)
+   2026-03-17 19:20 (-0400)
 
    FILE
    docs/css/style.css
 
    ACTION
-   Full consolidated replacement.
+   Full recovery replacement.
 
    PURPOSE
-   Replace corrupted stylesheet with one clean, parseable file
-   that restores site styling and keeps Demo 2 functional.
+   Restore a clean, working stylesheet after the corrupted CSS
+   file caused Demo 2 and other pages to render as mostly raw HTML.
 
    FIXES / CHANGES
-   • Removes broken merged CSS
    • Restores clean shared site styling
    • Restores homepage hero
    • Restores content pages
    • Restores game page styling
    • Restores Demo 2 styling
-   • Hides Reset button on Demo 2
-   • Keeps Demo 2 HUD flush to table
-   • Keeps pick panel below table
-   • Avoids aggressive z-index tricks that can break clicks
+   • Hides Reset button on Demo 2 for now
+   • Keeps Pick panel below the table
+   • Keeps HUD above the table
+   • Uses normal document flow only
+   • Avoids click-blocking layer tricks
 
    SCOPE
    Full file replacement.
@@ -38,22 +38,20 @@
    • docs/js/demo2.js
 
    ROW COUNT
-   Previous File Row Count: unusable/corrupted
-   Current File Row Count: 619
-   Delta: reset / clean replacement
+   Previous File Row Count: corrupted / not reliable
+   Current File Row Count: 620
+   Delta: recovery replacement
 
    ========================================================= */
 
 :root{
   --bg:#05070d;
-  --panel:#0f172a;
   --text:#e8ecf1;
   --muted:#b8c2d6;
   --line:#22314d;
   --gold:#d4b254;
   --blue:#7cb7ff;
   --shadow:0 16px 40px rgba(0,0,0,.35);
-  --radius:18px;
 }
 
 *{
@@ -133,10 +131,7 @@ body{
   font-size:1rem;
 }
 
-.navlinks a:hover{
-  color:#fff;
-}
-
+.navlinks a:hover,
 .navlinks .activeLink{
   color:#fff;
 }
