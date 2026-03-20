@@ -1,3 +1,42 @@
+<!--
+=========================================================
+CHANGE LOG
+2026-03-17 19:40 (-0400)
+
+FILE
+docs/demo2.html
+
+ACTION
+Full file replacement.
+
+PURPOSE
+Restore a clean Demo 2 page structure so buttons bind
+correctly and the Pick panel remains clickable.
+
+FIXES / CHANGES
+• Keeps approved Demo 2 visual layout structure
+• Keeps HUD above table
+• Keeps Pick panel below table
+• Keeps required IDs for demo2.js
+• Keeps hidden Reset button node present for JS compatibility
+• Moves script load to very end of body
+• Prevents DOM timing issues for Pick / OK / Re-Pick buttons
+
+DEPENDENCIES
+• docs/css/style.css
+• docs/js/demo2.js
+• docs/images/PluckTheCardGame_Logo.jpg
+
+ROW COUNT
+Previous File Row Count: unknown
+Current File Row Count: 182
+
+NOTE
+Reset button remains in the DOM for JS compatibility.
+CSS may hide it visually.
+=========================================================
+-->
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,16 +49,20 @@
 
   <header class="nav">
     <div class="navLeft">
-      <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
+      <a class="brand" href="index.html">
+        <img
+          src="images/PluckTheCardGame_Logo.jpg"
+          alt="Pluck The Card Game Logo"
+          class="logo"
+        />
         <span>PLUCK</span>
       </a>
     </div>
 
-    <nav class="navlinks" aria-label="Main navigation">
+    <nav class="navlinks" aria-label="Primary">
       <a href="index.html">Home</a>
       <a href="game.html">Play Demo</a>
-      <a href="demo2.html" class="activeLink">Demo 2</a>
+      <a class="activeLink" href="demo2.html">Demo 2</a>
       <a href="rules.html">Rules</a>
       <a href="learn-pluck.html">Learn Pluck</a>
       <a href="about.html">About</a>
@@ -28,7 +71,8 @@
 
   <main class="container">
 
-    <section class="topHud" aria-label="Game status">
+    <!-- HUD -->
+    <section class="topHud" aria-label="Game Status">
       <div class="statusBar">
         <div class="statusItem">
           <span class="statusLabel">TRUMP</span>
@@ -58,18 +102,20 @@
       </div>
     </section>
 
-    <section class="tableStage">
+    <!-- TABLE + hidden reset row kept for JS compatibility -->
+    <section class="tableStage" aria-label="Game Table">
+
       <div class="tableTopBar">
-        <button class="btn" id="resetBtn">Reset (New Deal)</button>
+        <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
       </div>
 
-      <div class="feltTable" aria-label="3-player table">
+      <section class="feltTable" aria-label="Pluck table">
         <div class="feltInset" aria-hidden="true"></div>
 
         <div class="seat seat-left">
           <div class="avatarWrap">
             <div class="avatar" aria-hidden="true"></div>
-            <div class="seatLabel">
+            <div>
               <div class="seatName">AI2 (Left)</div>
               <div class="seatSub">Hidden hand</div>
             </div>
@@ -79,14 +125,14 @@
         <div class="seat seat-right">
           <div class="avatarWrap">
             <div class="avatar" aria-hidden="true"></div>
-            <div class="seatLabel">
+            <div>
               <div class="seatName">AI3 (Right)</div>
               <div class="seatSub">Hidden hand</div>
             </div>
           </div>
         </div>
 
-        <div class="trickCenter" id="trickArea">
+        <div class="trickCenter">
           <div class="trickInner">
             <div class="trickTitle">Trick Area</div>
             <div class="trickSlots" id="trickSlots">
@@ -97,22 +143,48 @@
         </div>
 
         <div class="seat seat-bottom">
-          <div class="youDock">
-            <div class="youRow">
-              <div class="avatarWrap">
-                <div class="avatar avatar-you" aria-hidden="true"></div>
-                <div class="seatLabel">
-                  <div class="seatName">YOU</div>
-                  <div class="seatSub">Your cards are below the table</div>
-                </div>
-              </div>
+          <div class="avatarWrap">
+            <div class="avatar avatar-you" aria-hidden="true"></div>
+            <div>
+              <div class="seatName">YOU</div>
+              <div class="seatSub">Your cards are below the table</div>
             </div>
           </div>
         </div>
+      </section>
+    </section>
 
+    <!-- MESSAGE -->
+    <section class="bottomPanel" aria-label="System Message">
+      <div class="overlayCard bottomCard">
+        <div class="overlayStatus" id="msg">Pick first to begin.</div>
       </div>
     </section>
 
+    <!-- YOUR HAND -->
+    <section class="bottomPanel" aria-label="Your Hand">
+      <div class="overlayCard bottomCard">
+        <div class="overlayTitle">Your Hand</div>
+        <div class="yourHandRow tight" id="youHand"></div>
+      </div>
+    </section>
+
+    <!-- TRUMP PICK PANEL -->
+    <section class="bottomPanel" id="trumpPanel" aria-label="Trump Selection Panel" style="display:none;">
+      <div class="overlayCard bottomCard">
+        <div class="overlayTitle">Choose Trump</div>
+        <div class="overlaySub" id="trumpStatus">Dealer selects trump.</div>
+
+        <div class="overlayButtons">
+          <button class="btn" type="button" data-trump="S">Spades</button>
+          <button class="btn" type="button" data-trump="H">Hearts</button>
+          <button class="btn" type="button" data-trump="D">Diamonds</button>
+          <button class="btn" type="button" data-trump="C">Clubs</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PICK FIRST PANEL -->
     <section class="bottomPanel" id="pickPanel" aria-label="Pick First Panel">
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Pick First (Choose Dealer)</div>
@@ -121,9 +193,9 @@
         </div>
 
         <div class="overlayButtons">
-          <button class="btn" id="pickBtn" onclick="alert('pick-click-test')">Pick</button>
-          <button class="btn btn-secondary" id="pickOkBtn" disabled>OK</button>
-          <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
+          <button class="btn" id="pickBtn" type="button">Pick</button>
+          <button class="btn btn-secondary" id="pickOkBtn" type="button" disabled>OK</button>
+          <button class="btn btn-secondary" id="pickReBtn" type="button" disabled>Re-Pick</button>
         </div>
 
         <div class="overlayStatus" style="margin-top:10px;">
@@ -135,10 +207,12 @@
             <div class="pickName">AI2</div>
             <div class="pickCard" id="pickAI2">(none)</div>
           </div>
+
           <div class="pickSlot">
             <div class="pickName">AI3</div>
             <div class="pickCard" id="pickAI3">(none)</div>
           </div>
+
           <div class="pickSlot">
             <div class="pickName">YOU</div>
             <div class="pickCard" id="pickYOU">(none)</div>
@@ -147,20 +221,13 @@
       </div>
     </section>
 
-    <section id="trumpPanel" aria-hidden="true" style="display:none;">
-      <div id="trumpStatus"></div>
-      <button type="button" data-trump="S" style="display:none;">Spades</button>
-      <button type="button" data-trump="H" style="display:none;">Hearts</button>
-      <button type="button" data-trump="D" style="display:none;">Diamonds</button>
-      <button type="button" data-trump="C" style="display:none;">Clubs</button>
-    </section>
-<section class="bottomPanel" aria-label="Your Hand Panel">
-      <div id="youHand" class="yourHandRow tight" aria-label="Your hand"></div>
-      <div id="msg" class="overlayStatus" style="margin-top:10px; display:none;"></div>
-    </section>
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
+    <footer class="footer">
+      © 2026 Pluck The Card Game
+    </footer>
+
   </main>
 
   <script src="js/demo2.js"></script>
 </body>
 </html>
+
