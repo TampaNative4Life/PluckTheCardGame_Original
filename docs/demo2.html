@@ -1,3 +1,38 @@
+<!--
+=========================================================
+CHANGE LOG
+2026-03-21 20:45 (-0400)
+
+FILE
+docs/demo2.html
+
+ACTION
+Full file replacement.
+
+PURPOSE
+Replace duplicated/corrupted Demo 2 HTML with one clean
+document that preserves the current Demo 2 visual layout
+and DOM IDs required by demo2.js.
+
+FIXES / CHANGES
+• Removes second duplicated HTML document
+• Removes duplicated script tag
+• Preserves Demo 2 HUD
+• Preserves Demo 2 table layout
+• Preserves AI hand rows
+• Preserves pluck panel
+• Preserves pick panel
+• Keeps script tag at end of body
+
+DEPENDENCIES
+• docs/css/style.css
+• docs/js/demo2.js
+
+ROW COUNT
+Previous File Row Count: corrupted / duplicated
+Current File Row Count: 191
+=========================================================
+-->
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,34 +42,130 @@
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .cardBack {
-      width: 76px; height: 108px; border-radius: 14px;
+      width: 76px;
+      height: 108px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #1a3a6e, #0f2448);
       border: 1px solid rgba(255,255,255,.15);
       box-shadow: 0 10px 22px rgba(0,0,0,.32);
-      position: relative; flex: 0 0 auto;
+      position: relative;
+      flex: 0 0 auto;
     }
+
     .cardBack::after {
-      content: ""; position: absolute; inset: 6px; border-radius: 8px;
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 8px;
       border: 1px solid rgba(255,255,255,.12);
-      background: repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0px,rgba(255,255,255,.04) 2px,transparent 2px,transparent 8px);
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,.04) 0px,
+        rgba(255,255,255,.04) 2px,
+        transparent 2px,
+        transparent 8px
+      );
     }
+
     .aiHandRow {
-      display: flex; gap: 4px; flex-wrap: wrap; padding: 6px 10px;
-      border-radius: 12px; background: rgba(0,0,0,.15);
-      border: 1px solid rgba(255,255,255,.07); min-height: 36px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.15);
+      border: 1px solid rgba(255,255,255,.07);
+      min-height: 36px;
     }
-    .aiHandRow .cardBack { width: 32px; height: 46px; border-radius: 6px; }
+
+    .aiHandRow .cardBack {
+      width: 32px;
+      height: 46px;
+      border-radius: 6px;
+    }
+
     .turnStrip {
-      width: min(1100px, 100%); margin: 6px auto 0; padding: 8px 14px;
-      border-radius: 10px; background: rgba(10,20,38,.7);
-      border: 1px solid rgba(255,255,255,.07); color: #c8d4e8; font-size: .9rem;
+      width: min(1100px, 100%);
+      margin: 6px auto 0;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(10,20,38,.7);
+      border: 1px solid rgba(255,255,255,.07);
+      color: #c8d4e8;
+      font-size: .9rem;
     }
+
     #pluckChoices {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding: 8px;
-      border-radius: 12px; background: rgba(0,0,0,.15);
-      border: 1px solid rgba(255,255,255,.07); min-height: 50px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.15);
+      border: 1px solid rgba(255,255,255,.07);
+      min-height: 50px;
     }
   </style>
+</head>
+<body class="demo2">
+
+  <header class="nav">
+    <div class="navLeft">
+      <a class="brand" href="index.html">
+        <img src="images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
+        <span>PLUCK</span>
+      </a>
+    </div>
+    <nav class="navlinks" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="game.html">Play Demo</a>
+      <a class="activeLink" href="demo2.html">Demo 2</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="topHud" aria-label="Game Status">
+      <div class="statusBar">
+        <div class="statusItem">
+          <span class="statusLabel">TRUMP</span>
+          <span class="statusValue" id="trumpLabel">(not set)</span>
+        </div>
+        <div class="statusDivider" aria-hidden="true"></div>
+        <div class="statusItem">
+          <span class="statusLabel">BOOKS</span>
+          <span class="statusValue" id="booksSummary">YOU 0 • AI2 0 • AI3 0</span>
+        </div>
+        <div class="statusDivider" aria-hidden="true"></div>
+        <div class="statusItem">
+          <span class="statusLabel">PHASE</span>
+          <span class="statusValue" id="phaseVal">PICK</span>
+        </div>
+        <div class="statusDivider" aria-hidden="true"></div>
+        <div class="statusItem">
+          <span class="statusLabel">DEALER</span>
+          <span class="statusValue" id="dealerVal">(not set)</span>
+        </div>
+        <div class="statusDivider" aria-hidden="true"></div>
+        <div class="statusItem">
+          <span class="statusLabel">TRICK</span>
+          <span class="statusValue"><span id="trickNum">0</span> / <span id="trickMax">17</span></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="turnStrip" id="turnBanner">Phase: PICK_DEALER</div>
+
+    <section class="tableStage" aria-label="Game Table">
+      <div class="tableTopBar">
+        <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
+      </div>
+
+      <section class="feltTable" aria-label="Pluck table">  </style>
 </head>
 <body class="demo2">
 
