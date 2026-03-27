@@ -910,3 +910,88 @@ body{
     height:66px;
   }
 }
+/* =========================================================
+   CHANGE LOG
+   2026-03-21 21:45 (-0400)
+
+   FILE
+   docs/css/style.css
+
+   ACTION
+   Additive Demo 2 visual patch only.
+
+   PURPOSE
+   Rotate AI hand display to vertical card backs so AI rows do
+   not visually cover the center trick area.
+
+   FIXES / CHANGES
+   • AI2 hand cards display vertically
+   • AI3 hand cards display vertically
+   • Narrows AI hand footprint across the table
+   • Preserves current Demo 2 functionality
+   • No JS changes
+   • No HTML changes
+
+   FAILURE TEST VALIDATION
+   • Pick still works
+   • Trump selection still works
+   • Trick play still works
+   • No change to center trick logic
+   • No change to player hand logic
+
+   ROW COUNT
+   Added Row Count: 39
+   ========================================================= */
+
+body.demo2 .aiHandRow{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  align-items:flex-start;
+  justify-content:flex-start;
+  padding:6px 8px;
+  min-width:40px;
+  width:40px;
+  min-height:unset;
+}
+
+body.demo2 .aiHandRow .cardBack{
+  width:22px;
+  height:32px;
+  border-radius:4px;
+  margin:0;
+}
+
+body.demo2 .seat-left .avatarWrap,
+body.demo2 .seat-right .avatarWrap{
+  align-items:flex-start;
+}
+
+body.demo2 .seat-left .seatName,
+body.demo2 .seat-right .seatName{
+  margin-bottom:4px;
+}
+
+body.demo2 .seat-left .seatSub,
+body.demo2 .seat-right .seatSub{
+  margin-top:4px;
+}
+
+body.demo2 .seat-left{
+  left:14px;
+}
+
+body.demo2 .seat-right{
+  right:14px;
+}
+
+@media (max-width:860px){
+  body.demo2 .aiHandRow{
+    width:34px;
+  }
+
+  body.demo2 .aiHandRow .cardBack{
+    width:18px;
+    height:28px;
+  }
+}
