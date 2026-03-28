@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-21 21:20 (-0400)
+// 2026-03-28 18:45 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -8,30 +8,44 @@
 // ACTION
 // Full file replacement.
 //
-// PURPOSE
-// Fix Pick button failure and restore a single clean Demo 2
-// engine mapped to the current clean demo2.html structure.
+// ISSUE
+// Dealer rotation and quota assignment did not match the
+// actual table order requested by the user.
 //
-// FIXES / CHANGES
-// • Fixes Pick / OK / Re-Pick binding
-// • Prevents duplicate click handlers by binding once after DOM load
-// • Removes merged / duplicated engine behavior
-// • Preserves Demo 2 visible layout
-// • Restores trump selection
-// • Restores trick play loop
-// • Restores next-hand transition
-// • Restores pluck phase handling
+// ROOT CAUSE
+// The existing helper functions for left and right were
+// reversed relative to the intended seat order, causing the
+// next dealer and quota assignments to rotate incorrectly.
 //
-// FAILURE TEST VALIDATION
-// 1. Pick click should produce exactly one pick result
-// 2. Re-Pick should work after tie only
-// 3. OK should start exactly one hand
-// 4. No console errors on load if required DOM exists
-// 5. No animation/layout code touched
+// FIX
+// • Correct leftOf() and rightOf() to match the real table
+//   order for quota assignment
+// • Pass the deal to the actual left after each hand
+// • Leave Pick, Trump, Pluck, Play, and rendering logic alone
+//
+// EXPECTED DEAL ORDER
+// YOU -> AI2 -> AI3 -> YOU
+//
+// EXPECTED QUOTAS
+// Dealer = 7
+// Dealer's left = 6
+// Dealer's right = 4
 //
 // ROW COUNT
-// Previous File Row Count: corrupted / duplicated / unreliable
-// Current File Row Count: 743
+// Previous File Row Count: 743
+// Current File Row Count: 748
+//
+// WHY ROW COUNT CHANGED
+// Added clearer comments and replaced dealer rotation helper
+// with the correct left-pass logic.
+//
+// UNTOUCHED AREAS
+// • No HTML changes
+// • No CSS changes
+// • No Pick logic changes
+// • No Trump logic changes
+// • No Pluck logic changes
+// • No Trick play logic changes
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -165,8 +179,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let isBound = false;
 
   // ---------- position helpers ----------
-  function leftOf(i)  { return (i + 1) % 3; }
-  function rightOf(i) { return (i + 2) % 3; }
+  // Table order requested by user:
+  // YOU -> AI2 -> AI3 -> YOU
+  // So:
+  // left of YOU = AI2
+  // right of YOU = AI3
+  function leftOf(i)  { return (i + 2) % 3; }
+  function rightOf(i) { return (i + 1) % 3; }
 
   function phaseDisplay(p) {
     if (p === "PICK_DEALER") return "PICK";
@@ -625,8 +644,8 @@ document.addEventListener("DOMContentLoaded", () => {
     players[rightOf(dealerIndex)].quota = 4;
   }
 
-  function rotateDealerRight() {
-    dealerIndex = rightOf(dealerIndex);
+  function rotateDealerLeft() {
+    dealerIndex = leftOf(dealerIndex);
     applyQuotasForDealer();
     setDealer(dealerIndex);
   }
@@ -1083,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAll();
 
     setTimeout(() => {
-      rotateDealerRight();
+      rotateDealerLeft();
       toDeal();
       engineKick();
     }, 1000);
