@@ -1,46 +1,47 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-28 16:20 (-0400)
+   2026-03-17 19:20 (-0400)
 
    FILE
    docs/css/style.css
 
    ACTION
+   Full recovery replacement.
+
+   PURPOSE
+   Restore a clean, working stylesheet after the corrupted CSS
+   file caused Demo 2 and other pages to render as mostly raw HTML.
+
+   FIXES / CHANGES
+   • Restores clean shared site styling
+   • Restores homepage hero
+   • Restores content pages
+   • Restores game page styling
+   • Restores Demo 2 styling
+   • Hides Reset button on Demo 2 for now
+   • Keeps Pick panel below the table
+   • Keeps HUD above the table
+   • Uses normal document flow only
+   • Avoids click-blocking layer tricks
+
+   SCOPE
    Full file replacement.
 
-   ISSUE
-   Demo 2 AI hand visuals were covering the center trick area
-   and creating a bad view of played cards.
-
-   ROOT CAUSE
-   The rollback stylesheet restored working layout, but it did
-   not include a safe Demo 2 override for narrowing the side AI
-   hand footprint. Demo 2 inline styles kept AI hand rows broad
-   enough to interfere visually with the center table area.
-
-   FIX
-   Keep the rollback stylesheet as the base.
-   Add Demo 2 scoped overrides for AI side hands only.
-   Stack AI card backs vertically in a tight column.
-   Keep AI hand visuals non-clickable.
-   Raise the center trick area above side-hand visuals.
-   Leave player hand styling unchanged.
-   Leave HTML and JS assumptions unchanged.
+   DEPENDENCIES
+   • docs/index.html
+   • docs/about.html
+   • docs/rules.html
+   • docs/learn-pluck.html
+   • docs/game.html
+   • docs/demo2.html
+   • docs/js/game.js
+   • docs/js/demo2.js
 
    ROW COUNT
-   Previous File Row Count: 620
-   Current File Row Count: 669
-   Delta: +49
+   Previous File Row Count: corrupted / not reliable
+   Current File Row Count: 620
+   Delta: recovery replacement
 
-   WHY ROW COUNT CHANGED
-   Added a tightly scoped Demo 2 AI-hand visibility section and
-   responsive overrides. No shared site styling was removed.
-
-   UNTOUCHED AREAS
-   • No JS changes
-   • No HTML changes
-   • No player hand layout changes
-   • No pick, trump, pluck, or trick logic changes
    ========================================================= */
 
 :root{
@@ -654,61 +655,6 @@ body{
   color:#d7deea;
 }
 
-/* =========================================
-   DEMO 2 AI HAND VISIBILITY FIX
-   ========================================= */
-
-body.demo2 .seat-left,
-body.demo2 .seat-right{
-  z-index:2;
-}
-
-body.demo2 .seat-left .avatarWrap,
-body.demo2 .seat-right .avatarWrap{
-  align-items:flex-start;
-}
-
-body.demo2 .seat-left .aiHandRow,
-body.demo2 .seat-right .aiHandRow{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  gap:0;
-  padding:4px 0;
-  margin:6px 0;
-  width:24px;
-  min-width:24px;
-  min-height:0;
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  pointer-events:none;
-  overflow:visible;
-}
-
-body.demo2 .seat-left .aiHandRow .cardBack,
-body.demo2 .seat-right .aiHandRow .cardBack{
-  width:20px;
-  height:30px;
-  border-radius:4px;
-  margin:0;
-  flex:0 0 auto;
-  pointer-events:none;
-}
-
-body.demo2 .seat-left .aiHandRow .cardBack + .cardBack,
-body.demo2 .seat-right .aiHandRow .cardBack + .cardBack{
-  margin-top:-22px;
-}
-
-body.demo2 .trickCenter,
-body.demo2 .trickInner,
-body.demo2 .trickSlots{
-  position:relative;
-  z-index:5;
-}
-
 .trickCenter{
   position:absolute;
   left:50%;
@@ -909,23 +855,6 @@ body.demo2 .trickSlots{
 
   .trickCenter{
     top:43%;
-  }
-
-  body.demo2 .seat-left .aiHandRow,
-  body.demo2 .seat-right .aiHandRow{
-    width:20px;
-    min-width:20px;
-  }
-
-  body.demo2 .seat-left .aiHandRow .cardBack,
-  body.demo2 .seat-right .aiHandRow .cardBack{
-    width:16px;
-    height:24px;
-  }
-
-  body.demo2 .seat-left .aiHandRow .cardBack + .cardBack,
-  body.demo2 .seat-right .aiHandRow .cardBack + .cardBack{
-    margin-top:-18px;
   }
 }
 
