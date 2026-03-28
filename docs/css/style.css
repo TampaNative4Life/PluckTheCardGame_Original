@@ -1,47 +1,38 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 19:20 (-0400)
+   2026-03-28 17:25 (-0400)
 
    FILE
    docs/css/style.css
 
-   ACTION
-   Full recovery replacement.
+   ISSUE
+   Demo 2 AI hand rows are visually covering the center trick area.
 
-   PURPOSE
-   Restore a clean, working stylesheet after the corrupted CSS
-   file caused Demo 2 and other pages to render as mostly raw HTML.
+   ROOT CAUSE
+   demo2.html defines .aiHandRow as a horizontal row with wrapping card backs.
+   That works for a normal hand display, but in Demo 2 the left and right AI
+   hands sit too close to the center trick area and spread across it.
 
-   FIXES / CHANGES
-   • Restores clean shared site styling
-   • Restores homepage hero
-   • Restores content pages
-   • Restores game page styling
-   • Restores Demo 2 styling
-   • Hides Reset button on Demo 2 for now
-   • Keeps Pick panel below the table
-   • Keeps HUD above the table
-   • Uses normal document flow only
-   • Avoids click-blocking layer tricks
-
-   SCOPE
-   Full file replacement.
-
-   DEPENDENCIES
-   • docs/index.html
-   • docs/about.html
-   • docs/rules.html
-   • docs/learn-pluck.html
-   • docs/game.html
-   • docs/demo2.html
-   • docs/js/game.js
-   • docs/js/demo2.js
+   FIX
+   Keep the rollback stylesheet as the base.
+   Add a tightly scoped Demo 2 override for AI side hands only.
+   Stack AI hand backs vertically in a narrow column.
+   Lift the trick area above side seat visuals.
+   Leave player hand styling and gameplay untouched.
 
    ROW COUNT
-   Previous File Row Count: corrupted / not reliable
-   Current File Row Count: 620
-   Delta: recovery replacement
+   Previous File Row Count: 620
+   Current File Row Count: 656
+   Delta: +36
 
+   WHY ROW COUNT CHANGED
+   Added one small Demo 2 only CSS section and one responsive override.
+
+   CONFIRMATION OF UNTOUCHED AREAS
+   • No HTML changes
+   • No JS changes
+   • No gameplay logic changes
+   • No player hand layout changes
    ========================================================= */
 
 :root{
@@ -835,6 +826,49 @@ body{
 }
 
 /* =========================================
+   DEMO 2 AI HAND VISIBILITY FIX
+   ========================================= */
+
+body.demo2 .seat-left .aiHandRow,
+body.demo2 .seat-right .aiHandRow{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  align-items:center;
+  justify-content:flex-start;
+  width:28px;
+  min-width:28px;
+  min-height:0;
+  padding:4px 0;
+  margin:6px 0;
+  background:transparent;
+  border:0;
+}
+
+body.demo2 .seat-left .aiHandRow .cardBack,
+body.demo2 .seat-right .aiHandRow .cardBack{
+  width:22px;
+  height:32px;
+  border-radius:4px;
+  margin:0;
+  flex:0 0 auto;
+}
+
+body.demo2 .seat-left .aiHandRow .cardBack + .cardBack,
+body.demo2 .seat-right .aiHandRow .cardBack + .cardBack{
+  margin-top:-24px;
+}
+
+body.demo2 .trickCenter{
+  z-index:4;
+}
+
+body.demo2 .seat-left,
+body.demo2 .seat-right{
+  z-index:2;
+}
+
+/* =========================================
    RESPONSIVE
    ========================================= */
 
@@ -855,6 +889,23 @@ body{
 
   .trickCenter{
     top:43%;
+  }
+
+  body.demo2 .seat-left .aiHandRow,
+  body.demo2 .seat-right .aiHandRow{
+    width:24px;
+    min-width:24px;
+  }
+
+  body.demo2 .seat-left .aiHandRow .cardBack,
+  body.demo2 .seat-right .aiHandRow .cardBack{
+    width:18px;
+    height:26px;
+  }
+
+  body.demo2 .seat-left .aiHandRow .cardBack + .cardBack,
+  body.demo2 .seat-right .aiHandRow .cardBack + .cardBack{
+    margin-top:-20px;
   }
 }
 
