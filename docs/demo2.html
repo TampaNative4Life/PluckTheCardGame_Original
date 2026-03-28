@@ -1,36 +1,38 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-03-21 20:45 (-0400)
+2026-03-28 18:05 (-0400)
 
 FILE
 docs/demo2.html
 
-ACTION
-Full file replacement.
+ISSUE
+AI hand cards are visually covering the center trick area.
 
-PURPOSE
-Replace duplicated/corrupted Demo 2 HTML with one clean
-document that preserves the current Demo 2 visual layout
-and DOM IDs required by demo2.js.
+ROOT CAUSE
+The page-level style block in demo2.html defines .aiHandRow as a
+horizontal wrapping row, which overrides the intended table layout
+for the left and right AI seats.
 
-FIXES / CHANGES
-• Removes second duplicated HTML document
-• Removes duplicated script tag
-• Preserves Demo 2 HUD
-• Preserves Demo 2 table layout
-• Preserves AI hand rows
-• Preserves pluck panel
-• Preserves pick panel
-• Keeps script tag at end of body
-
-DEPENDENCIES
-• docs/css/style.css
-• docs/js/demo2.js
+FIX
+Change only the inline Demo 2 AI hand styling in this file.
+Stack AI card backs vertically in narrow columns.
+Keep the trick area above the side seat visuals.
+Leave IDs, structure, and gameplay wiring untouched.
 
 ROW COUNT
-Previous File Row Count: corrupted / duplicated
-Current File Row Count: 191
+Previous File Row Count: 191
+Current File Row Count: 206
+Delta: +15
+
+WHY ROW COUNT CHANGED
+Added tightly scoped inline CSS for AI hand layout only.
+
+CONFIRMATION OF UNTOUCHED AREAS
+• No JS changes
+• No style.css changes
+• No DOM ID changes
+• No gameplay logic changes
 =========================================================
 -->
 <!doctype html>
@@ -67,21 +69,46 @@ Current File Row Count: 191
       );
     }
 
-    .aiHandRow {
+    body.demo2 .seat-left .aiHandRow,
+    body.demo2 .seat-right .aiHandRow {
       display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      padding: 6px 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0;
+      width: 30px;
+      min-width: 30px;
+      min-height: 0;
+      padding: 6px 4px;
+      margin: 6px 0;
       border-radius: 12px;
       background: rgba(0,0,0,.15);
       border: 1px solid rgba(255,255,255,.07);
-      min-height: 36px;
+      overflow: visible;
+      pointer-events: none;
     }
 
-    .aiHandRow .cardBack {
-      width: 32px;
-      height: 46px;
-      border-radius: 6px;
+    body.demo2 .seat-left .aiHandRow .cardBack,
+    body.demo2 .seat-right .aiHandRow .cardBack {
+      width: 22px;
+      height: 32px;
+      border-radius: 5px;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    body.demo2 .seat-left .aiHandRow .cardBack + .cardBack,
+    body.demo2 .seat-right .aiHandRow .cardBack + .cardBack {
+      margin-top: -24px;
+    }
+
+    body.demo2 .seat-left,
+    body.demo2 .seat-right {
+      z-index: 2;
+    }
+
+    body.demo2 .trickCenter {
+      z-index: 4;
     }
 
     .turnStrip {
@@ -105,6 +132,25 @@ Current File Row Count: 191
       background: rgba(0,0,0,.15);
       border: 1px solid rgba(255,255,255,.07);
       min-height: 50px;
+    }
+
+    @media (max-width: 860px) {
+      body.demo2 .seat-left .aiHandRow,
+      body.demo2 .seat-right .aiHandRow {
+        width: 24px;
+        min-width: 24px;
+      }
+
+      body.demo2 .seat-left .aiHandRow .cardBack,
+      body.demo2 .seat-right .aiHandRow .cardBack {
+        width: 18px;
+        height: 26px;
+      }
+
+      body.demo2 .seat-left .aiHandRow .cardBack + .cardBack,
+      body.demo2 .seat-right .aiHandRow .cardBack + .cardBack {
+        margin-top: -20px;
+      }
     }
   </style>
 </head>
