@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-28 18:45 (-0400)
+// 2026-03-28 19:00 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,35 +9,31 @@
 // Full file replacement.
 //
 // ISSUE
-// Dealer rotation and quota assignment did not match the
-// actual table order requested by the user.
+// Dealer rotation and quota assignment were still wrong after
+// the prior change. The previous dealer was receiving 6 when
+// they should have received 4 in the next hand.
 //
 // ROOT CAUSE
-// The existing helper functions for left and right were
-// reversed relative to the intended seat order, causing the
-// next dealer and quota assignments to rotate incorrectly.
+// The original left/right seat math was already correct.
+// I incorrectly swapped the leftOf() and rightOf() helpers.
+// Only dealer rotation direction needed to change.
 //
 // FIX
-// • Correct leftOf() and rightOf() to match the real table
-//   order for quota assignment
-// • Pass the deal to the actual left after each hand
-// • Leave Pick, Trump, Pluck, Play, and rendering logic alone
+// • Restore original seat math
+// • Keep deal passing left after each hand
+// • Leave all gameplay, rendering, HTML, and CSS untouched
 //
-// EXPECTED DEAL ORDER
+// CORRECT DEAL ORDER
 // YOU -> AI2 -> AI3 -> YOU
 //
-// EXPECTED QUOTAS
+// CORRECT QUOTAS
 // Dealer = 7
 // Dealer's left = 6
 // Dealer's right = 4
 //
 // ROW COUNT
 // Previous File Row Count: 743
-// Current File Row Count: 748
-//
-// WHY ROW COUNT CHANGED
-// Added clearer comments and replaced dealer rotation helper
-// with the correct left-pass logic.
+// Current File Row Count: 744
 //
 // UNTOUCHED AREAS
 // • No HTML changes
@@ -179,13 +175,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let isBound = false;
 
   // ---------- position helpers ----------
-  // Table order requested by user:
-  // YOU -> AI2 -> AI3 -> YOU
-  // So:
-  // left of YOU = AI2
-  // right of YOU = AI3
-  function leftOf(i)  { return (i + 2) % 3; }
-  function rightOf(i) { return (i + 1) % 3; }
+  // Correct seat math for this table:
+  // AI2 = 0, AI3 = 1, YOU = 2
+  // left pass order: YOU -> AI2 -> AI3 -> YOU
+  function leftOf(i)  { return (i + 1) % 3; }
+  function rightOf(i) { return (i + 2) % 3; }
 
   function phaseDisplay(p) {
     if (p === "PICK_DEALER") return "PICK";
