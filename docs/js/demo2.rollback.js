@@ -1,46 +1,48 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-28 19:00 (-0400)
+// 2026-03-28 19:35 (-0400)
 //
 // FILE
-// docs/js/demo2.js
+// New Rollback point 3/29/2026
 //
 // ACTION
-// New rollback point
+// New Rollback point 3/29/2026
 //
 // ISSUE
-// Dealer rotation and quota assignment were still wrong after
-// the prior change. The previous dealer was receiving 6 when
-// they should have received 4 in the next hand.
+// Pluck messages exposed hidden AI-to-AI card exchange details,
+// and the user could not see how many plucks they still had,
+// or which players owed those plucks.
 //
 // ROOT CAUSE
-// The original left/right seat math was already correct.
-// I incorrectly swapped the leftOf() and rightOf() helpers.
-// Only dealer rotation direction needed to change.
+// The current pluck messaging always showed exact exchanged cards,
+// regardless of whether the user was involved. The code also did
+// not summarize the user's remaining plucks in the main message box.
 //
 // FIX
-// • Restore original seat math
-// • Keep deal passing left after each hand
-// • Leave all gameplay, rendering, HTML, and CSS untouched
+// • Hide exact pluck card details for AI-to-AI plucks
+// • Show full pluck detail only when YOU are involved
+// • Show user's remaining pluck count in the same message box
+// • Show which players owe those remaining plucks
+// • Leave all pluck mechanics, dealer rotation, quotas, HTML,
+//   CSS, and trick logic unchanged
 //
-// CORRECT DEAL ORDER
-// YOU -> AI2 -> AI3 -> YOU
-//
-// CORRECT QUOTAS
-// Dealer = 7
-// Dealer's left = 6
-// Dealer's right = 4
+// MESSAGE RULES
+// • AI vs AI: "AI3 plucked AI2."
+// • You pluck AI: "You plucked AI2. Gave 3C, received KC."
+// • AI plucks you: "AI2 plucked you. You gave KC, received 3C."
+// • Same box also shows: "Your plucks: 3. AI2 owes 2, AI3 owes 1."
 //
 // ROW COUNT
 // Previous File Row Count: 743
-// Current File Row Count: 744
+// Current File Row Count: 803
 //
 // UNTOUCHED AREAS
 // • No HTML changes
 // • No CSS changes
+// • No dealer rotation changes
+// • No quota logic changes
 // • No Pick logic changes
 // • No Trump logic changes
-// • No Pluck logic changes
 // • No Trick play logic changes
 // =========================================================
 
@@ -256,6 +258,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const c = parseCard(cs);
     if (isTrumpCard(cs)) return 10000 + c.value;
     return c.value;
+  }
+
+  // ---------- pluck messaging ----------
+  function getYourRemainingPluckCounts() {
+    const counts = new Map();
+    for (const item of pluckQueue) {
+      if (item.pluckerIndex !== 2) continue;
+      const victimId = players[item.pluckeeIndex].id;
+      counts.set(victimId, (counts.get(victimId) || 0) + 1);
+    }
+    return counts;
+  }
+
+  function formatYourRemainingPluckSummary() {
+    const counts = getYourRemainingPluckCounts();
+    let total = 0;
+    for (const count of counts.values()) total += count;
+
+    if (total === 0) return "";
+
+    const parts = [];
+    for (const [playerId, count] of counts.entries()) {
+      parts.push(`${playerId} owes ${count}`);
+    }
+
+    return `Your plucks: ${total}. ${parts.join(", ")}.`;
+  }
+
+  function composeMsg(base) {
+    const summary = formatYourRemainingPluckSummary();
+    if (!summary) return base;
+    if (!base) return summary;
+    return `${base} ${summary}`;
+  }
+
+  function describePluckResult(pluckerI, pluckeeI, res) {
+    const pluckerId = players[pluckerI].id;
+    const pluckeeId = players[pluckeeI].id;
+
+    if (!res.ok) {
+      if (pluckerI === 2) {
+        return `Your pluck against ${pluckeeId} failed: ${res.reason}`;
+      }
+      if (pluckeeI === 2) {
+        return `${pluckerId} could not pluck you: ${res.reason}`;
+      }
+      return `${pluckerId} could not pluck ${pluckeeId}.`;
+    }
+
+    if (pluckerI === 2) {
+      return `You plucked ${pluckeeId}. Gave ${res.giveLow}, received ${res.takeHigh}.`;
+    }
+
+    if (pluckeeI === 2) {
+      return `${pluckerId} plucked you. You gave ${res.takeHigh}, received ${res.giveLow}.`;
+    }
+
+    return `${pluckerId} plucked ${pluckeeId}.`;
   }
 
   // ---------- rendering helpers ----------
@@ -512,10 +572,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const pluckerI = activePluck.pluckerIndex;
     const pluckeeI = activePluck.pluckeeIndex;
     const suits = availablePluckSuits(pluckerI, pluckeeI);
+    const yourSummary = formatYourRemainingPluckSummary();
 
     if (pluckerI === 2) {
       pluckNextBtn.disabled = true;
-      pluckStatusEl.textContent = `You are plucking ${players[pluckeeI].id}. Choose a suit.`;
+      pluckStatusEl.textContent = yourSummary
+        ? `You are plucking ${players[pluckeeI].id}. Choose a suit. ${yourSummary}`
+        : `You are plucking ${players[pluckeeI].id}. Choose a suit.`;
 
       if (!suits.length) {
         const b = document.createElement("button");
@@ -523,8 +586,10 @@ document.addEventListener("DOMContentLoaded", () => {
         b.type = "button";
         b.textContent = "No suit available, skip";
         b.addEventListener("click", () => {
+          const base = `You could not pluck ${players[pluckeeI].id}.`;
           pluckQueue.shift();
           activePluck = null;
+          msg(composeMsg(base));
           if (!pluckQueue.length) toTrumpPick();
           renderAll();
         }, { once: true });
@@ -542,12 +607,14 @@ document.addEventListener("DOMContentLoaded", () => {
           const res = attemptPluck(pluckerI, pluckeeI, s);
           if (!res.ok) {
             usedSuitSet(pluckerI, pluckeeI).add(s);
-            msg(`Pluck failed: ${res.reason}`);
-          } else {
-            msg(`Pluck: gave ${res.giveLow}, received ${res.takeHigh}.`);
           }
+
           pluckQueue.shift();
           activePluck = null;
+
+          const base = describePluckResult(pluckerI, pluckeeI, res);
+          msg(composeMsg(base));
+
           if (!pluckQueue.length) toTrumpPick();
           renderAll();
         }, { once: true });
@@ -791,8 +858,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const suits = availablePluckSuits(pluckerI, pluckeeI);
 
     if (!suits.length) {
+      const base = pluckeeI === 2
+        ? `${players[pluckerI].id} could not pluck you.`
+        : `${players[pluckerI].id} could not pluck ${players[pluckeeI].id}.`;
+
       pluckQueue.shift();
       activePluck = null;
+      msg(composeMsg(base));
+
       if (!pluckQueue.length) toTrumpPick();
       renderAll();
       return;
@@ -817,12 +890,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
     if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
 
-    msg(res.ok
-      ? `Pluck: ${players[pluckerI].id} gave ${res.giveLow}, received ${res.takeHigh}.`
-      : `Pluck failed: ${res.reason}`);
-
     pluckQueue.shift();
     activePluck = null;
+
+    const base = describePluckResult(pluckerI, pluckeeI, res);
+    msg(composeMsg(base));
+
     if (!pluckQueue.length) toTrumpPick();
     renderAll();
   }
@@ -1024,7 +1097,7 @@ document.addEventListener("DOMContentLoaded", () => {
     show(pickPanelEl, false);
     show(pluckPanelEl, true);
     show(trumpPanelEl, false);
-    msg("Pluck phase.");
+    msg(composeMsg("Pluck phase."));
     renderAll();
 
     if (activePluck && activePluck.pluckerIndex === 2) return;
