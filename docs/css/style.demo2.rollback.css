@@ -1,16 +1,15 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 19:20 (-0400)
+   2026-03-29 16:13 (-0400)
 
    FILE
-   New Roolback point 3/29/2026
+   New Roolback point 3/29/2026 16:13
 
    ACTION
-   New Roolback point 3/29/2026
+    New Roolback point 3/29/2026 16:13
 
    PURPOSE
-   New Roolback point 3/29/2026
-
+    New Roolback point 3/29/2026 16:13
 
    FIXES / CHANGES
    • Restores clean shared site styling
@@ -909,4 +908,29 @@ body{
     width:46px;
     height:66px;
   }
+}
+/* AI hand container */
+#ai2Hand,
+#ai3Hand{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  padding-top:6px;
+}
+
+/* Individual card backs */
+#ai2Hand .cardBack,
+#ai3Hand .cardBack{
+  width:22px;
+  height:32px;
+  border-radius:4px;
+
+  margin-top:-24px; /* overlap */
+}
+
+/* First card should not shift upward */
+#ai2Hand .cardBack:first-child,
+#ai3Hand .cardBack:first-child{
+  margin-top:0;
 }
