@@ -910,3 +910,29 @@ body{
     height:66px;
   }
 }
+/* AI hand container */
+#ai2Hand,
+#ai3Hand{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  padding-top:6px;
+}
+
+/* Individual card backs */
+#ai2Hand .cardBack,
+#ai3Hand .cardBack{
+  width:22px;
+  height:32px;
+  border-radius:4px;
+
+  margin-top:-24px; /* overlap */
+}
+
+/* First card should not shift upward */
+#ai2Hand .cardBack:first-child,
+#ai3Hand .cardBack:first-child{
+  margin-top:0;
+}
+
