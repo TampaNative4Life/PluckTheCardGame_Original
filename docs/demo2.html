@@ -1,318 +1,209 @@
-<!--
-=========================================================
-CHANGE LOG
-2026-03-21 20:45 (-0400)
-
-FILE
-docs/demo2.html
-
-ACTION
-Full file replacement.
-
-PURPOSE
-Replace duplicated/corrupted Demo 2 HTML with one clean
-document that preserves the current Demo 2 visual layout
-and DOM IDs required by demo2.js.
-
-FIXES / CHANGES
-• Removes second duplicated HTML document
-• Removes duplicated script tag
-• Preserves Demo 2 HUD
-• Preserves Demo 2 table layout
-• Preserves AI hand rows
-• Preserves pluck panel
-• Preserves pick panel
-• Keeps script tag at end of body
-
-DEPENDENCIES
-• docs/css/style.css
-• docs/js/demo2.js
-
-ROW COUNT
-Previous File Row Count: corrupted / duplicated
-Current File Row Count: 191
-=========================================================
--->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pluck Demo 2</title>
+
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    .cardBack {
-      width: 76px;
-      height: 108px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #1a3a6e, #0f2448);
-      border: 1px solid rgba(255,255,255,.15);
-      box-shadow: 0 10px 22px rgba(0,0,0,.32);
-      position: relative;
-      flex: 0 0 auto;
-    }
-
-    .cardBack::after {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: repeating-linear-gradient(
-        45deg,
-        rgba(255,255,255,.04) 0px,
-        rgba(255,255,255,.04) 2px,
-        transparent 2px,
-        transparent 8px
-      );
-    }
-
-    .aiHandRow {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      padding: 6px 10px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.15);
-      border: 1px solid rgba(255,255,255,.07);
-      min-height: 36px;
-    }
-
-    .aiHandRow .cardBack {
-      width: 32px;
-      height: 46px;
-      border-radius: 6px;
-    }
-
-    .turnStrip {
-      width: min(1100px, 100%);
-      margin: 6px auto 0;
-      padding: 8px 14px;
-      border-radius: 10px;
-      background: rgba(10,20,38,.7);
-      border: 1px solid rgba(255,255,255,.07);
-      color: #c8d4e8;
-      font-size: .9rem;
-    }
-
-    #pluckChoices {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      padding: 8px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.15);
-      border: 1px solid rgba(255,255,255,.07);
-      min-height: 50px;
-    }
-  </style>
 </head>
+
 <body class="demo2">
 
-  <header class="nav">
+  <!-- TOP NAV / HEADER -->
+  <div class="nav">
     <div class="navLeft">
       <a class="brand" href="index.html">
-        <img src="images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
+        <img src="assets/PluckTheCardGame_Logo.jpg" alt="Pluck Logo">
         <span>PLUCK</span>
       </a>
     </div>
-    <nav class="navlinks" aria-label="Primary">
+
+    <div class="navlinks">
       <a href="index.html">Home</a>
-      <a href="game.html">Play Demo</a>
-      <a class="activeLink" href="demo2.html">Demo 2</a>
       <a href="rules.html">Rules</a>
-      <a href="learn-pluck.html">Learn Pluck</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+      <a href="learn-pluck.html">Learn</a>
+      <a href="demo2.html" class="activeLink">Play Demo</a>
+    </div>
+  </div>
 
-  <main class="container">
+  <div class="container">
 
-    <section class="topHud" aria-label="Game Status">
-      <div class="statusBar">
-        <div class="statusItem">
-          <span class="statusLabel">TRUMP</span>
-          <span class="statusValue" id="trumpLabel">(not set)</span>
-        </div>
-        <div class="statusDivider" aria-hidden="true"></div>
-        <div class="statusItem">
-          <span class="statusLabel">BOOKS</span>
-          <span class="statusValue" id="booksSummary">YOU 0 • AI2 0 • AI3 0</span>
-        </div>
-        <div class="statusDivider" aria-hidden="true"></div>
-        <div class="statusItem">
-          <span class="statusLabel">PHASE</span>
-          <span class="statusValue" id="phaseVal">PICK</span>
-        </div>
-        <div class="statusDivider" aria-hidden="true"></div>
-        <div class="statusItem">
-          <span class="statusLabel">DEALER</span>
-          <span class="statusValue" id="dealerVal">(not set)</span>
-        </div>
-        <div class="statusDivider" aria-hidden="true"></div>
-        <div class="statusItem">
-          <span class="statusLabel">TRICK</span>
-          <span class="statusValue"><span id="trickNum">0</span> / <span id="trickMax">17</span></span>
-        </div>
-      </div>
-    </section>
-
-    <div class="turnStrip" id="turnBanner">Phase: PICK_DEALER</div>
-
-    <section class="tableStage" aria-label="Game Table">
-      <div class="tableTopBar">
-        <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
+    <!-- STATUS BAR -->
+    <div class="statusBar">
+      <div class="statusItem">
+        <span class="statusLabel">Phase</span>
+        <span id="phaseVal" class="statusValue">PICK</span>
       </div>
 
-      <section class="feltTable" aria-label="Pluck table">
-        <div class="feltInset" aria-hidden="true"></div>
+      <div class="statusDivider"></div>
 
+      <div class="statusItem">
+        <span class="statusLabel">Dealer</span>
+        <span id="dealerVal" class="statusValue">(not set)</span>
+      </div>
+
+      <div class="statusDivider"></div>
+
+      <div class="statusItem">
+        <span class="statusLabel">Trump</span>
+        <span id="trumpLabel" class="statusValue">(not set)</span>
+      </div>
+
+      <div class="statusDivider"></div>
+
+      <div class="statusItem">
+        <span class="statusLabel">Trick</span>
+        <span class="statusValue">
+          <span id="trickNum">0</span> / <span id="trickMax">17</span>
+        </span>
+      </div>
+
+      <div class="statusDivider"></div>
+
+      <div class="statusItem">
+        <span class="statusLabel">Books</span>
+        <span id="booksSummary" class="statusValue">YOU 0 • AI2 0 • AI3 0</span>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="tableStage">
+      <div class="feltTable">
+
+        <!-- AI LEFT -->
         <div class="seat seat-left">
           <div class="avatarWrap">
-            <div class="avatar" aria-hidden="true"></div>
+            <div class="avatar"></div>
             <div>
-              <div class="seatName">AI2 (Left)</div>
-              <div class="aiHandRow" id="ai2Hand"></div>
-              <div class="seatSub">Quota: <strong id="ai2Quota">7</strong> &nbsp;|&nbsp; Tricks: <strong id="ai2Tricks">0</strong></div>
+              <div class="seatName">AI2</div>
+              <div class="seatSub">
+                Q: <span id="ai2Quota">7</span> • T: <span id="ai2Tricks">0</span>
+              </div>
             </div>
           </div>
+
+          <div id="ai2Hand"></div>
         </div>
 
+        <!-- AI RIGHT -->
         <div class="seat seat-right">
           <div class="avatarWrap">
-            <div class="avatar" aria-hidden="true"></div>
+            <div class="avatar"></div>
             <div>
-              <div class="seatName">AI3 (Right)</div>
-              <div class="aiHandRow" id="ai3Hand"></div>
-              <div class="seatSub">Quota: <strong id="ai3Quota">6</strong> &nbsp;|&nbsp; Tricks: <strong id="ai3Tricks">0</strong></div>
+              <div class="seatName">AI3</div>
+              <div class="seatSub">
+                Q: <span id="ai3Quota">6</span> • T: <span id="ai3Tricks">0</span>
+              </div>
             </div>
           </div>
+
+          <div id="ai3Hand"></div>
         </div>
 
+        <!-- TRICK CENTER -->
         <div class="trickCenter">
           <div class="trickInner">
-            <div class="trickTitle">Trick Area</div>
-            <div class="trickSlots" id="trickSlots">
-              <div class="slotHint">(empty)</div>
-            </div>
+            <div class="trickTitle">Table</div>
+            <div id="trickSlots" class="trickSlots"></div>
           </div>
         </div>
 
+        <!-- YOU -->
         <div class="seat seat-bottom">
           <div class="avatarWrap">
-            <div class="avatar avatar-you" aria-hidden="true"></div>
-            <div style="flex:1">
-              <div class="seatName">YOU &nbsp;|&nbsp; Quota: <strong id="youQuota">4</strong> &nbsp;|&nbsp; Tricks: <strong id="youTricks">0</strong></div>
-              <div class="seatSub">Your cards are below</div>
+            <div class="avatar avatar-you"></div>
+            <div>
+              <div class="seatName">YOU</div>
+              <div class="seatSub">
+                Q: <span id="youQuota">4</span> • T: <span id="youTricks">0</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </section>
 
-    <section class="bottomPanel" aria-label="System Message">
-      <div class="overlayCard bottomCard">
-        <div class="overlayStatus" id="msg">Pick first to begin.</div>
-      </div>
-    </section>
-
-    <section class="bottomPanel" aria-label="Your Hand">
-      <div class="overlayCard bottomCard">
-        <div class="overlayTitle">Your Hand</div>
-        <div class="yourHandRow tight" id="youHand"></div>
-      </div>
-    </section>
-
-    <section class="bottomPanel" id="trumpPanel" aria-label="Trump Selection" style="display:none;">
-      <div class="overlayCard bottomCard">
-        <div class="overlayTitle">Choose Trump</div>
-        <div class="overlaySub" id="trumpStatus">Dealer selects trump.</div>
-        <div class="overlayButtons">
-          <button class="btn" type="button" data-trump="S">&#9824; Spades</button>
-          <button class="btn" type="button" data-trump="H">&#9829; Hearts</button>
-          <button class="btn" type="button" data-trump="D">&#9830; Diamonds</button>
-          <button class="btn" type="button" data-trump="C">&#9827; Clubs</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="bottomPanel" id="pluckPanel" aria-label="Pluck Phase" style="display:none;">
-      <div class="overlayCard bottomCard">
-        <div class="overlayTitle">Pluck Phase</div>
-        <div class="overlaySub" id="pluckStatus">Processing plucks…</div>
-        <div id="pluckChoices"></div>
-        <div class="overlayButtons" style="margin-top:10px;">
-          <button class="btn" id="pluckNextBtn" type="button" disabled>Confirm Send</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="bottomPanel" id="pickPanel" aria-label="Pick First Panel">
-      <div class="overlayCard bottomCard">
-        <div class="overlayTitle">Pick First — Choose Dealer</div>
-        <div class="overlaySub">Each player draws 1 card. Lowest card becomes Dealer. Ties re-pick.</div>
-        <div class="overlaySub" id="gameLengthStatus">Game Length: Standard Game, 10 plucks against.</div>
-        <div class="gameLengthRow" aria-label="Game Length Selection">
-          <button class="btn btn-secondary gameLengthBtn" id="gameLen8Btn" type="button" data-threshold="8">Short Game, 8</button>
-          <button class="btn gameLengthBtn activeLengthBtn" id="gameLen10Btn" type="button" data-threshold="10">Standard Game, 10</button>
-          <button class="btn btn-secondary gameLengthBtn" id="gameLen12Btn" type="button" data-threshold="12">Long Game, 12</button>
-        </div>
-        <div class="overlayButtons">
-          <button class="btn" id="pickBtn" type="button">Pick</button>
-          <button class="btn btn-secondary" id="pickOkBtn" type="button" disabled>OK — Start</button>
-          <button class="btn btn-secondary" id="pickReBtn" type="button" disabled>Re-Pick</button>
-        </div>
-        <div class="overlayStatus" style="margin-top:10px;">
-          <strong>Status:</strong> <span id="pickStatus">Click Pick.</span>
-        </div>
-        <div class="pickRow">
-          <div class="pickSlot">
-            <div class="pickName">AI2</div>
-            <div class="pickCard" id="pickAI2">(none)</div>
-          </div>
-          <div class="pickSlot">
-            <div class="pickName">AI3</div>
-            <div class="pickCard" id="pickAI3">(none)</div>
-          </div>
-          <div class="pickSlot">
-            <div class="pickName">YOU</div>
-            <div class="pickCard" id="pickYOU">(none)</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-    <section class="gameOverModal" id="gameOverModal" aria-label="Game Over Summary" style="display:none;">
-      <div class="gameOverBackdrop" id="gameOverBackdrop"></div>
-      <div class="gameOverCard">
-        <div class="gameOverTop">
-          <div class="gameOverEyebrow">Match Complete</div>
-          <div class="gameOverTitle">Game Over</div>
-          <div class="gameOverSub" id="gameOverThreshold">Threshold: 10 Plucks Against</div>
-        </div>
-
-        <div class="gameOverWinner" id="gameOverWinner">Winner: YOU</div>
-
-        <div class="gameOverGrid" id="gameOverGrid">
-          <div class="gameOverPlayerRow">
-            <div class="gameOverPlayerName">YOU</div>
-            <div class="gameOverPlayerStats">Earned: 0 • Against: 0 • Diff: 0</div>
+          <div class="youDock">
+            <div id="youHand" class="yourHandRow tight"></div>
           </div>
         </div>
 
-        <div class="gameOverFooter" id="gameOverFooter">AI2 reached 10 plucks against and leaves the table.</div>
+      </div>
+    </div>
 
-        <div class="gameOverButtons">
-          <button class="btn" id="newGameBtn" type="button">Start New Game</button>
+    <!-- MESSAGE -->
+    <div id="msg" class="msg"></div>
+
+    <!-- PICK PANEL -->
+    <div id="pickPanel" class="overlayCard bottomPanel">
+      <div class="overlayTitle">Pick for Dealer</div>
+
+      <div class="overlayButtons">
+        <button id="pickBtn" class="btn">Pick</button>
+        <button id="pickOkBtn" class="btn">OK</button>
+        <button id="pickReBtn" class="btn btn-secondary">Re-Pick</button>
+      </div>
+
+      <div id="pickStatus" class="overlayStatus"></div>
+
+      <div class="pickRow">
+        <div class="pickSlot">
+          <div class="pickName">AI2</div>
+          <div id="pickAI2"></div>
+        </div>
+
+        <div class="pickSlot">
+          <div class="pickName">AI3</div>
+          <div id="pickAI3"></div>
+        </div>
+
+        <div class="pickSlot">
+          <div class="pickName">YOU</div>
+          <div id="pickYOU"></div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
+    <!-- TRUMP PANEL -->
+    <div id="trumpPanel" class="overlayCard bottomPanel" style="display:none;">
+      <div class="overlayTitle">Choose Trump</div>
+      <div id="trumpStatus" class="overlayStatus"></div>
 
+      <div class="overlayButtons">
+        <button class="btn" data-trump="S">Spades</button>
+        <button class="btn" data-trump="H">Hearts</button>
+        <button class="btn" data-trump="D">Diamonds</button>
+        <button class="btn" data-trump="C">Clubs</button>
+      </div>
+    </div>
+
+    <!-- PLUCK PANEL -->
+    <div id="pluckPanel" class="overlayCard bottomPanel" style="display:none;">
+      <div class="overlayTitle">Pluck</div>
+      <div id="pluckStatus" class="overlayStatus"></div>
+
+      <div id="pluckChoices" class="overlayButtons"></div>
+      <button id="pluckNextBtn" class="btn">Next</button>
+    </div>
+
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div id="gameOverModal" class="gameOverModal" style="display:none;">
+    <div class="gameOverCard">
+
+      <div class="gameOverTitle">GAME OVER</div>
+      <div class="gameOverSub" id="gameOverThreshold"></div>
+
+      <div id="gameOverBody" class="gameOverBody"></div>
+
+      <div id="gameOverFooter" class="gameOverFooter"></div>
+
+      <button id="newGameBtn" class="btn">Start New Game</button>
+
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
   <script src="js/demo2.js"></script>
+
 </body>
 </html>
