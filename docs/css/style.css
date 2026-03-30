@@ -1,47 +1,31 @@
 /* =========================================================
    CHANGE LOG
-   2026-03-17 19:20 (-0400)
+   2026-03-30
 
    FILE
-   New Roolback point
+   docs/css/style.css
 
    ACTION
-    New Roolback point.
-
-   PURPOSE
-    New Roolback point
-
-
-   FIXES / CHANGES
-   • Restores clean shared site styling
-   • Restores homepage hero
-   • Restores content pages
-   • Restores game page styling
-   • Restores Demo 2 styling
-   • Hides Reset button on Demo 2 for now
-   • Keeps Pick panel below the table
-   • Keeps HUD above the table
-   • Uses normal document flow only
-   • Avoids click-blocking layer tricks
-
-   SCOPE
    Full file replacement.
 
-   DEPENDENCIES
-   • docs/index.html
-   • docs/about.html
-   • docs/rules.html
-   • docs/learn-pluck.html
-   • docs/game.html
-   • docs/demo2.html
-   • docs/js/game.js
-   • docs/js/demo2.js
+   PURPOSE
+   Preserve the current stable Demo 2 layout while adding:
+   1. Vertical AI hand stacks that do not block the trick area
+   2. Themed Game Over modal styling
 
-   ROW COUNT
-   Previous File Row Count: corrupted / not reliable
-   Current File Row Count: 620
-   Delta: recovery replacement
+   FIXES / CHANGES
+   • Keeps recovery stylesheet intact
+   • Keeps current theme intact
+   • Keeps gameplay window layout intact
+   • Keeps AI hands vertical and compact
+   • Adds centered themed game-over modal
+   • Does not touch gameplay logic
 
+   UNTOUCHED AREAS
+   • No HTML structure assumptions changed here
+   • No JS logic changed here
+   • No dealer rotation changed here
+   • No quota logic changed here
    ========================================================= */
 
 :root{
@@ -835,6 +819,121 @@ body{
 }
 
 /* =========================================
+   DEMO 2 AI HAND STACK
+   ========================================= */
+
+#ai2Hand,
+#ai3Hand{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  padding-top:6px;
+}
+
+#ai2Hand .cardBack,
+#ai3Hand .cardBack{
+  width:22px;
+  height:32px;
+  border-radius:4px;
+  margin-top:-24px;
+}
+
+#ai2Hand .cardBack:first-child,
+#ai3Hand .cardBack:first-child{
+  margin-top:0;
+}
+
+/* =========================================
+   GAME OVER MODAL
+   ========================================= */
+
+.gameOverModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.68);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  padding:18px;
+}
+
+.gameOverCard{
+  width:min(520px, 100%);
+  padding:22px 22px 18px;
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(124,183,255,.10), transparent 28%),
+    radial-gradient(circle at 82% 76%, rgba(212,178,84,.08), transparent 24%),
+    linear-gradient(145deg, rgba(15,23,42,.98), rgba(7,14,27,.98));
+  border:1px solid rgba(124,183,255,.20);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,255,255,.03) inset;
+  color:#e6eefc;
+  text-align:center;
+}
+
+.gameOverTitle{
+  font-size:1.55rem;
+  font-weight:900;
+  color:var(--gold);
+  margin-bottom:6px;
+  letter-spacing:.4px;
+}
+
+.gameOverSub{
+  font-size:.95rem;
+  color:#b9c8e3;
+  margin-bottom:16px;
+}
+
+.gameOverBody{
+  text-align:left;
+  margin-bottom:14px;
+  display:grid;
+  gap:10px;
+}
+
+.winnerLine{
+  font-weight:800;
+  color:var(--gold);
+  margin-bottom:4px;
+  text-align:center;
+}
+
+.playerRow{
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.playerRow.loser{
+  opacity:.78;
+}
+
+.playerName{
+  font-weight:800;
+  color:#f2f5fa;
+  margin-bottom:3px;
+}
+
+.playerStats{
+  font-size:.9rem;
+  color:#c8d4e8;
+  line-height:1.45;
+}
+
+.gameOverFooter{
+  font-size:.9rem;
+  color:#a9c0e8;
+  margin:6px 0 16px;
+  line-height:1.45;
+}
+
+/* =========================================
    RESPONSIVE
    ========================================= */
 
@@ -909,30 +1008,18 @@ body{
     width:46px;
     height:66px;
   }
-}
-/* AI hand container */
-#ai2Hand,
-#ai3Hand{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:0;
-  padding-top:6px;
-}
 
-/* Individual card backs */
-#ai2Hand .cardBack,
-#ai3Hand .cardBack{
-  width:22px;
-  height:32px;
-  border-radius:4px;
+  .gameOverCard{
+    padding:18px 16px 16px;
+  }
 
-  margin-top:-24px; /* overlap */
+  .gameOverTitle{
+    font-size:1.35rem;
+  }
+
+  .playerStats{
+    font-size:.86rem;
+  }
 }
 
-/* First card should not shift upward */
-#ai2Hand .cardBack:first-child,
-#ai3Hand .cardBack:first-child{
-  margin-top:0;
-}
-
+If you want, next I’ll repost the full demo2.html so the modal markup is already in the right place.
