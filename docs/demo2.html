@@ -252,6 +252,12 @@ Current File Row Count: 191
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Pick First — Choose Dealer</div>
         <div class="overlaySub">Each player draws 1 card. Lowest card becomes Dealer. Ties re-pick.</div>
+        <div class="overlaySub" id="gameLengthStatus">Game Length: Standard Game, 10 plucks against.</div>
+        <div class="gameLengthRow" aria-label="Game Length Selection">
+          <button class="btn btn-secondary gameLengthBtn" id="gameLen8Btn" type="button" data-threshold="8">Short Game, 8</button>
+          <button class="btn gameLengthBtn activeLengthBtn" id="gameLen10Btn" type="button" data-threshold="10">Standard Game, 10</button>
+          <button class="btn btn-secondary gameLengthBtn" id="gameLen12Btn" type="button" data-threshold="12">Long Game, 12</button>
+        </div>
         <div class="overlayButtons">
           <button class="btn" id="pickBtn" type="button">Pick</button>
           <button class="btn btn-secondary" id="pickOkBtn" type="button" disabled>OK — Start</button>
@@ -273,6 +279,33 @@ Current File Row Count: 191
             <div class="pickName">YOU</div>
             <div class="pickCard" id="pickYOU">(none)</div>
           </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="gameOverModal" id="gameOverModal" aria-label="Game Over Summary" style="display:none;">
+      <div class="gameOverBackdrop" id="gameOverBackdrop"></div>
+      <div class="gameOverCard">
+        <div class="gameOverTop">
+          <div class="gameOverEyebrow">Match Complete</div>
+          <div class="gameOverTitle">Game Over</div>
+          <div class="gameOverSub" id="gameOverThreshold">Threshold: 10 Plucks Against</div>
+        </div>
+
+        <div class="gameOverWinner" id="gameOverWinner">Winner: YOU</div>
+
+        <div class="gameOverGrid" id="gameOverGrid">
+          <div class="gameOverPlayerRow">
+            <div class="gameOverPlayerName">YOU</div>
+            <div class="gameOverPlayerStats">Earned: 0 • Against: 0 • Diff: 0</div>
+          </div>
+        </div>
+
+        <div class="gameOverFooter" id="gameOverFooter">AI2 reached 10 plucks against and leaves the table.</div>
+
+        <div class="gameOverButtons">
+          <button class="btn" id="newGameBtn" type="button">Start New Game</button>
         </div>
       </div>
     </section>
