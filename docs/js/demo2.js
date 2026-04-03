@@ -1,27 +1,42 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-03 20:35 (-0400)
+// 2026-04-03 17:15 (-0400)
 //
 // FILE
 // docs/js/demo2.js
 //
 // ACTION
-// Full file replacement.
+// Full Rollback 04032026
 //
 // ISSUE
-// The running cumulative Against total was not visible for
-// each player during the match.
+// Full Rollback 04032026
 //
 // ROOT CAUSE
-// gameTotals already tracked cumulative against values, but
-// the page had no render targets and renderHUD did not output them.
+// Per-hand plucks were calculated correctly, but not carried
+// forward into a cumulative match total and not checked against
+// a selected threshold.
 //
 // FIX
-// • Add DOM hookups for ai2Against, ai3Against, youAgainst
-// • Update renderHUD() to display cumulative Against totals
-// • No gameplay changes
-// • No pick changes
-// • No flow changes
+// • Add match length selection using existing HTML buttons
+// • Add cumulative plucks earned / against across hands
+// • Add game-over trigger at end of hand only
+// • Add winner calculation by differential
+// • Add Game Over modal rendering
+// • Add Start New Game reset flow
+//
+// ROW COUNT
+// Previous File Row Count: 803
+// Current File Row Count: 944
+//
+// UNTOUCHED AREAS
+// • Dealer rotation logic
+// • Quota assignment logic
+// • Pick logic
+// • Trump logic
+// • Pluck mechanics
+// • Trick play logic
+// • AI choice logic
+// • Existing rendering structure
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -83,9 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai2TricksEl    = $("ai2Tricks");
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
-  const ai2AgainstEl   = $("ai2Against");
-  const ai3AgainstEl   = $("ai3Against");
-  const youAgainstEl   = $("youAgainst");
 
   // New UI, optional but expected in current HTML
   const gameLen8Btn        = $("gameLen8");
@@ -513,10 +525,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (ai2TricksEl) setText(ai2TricksEl, String(players[0].tricks));
     if (ai3TricksEl) setText(ai3TricksEl, String(players[1].tricks));
     if (youTricksEl) setText(youTricksEl, String(players[2].tricks));
-
-    if (ai2AgainstEl) setText(ai2AgainstEl, String(gameTotals[0].against));
-    if (ai3AgainstEl) setText(ai3AgainstEl, String(gameTotals[1].against));
-    if (youAgainstEl) setText(youAgainstEl, String(gameTotals[2].against));
 
     if (trickNumEl) setText(trickNumEl, String(trickNumber));
     if (trickMaxEl) setText(trickMaxEl, String(TOTAL_TRICKS));
@@ -1561,12 +1569,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   boot();
 });
-
-Test only these:
-
-Pick works
-OK Start works
-all 3 Against counters start at 0
-Against increases after hand end
-Against carries across hands
-Reset and Start New Game return Against to 0
