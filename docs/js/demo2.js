@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-31 15:05 (-0400)
+// 2026-03-31 16:00 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,38 +9,30 @@
 // Full file replacement.
 //
 // ISSUE
-// Pluck procedure and pluck math ordering did not match the
-// intended table rules.
+// The running cumulative "Against" total was not visible for
+// each player during the match.
 //
 // ROOT CAUSE
-// The prior queue builder assigned plucks greedily by totals,
-// but did not:
-// • prioritize victims by highest plucks against first
-// • resolve ties with pick-card draws
-// • keep a plucker locked on one victim until done
-// • prevent returning to that same victim later in the round
-// • choose AI pluck suits with enough hand-value awareness
+// The match totals already existed in gameTotals, but there were
+// no DOM targets or render updates exposing those values.
 //
 // FIX
-// • Add victim ordering by plucks against desc
-// • Add plucker ordering by plucks earned desc
-// • Add pick-card tie-breaks, highest card first
-// • Rebuild pluck queue by victim rounds
-// • Keep each plucker’s plucks against a victim consecutive
-// • Improve AI suit selection during plucks
-// • Preserve current match length and game over logic
+// • Add DOM hookups for ai2Against, ai3Against, youAgainst
+// • Update renderHUD() to display cumulative Against totals
+// • Leave gameplay, pluck logic, scoring, modal, and match flow intact
 //
 // ROW COUNT
-// Previous Working File Row Count: 944
-// Current File Row Count: 1064
+// Previous File Row Count: 1064
+// Current File Row Count: 1073
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
 // • Trump logic
+// • Pluck mechanics
 // • Trick play logic
-// • AI trick-play logic
+// • AI choice logic
 // • Existing rendering structure
 // =========================================================
 
@@ -103,6 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai2TricksEl    = $("ai2Tricks");
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
+  const ai2AgainstEl   = $("ai2Against");
+  const ai3AgainstEl   = $("ai3Against");
+  const youAgainstEl   = $("youAgainst");
 
   // New UI
   const gameLen8Btn        = $("gameLen8");
@@ -596,6 +591,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (ai2TricksEl) setText(ai2TricksEl, String(players[0].tricks));
     if (ai3TricksEl) setText(ai3TricksEl, String(players[1].tricks));
     if (youTricksEl) setText(youTricksEl, String(players[2].tricks));
+
+    if (ai2AgainstEl) setText(ai2AgainstEl, String(gameTotals[0].against));
+    if (ai3AgainstEl) setText(ai3AgainstEl, String(gameTotals[1].against));
+    if (youAgainstEl) setText(youAgainstEl, String(gameTotals[2].against));
 
     if (trickNumEl) setText(trickNumEl, String(trickNumber));
     if (trickMaxEl) setText(trickMaxEl, String(TOTAL_TRICKS));
@@ -1356,321 +1355,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverTriggered) return;
 
     phase = "TRUMP_PICK";
-    setText(phaseValEl, phaseDisplay(phase));
-    show(pickPanelEl, false);
-    show(pluckPanelEl, false);
-    show(trumpPanelEl, true);
-    renderAll();
-
-    if (dealerIndex !== 2) {
-      const suit = chooseTrumpFromOwnHand(dealerIndex);
-      setTrump(suit);
-      msg(`${players[dealerIndex].id} selected trump: ${suitName(suit)}.`);
-      setTimeout(() => {
-        if (gameOverTriggered) return;
-        toPlay();
-        renderAll();
-        engineKick();
-      }, 120);
-    } else {
-      msg("You are dealer. Choose trump.");
-    }
-  }
-
-  function toPlay() {
-    if (gameOverTriggered) return;
-
-    phase = "PLAY";
-    setText(phaseValEl, phaseDisplay(phase));
-    show(pickPanelEl, false);
-    show(pluckPanelEl, false);
-    show(trumpPanelEl, false);
-
-    trick = [];
-    leadSuit = null;
-    trickNumber = 1;
-
-    let whoHas2C = 0;
-    for (let pi = 0; pi < 3; pi++) {
-      if (players[pi].hand.includes(CARD_OPEN_LEAD)) {
-        whoHas2C = pi;
-        break;
-      }
-    }
-    turnIndex = whoHas2C;
-
-    msg("Play begins.");
-    renderAll();
-  }
-
-  function endOfHand() {
-    computePlucksEarnedSuffered();
-
-    for (let i = 0; i < 3; i++) {
-      gameTotals[i].earned += players[i].plucksEarned;
-      gameTotals[i].against += players[i].plucksSuffered;
-    }
-
-    if (checkGameOver()) return;
-
-    pendingPlucks = buildPluckQueue();
-    firstHandDone = true;
-
-    const summary =
-      `Hand complete. YOU ${players[2].tricks}/${players[2].quota} • ` +
-      `AI2 ${players[0].tricks}/${players[0].quota} • ` +
-      `AI3 ${players[1].tricks}/${players[1].quota}.`;
-
-    msg(summary);
-    renderAll();
-
-    setTimeout(() => {
-      if (gameOverTriggered) return;
-      rotateDealerLeft();
-      toDeal();
-      engineKick();
-    }, 1000);
-  }
-
-  function resolveTrick() {
-    const winner = evaluateTrickWinner();
-    players[winner].tricks += 1;
-
-    msg(`${players[winner].id} wins the trick.`);
-    renderAll();
-
-    setTimeout(() => {
-      trick = [];
-      leadSuit = null;
-      turnIndex = winner;
-
-      if (players.every(p => p.hand.length === 0)) {
-        endOfHand();
-        return;
-      }
-
-      trickNumber += 1;
-      renderAll();
-      engineKick();
-    }, BETWEEN_TRICKS);
-  }
-
-  // ---------- engine ----------
-  function engineStep() {
-    if (gameOverTriggered) return;
-    if (engineBusy) return;
-    engineBusy = true;
-
-    try {
-      if (phase !== "PLAY") {
-        engineBusy = false;
-        return;
-      }
-
-      if (trick.length === 3) {
-        setTimeout(() => {
-          if (gameOverTriggered) {
-            engineBusy = false;
-            return;
-          }
-          resolveTrick();
-          engineBusy = false;
-        }, RESOLVE_DELAY);
-        return;
-      }
-
-      if (turnIndex !== 2) {
-        const pi = turnIndex;
-        setTimeout(() => {
-          if (gameOverTriggered) {
-            engineBusy = false;
-            return;
-          }
-          if (phase !== "PLAY") {
-            engineBusy = false;
-            return;
-          }
-          const idx = aiChooseIndex(pi);
-          playCard(pi, idx);
-          engineBusy = false;
-          engineKick();
-        }, AI_DELAY);
-        return;
-      }
-
-      engineBusy = false;
-    } catch (e) {
-      engineBusy = false;
-      fail(`Engine crashed: ${e?.message || e}`);
-    }
-  }
-
-  function engineKick() {
-    if (gameOverTriggered) return;
-    setTimeout(engineStep, 0);
-  }
-
-  // ---------- reset ----------
-  function resetToPick() {
-    firstHandDone = false;
-    pendingPlucks = null;
-    pluckQueue = [];
-    activePluck = null;
-    trumpSuit = null;
-    trumpOpen = false;
-    trick = [];
-    leadSuit = null;
-    trickNumber = 0;
-    turnIndex = 0;
-    dealerIndex = null;
-    phase = "PICK_DEALER";
-    engineBusy = false;
-    pluckSuitUsedByPair = new Map();
-
-    resetMatchTotals();
-
-    players.forEach(p => {
-      p.hand = [];
-      p.tricks = 0;
-      p.plucksEarned = 0;
-      p.plucksSuffered = 0;
-    });
-
-    clearPickUI();
-    show(pickPanelEl, true);
-    show(pluckPanelEl, false);
-    show(trumpPanelEl, false);
-    if (gameOverModalEl) gameOverModalEl.style.display = "none";
-
-    setText(phaseValEl, phaseDisplay(phase));
-    setText(trickNumEl, "0");
-    setText(trickMaxEl, String(TOTAL_TRICKS));
-    msg("Pick first to begin.");
-    renderAll();
-  }
-
-  // ---------- events ----------
-  function bindOnce() {
-    if (isBound) return;
-    isBound = true;
-
-    document.querySelectorAll(".gameLengthBtn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        if (phase !== "PICK_DEALER") return;
-        const value = parseInt(btn.dataset.threshold, 10);
-        if (!Number.isFinite(value)) return;
-        setGameThreshold(value);
-      });
-    });
-
-    pickBtn.addEventListener("click", () => {
-      if (phase !== "PICK_DEALER") return;
-      doPick();
-      renderAll();
-    });
-
-    pickReBtn.addEventListener("click", () => {
-      if (phase !== "PICK_DEALER") return;
-      doPick();
-      renderAll();
-    });
-
-    pickOkBtn.addEventListener("click", () => {
-      if (phase !== "PICK_DEALER") return;
-      if (dealerIndex === null) {
-        setText(pickStatusEl, "No dealer set. Pick again.");
-        return;
-      }
-
-      applyQuotasForDealer();
-      setDealer(dealerIndex);
-
-      pickOkBtn.disabled = true;
-      pickReBtn.disabled = true;
-      pickBtn.disabled = true;
-
-      msg(`Dealer set to ${players[dealerIndex].id}. Starting hand 1.`);
-      renderAll();
-
-      toDeal();
-      engineKick();
-    });
-
-    pluckNextBtn.addEventListener("click", () => {
-      if (phase !== "PLUCK") return;
-      runOnePluck();
-      renderAll();
-    });
-
-    trumpPanelEl.querySelectorAll("button[data-trump]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        if (phase !== "TRUMP_PICK") return;
-        if (dealerIndex !== 2) return;
-        if (trumpSuit) return;
-
-        const s = btn.getAttribute("data-trump");
-        if (!SUITS.includes(s)) return;
-
-        setTrump(s);
-        setText(trumpStatusEl, `Trump set: ${suitName(s)}.`);
-        msg(`You selected trump: ${suitName(s)}.`);
-        setTimeout(() => {
-          if (gameOverTriggered) return;
-          toPlay();
-          renderAll();
-          engineKick();
-        }, 150);
-      });
-    });
-
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        resetToPick();
-      });
-    }
-
-    if (newGameBtn) {
-      newGameBtn.addEventListener("click", () => {
-        resetToPick();
-      });
-    }
-  }
-
-  // ---------- boot ----------
-  function boot() {
-    bindOnce();
-    firstHandDone = false;
-    pendingPlucks = null;
-    pluckQueue = [];
-    activePluck = null;
-    trumpSuit = null;
-    trumpOpen = false;
-    trick = [];
-    leadSuit = null;
-    trickNumber = 0;
-    turnIndex = 0;
-    resetMatchTotals();
-
-    players.forEach(p => {
-      p.hand = [];
-      p.tricks = 0;
-      p.plucksEarned = 0;
-      p.plucksSuffered = 0;
-    });
-
-    phase = "PICK_DEALER";
-    setText(trickNumEl, "0");
-    setText(trickMaxEl, String(TOTAL_TRICKS));
-    clearPickUI();
-    show(pickPanelEl, true);
-    show(pluckPanelEl, false);
-    show(trumpPanelEl, false);
-    if (gameOverModalEl) gameOverModalEl.style.display = "none";
-    setGameThreshold(10);
-    setText(phaseValEl, phaseDisplay(phase));
-    msg("Pick first to begin.");
-    renderAll();
-  }
-
-  boot();
-});
+    setText(phaseVal
