@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-31 16:00 (-0400)
+// 2026-03-31 13:45 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,21 +9,26 @@
 // Full file replacement.
 //
 // ISSUE
-// The running cumulative "Against" total was not visible for
-// each player during the match.
+// The game had no cumulative match-end system tied to plucks
+// against, and no way to use the new 8 / 10 / 12 match-length
+// controls or the new Game Over modal.
 //
 // ROOT CAUSE
-// The match totals already existed in gameTotals, but there were
-// no DOM targets or render updates exposing those values.
+// Per-hand plucks were calculated correctly, but not carried
+// forward into a cumulative match total and not checked against
+// a selected threshold.
 //
 // FIX
-// • Add DOM hookups for ai2Against, ai3Against, youAgainst
-// • Update renderHUD() to display cumulative Against totals
-// • Leave gameplay, pluck logic, scoring, modal, and match flow intact
+// • Add match length selection using existing HTML buttons
+// • Add cumulative plucks earned / against across hands
+// • Add game-over trigger at end of hand only
+// • Add winner calculation by differential
+// • Add Game Over modal rendering
+// • Add Start New Game reset flow
 //
 // ROW COUNT
-// Previous File Row Count: 1064
-// Current File Row Count: 1073
+// Previous File Row Count: 803
+// Current File Row Count: 944
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -95,21 +100,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai2TricksEl    = $("ai2Tricks");
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
-  const ai2AgainstEl   = $("ai2Against");
-  const ai3AgainstEl   = $("ai3Against");
-  const youAgainstEl   = $("youAgainst");
 
-  // New UI
+  // New UI, optional but expected in current HTML
   const gameLen8Btn        = $("gameLen8");
   const gameLen10Btn       = $("gameLen10");
   const gameLen12Btn       = $("gameLen12");
   const gameLengthHintEl   = $("gameLengthHint");
 
-  const gameOverModalEl     = $("gameOverModal");
-  const gameOverThresholdEl = $("gameOverThreshold");
-  const gameOverBodyEl      = $("gameOverBody");
-  const gameOverFooterEl    = $("gameOverFooter");
-  const newGameBtn          = $("newGameBtn");
+  const gameOverModalEl    = $("gameOverModal");
+  const gameOverThresholdEl= $("gameOverThreshold");
+  const gameOverBodyEl     = $("gameOverBody");
+  const gameOverFooterEl   = $("gameOverFooter");
+  const newGameBtn         = $("newGameBtn");
 
   const required = [
     ["youHand", youHandEl],
@@ -169,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let phase = "PICK_DEALER";
   let trumpSuit = null;
   let trumpOpen = false;
-  let trick = [];
+  let trick = [];              // [{ playerIndex, cardStr }]
   let leadSuit = null;
   let trickNumber = 0;
   let turnIndex = 0;
@@ -305,6 +307,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- position helpers ----------
+  // Correct seat math for this table:
+  // AI2 = 0, AI3 = 1, YOU = 2
+  // left pass order: YOU -> AI2 -> AI3 -> YOU
   function leftOf(i)  { return (i + 1) % 3; }
   function rightOf(i) { return (i + 2) % 3; }
 
@@ -384,75 +389,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const c = parseCard(cs);
     if (isTrumpCard(cs)) return 10000 + c.value;
     return c.value;
-  }
-
-  // ---------- pluck ordering helpers ----------
-  function drawPickCardsForOrder(indices) {
-    if (indices.length <= 1) {
-      return { ordered: indices.slice(), text: "" };
-    }
-
-    while (true) {
-      const deck = shuffle(makeDeck51()).filter(c => !isJoker(c));
-      const draws = indices.map((pi, idx) => ({
-        pi,
-        card: deck[idx],
-        value: pickRankValue(deck[idx])
-      }));
-
-      const valueSet = new Set(draws.map(d => d.value));
-      if (valueSet.size !== draws.length) continue;
-
-      draws.sort((a, b) => b.value - a.value);
-
-      const text = draws
-        .map(d => `${players[d.pi].id} ${d.card}`)
-        .join(" • ");
-
-      return {
-        ordered: draws.map(d => d.pi),
-        text
-      };
-    }
-  }
-
-  function sortWithTieBreaker(indices, scoreFn, label) {
-    const groups = new Map();
-
-    for (const pi of indices) {
-      const key = scoreFn(pi);
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(pi);
-    }
-
-    const scores = [...groups.keys()].sort((a, b) => b - a);
-    const ordered = [];
-    const messages = [];
-
-    for (const score of scores) {
-      const group = groups.get(score);
-      if (group.length === 1) {
-        ordered.push(group[0]);
-      } else {
-        const result = drawPickCardsForOrder(group);
-        ordered.push(...result.ordered);
-        if (result.text) {
-          messages.push(`${label} tie break: ${result.text}.`);
-        }
-      }
-    }
-
-    return { ordered, messages };
-  }
-
-  function getVictimOrder() {
-    const victims = [0, 1, 2].filter(i => players[i].plucksSuffered > 0);
-    return sortWithTieBreaker(victims, (i) => players[i].plucksSuffered, "Victim");
-  }
-
-  function getPluckerOrder() {
-    const pluckers = [0, 1, 2].filter(i => players[i].plucksEarned > 0);
-    return sortWithTieBreaker(pluckers, (i) => players[i].plucksEarned, "Plucker");
   }
 
   // ---------- pluck messaging ----------
@@ -591,10 +527,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (ai2TricksEl) setText(ai2TricksEl, String(players[0].tricks));
     if (ai3TricksEl) setText(ai3TricksEl, String(players[1].tricks));
     if (youTricksEl) setText(youTricksEl, String(players[2].tricks));
-
-    if (ai2AgainstEl) setText(ai2AgainstEl, String(gameTotals[0].against));
-    if (ai3AgainstEl) setText(ai3AgainstEl, String(gameTotals[1].against));
-    if (youAgainstEl) setText(youAgainstEl, String(gameTotals[2].against));
 
     if (trickNumEl) setText(trickNumEl, String(trickNumber));
     if (trickMaxEl) setText(trickMaxEl, String(TOTAL_TRICKS));
@@ -953,67 +885,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function pluckerOrder() {
+    const tie = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
+    return [0,1,2].slice().sort((a,b) => {
+      const da = players[a].plucksEarned, db = players[b].plucksEarned;
+      if (db !== da) return db - da;
+      return tie.indexOf(a) - tie.indexOf(b);
+    }).filter(i => players[i].plucksEarned > 0);
+  }
+
+  function victimOrder() {
+    const tie = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
+    return [0,1,2].slice().sort((a,b) => {
+      const da = players[a].plucksSuffered, db = players[b].plucksSuffered;
+      if (db !== da) return db - da;
+      return tie.indexOf(a) - tie.indexOf(b);
+    }).filter(i => players[i].plucksSuffered > 0);
+  }
+
   function buildPluckQueue() {
-    const queue = [];
-    const victimResult = getVictimOrder();
-    const pluckerResult = getPluckerOrder();
+    const q = [];
+    const pluckers = pluckerOrder();
+    const victims = victimOrder();
+    const earned = new Map(pluckers.map(i => [i, players[i].plucksEarned]));
+    const suffered = new Map(victims.map(i => [i, players[i].plucksSuffered]));
 
-    const victims = victimResult.ordered;
-    const pluckers = pluckerResult.ordered;
-
-    const remainingEarned = new Map();
     for (const plucker of pluckers) {
-      remainingEarned.set(plucker, players[plucker].plucksEarned);
-    }
+      while ((earned.get(plucker) || 0) > 0) {
+        const victim = victims
+          .filter(v => (suffered.get(v) || 0) > 0)
+          .sort((a,b) => (suffered.get(b) || 0) - (suffered.get(a) || 0))[0];
+        if (victim === undefined) break;
 
-    const tieMsgs = [...victimResult.messages, ...pluckerResult.messages];
-    if (tieMsgs.length) {
-      msg(tieMsgs.join(" "));
-    }
-
-    for (const victim of victims) {
-      let victimNeed = players[victim].plucksSuffered;
-      if (victimNeed <= 0) continue;
-
-      for (const plucker of pluckers) {
-        let earnedLeft = remainingEarned.get(plucker) || 0;
-        if (earnedLeft <= 0) continue;
-        if (victimNeed <= 0) break;
-
-        const assignCount = Math.min(earnedLeft, victimNeed);
-
-        for (let i = 0; i < assignCount; i++) {
-          queue.push({ pluckerIndex: plucker, pluckeeIndex: victim });
-        }
-
-        remainingEarned.set(plucker, earnedLeft - assignCount);
-        victimNeed -= assignCount;
+        q.push({ pluckerIndex: plucker, pluckeeIndex: victim });
+        earned.set(plucker, (earned.get(plucker) || 0) - 1);
+        suffered.set(victim, (suffered.get(victim) || 0) - 1);
       }
     }
-
-    return queue;
+    return q;
   }
 
   function pairKey(a,b) {
     return `${a}-${b}`;
   }
 
-  function getSuitCards(pi, suit) {
-    return players[pi].hand
-      .filter(c => !isJoker(c) && c.slice(-1) === suit)
-      .sort((a, b) => (RANK_VALUE[a.slice(0,-1)] || 99) - (RANK_VALUE[b.slice(0,-1)] || 99));
-  }
-
   function lowestOfSuitNonJoker(pi, suit) {
-    const cards = getSuitCards(pi, suit);
-    return cards.length ? cards[0] : null;
+    const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
+    if (!cards.length) return null;
+    cards.sort((a,b) => (RANK_VALUE[a.slice(0,-1)] || 99) - (RANK_VALUE[b.slice(0,-1)] || 99));
+    return cards[0];
   }
 
   function highestOfSuitNonJoker(pi, suit) {
-    const cards = players[pi].hand
-      .filter(c => !isJoker(c) && c.slice(-1) === suit)
-      .sort((a, b) => (RANK_VALUE[b.slice(0,-1)] || 0) - (RANK_VALUE[a.slice(0,-1)] || 0));
-    return cards.length ? cards[0] : null;
+    const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
+    if (!cards.length) return null;
+    cards.sort((a,b) => (RANK_VALUE[b.slice(0,-1)] || 0) - (RANK_VALUE[a.slice(0,-1)] || 0));
+    return cards[0];
   }
 
   function removeFromHand(pi, cardStr) {
@@ -1054,45 +981,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return { ok:true, giveLow, takeHigh };
   }
 
-  function getSuitPluckCost(pi, suit) {
-    const cards = getSuitCards(pi, suit);
-    if (!cards.length) return Infinity;
-
-    const values = cards.map(c => RANK_VALUE[c.slice(0,-1)] || 0);
-    const low = values[0];
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    const highCount = values.filter(v => v >= 11).length;
-    const allHigh = values.every(v => v >= 11);
-
-    let cost = low * 10;
-    cost += avg;
-    cost += highCount * 6;
-    if (values.length === 1) cost += 40;
-    if (values.length === 2) cost += 15;
-    if (allHigh) cost += 20;
-
-    return cost;
-  }
-
-  function chooseBestPluckSuit(pluckerI, pluckeeI) {
-    const suits = availablePluckSuits(pluckerI, pluckeeI);
-    if (!suits.length) return null;
-
-    let bestSuit = suits[0];
-    let bestCost = getSuitPluckCost(pluckerI, bestSuit);
-
-    for (let i = 1; i < suits.length; i++) {
-      const suit = suits[i];
-      const cost = getSuitPluckCost(pluckerI, suit);
-      if (cost < bestCost) {
-        bestCost = cost;
-        bestSuit = suit;
-      }
-    }
-
-    return bestSuit;
-  }
-
   function runOnePluck() {
     if (phase !== "PLUCK") return;
     if (!pluckQueue.length) return;
@@ -1121,7 +1009,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const bestSuit = chooseBestPluckSuit(pluckerI, pluckeeI);
+    let bestSuit = suits[0];
+    let bestVal = 999;
+    for (const s of suits) {
+      const give = lowestOfSuitNonJoker(pluckerI, s);
+      const v = give ? (RANK_VALUE[give.slice(0,-1)] || 99) : 99;
+      if (v < bestVal) {
+        bestVal = v;
+        bestSuit = s;
+      }
+    }
+
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
     if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
 
@@ -1355,4 +1253,321 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverTriggered) return;
 
     phase = "TRUMP_PICK";
-    setText(phaseVal
+    setText(phaseValEl, phaseDisplay(phase));
+    show(pickPanelEl, false);
+    show(pluckPanelEl, false);
+    show(trumpPanelEl, true);
+    renderAll();
+
+    if (dealerIndex !== 2) {
+      const suit = chooseTrumpFromOwnHand(dealerIndex);
+      setTrump(suit);
+      msg(`${players[dealerIndex].id} selected trump: ${suitName(suit)}.`);
+      setTimeout(() => {
+        if (gameOverTriggered) return;
+        toPlay();
+        renderAll();
+        engineKick();
+      }, 120);
+    } else {
+      msg("You are dealer. Choose trump.");
+    }
+  }
+
+  function toPlay() {
+    if (gameOverTriggered) return;
+
+    phase = "PLAY";
+    setText(phaseValEl, phaseDisplay(phase));
+    show(pickPanelEl, false);
+    show(pluckPanelEl, false);
+    show(trumpPanelEl, false);
+
+    trick = [];
+    leadSuit = null;
+    trickNumber = 1;
+
+    let whoHas2C = 0;
+    for (let pi = 0; pi < 3; pi++) {
+      if (players[pi].hand.includes(CARD_OPEN_LEAD)) {
+        whoHas2C = pi;
+        break;
+      }
+    }
+    turnIndex = whoHas2C;
+
+    msg("Play begins.");
+    renderAll();
+  }
+
+  function endOfHand() {
+    computePlucksEarnedSuffered();
+
+    for (let i = 0; i < 3; i++) {
+      gameTotals[i].earned += players[i].plucksEarned;
+      gameTotals[i].against += players[i].plucksSuffered;
+    }
+
+    if (checkGameOver()) return;
+
+    pendingPlucks = buildPluckQueue();
+    firstHandDone = true;
+
+    const summary =
+      `Hand complete. YOU ${players[2].tricks}/${players[2].quota} • ` +
+      `AI2 ${players[0].tricks}/${players[0].quota} • ` +
+      `AI3 ${players[1].tricks}/${players[1].quota}.`;
+
+    msg(summary);
+    renderAll();
+
+    setTimeout(() => {
+      if (gameOverTriggered) return;
+      rotateDealerLeft();
+      toDeal();
+      engineKick();
+    }, 1000);
+  }
+
+  function resolveTrick() {
+    const winner = evaluateTrickWinner();
+    players[winner].tricks += 1;
+
+    msg(`${players[winner].id} wins the trick.`);
+    renderAll();
+
+    setTimeout(() => {
+      trick = [];
+      leadSuit = null;
+      turnIndex = winner;
+
+      if (players.every(p => p.hand.length === 0)) {
+        endOfHand();
+        return;
+      }
+
+      trickNumber += 1;
+      renderAll();
+      engineKick();
+    }, BETWEEN_TRICKS);
+  }
+
+  // ---------- engine ----------
+  function engineStep() {
+    if (gameOverTriggered) return;
+    if (engineBusy) return;
+    engineBusy = true;
+
+    try {
+      if (phase !== "PLAY") {
+        engineBusy = false;
+        return;
+      }
+
+      if (trick.length === 3) {
+        setTimeout(() => {
+          if (gameOverTriggered) {
+            engineBusy = false;
+            return;
+          }
+          resolveTrick();
+          engineBusy = false;
+        }, RESOLVE_DELAY);
+        return;
+      }
+
+      if (turnIndex !== 2) {
+        const pi = turnIndex;
+        setTimeout(() => {
+          if (gameOverTriggered) {
+            engineBusy = false;
+            return;
+          }
+          if (phase !== "PLAY") {
+            engineBusy = false;
+            return;
+          }
+          const idx = aiChooseIndex(pi);
+          playCard(pi, idx);
+          engineBusy = false;
+          engineKick();
+        }, AI_DELAY);
+        return;
+      }
+
+      engineBusy = false;
+    } catch (e) {
+      engineBusy = false;
+      fail(`Engine crashed: ${e?.message || e}`);
+    }
+  }
+
+  function engineKick() {
+    if (gameOverTriggered) return;
+    setTimeout(engineStep, 0);
+  }
+
+  // ---------- reset ----------
+  function resetToPick() {
+    firstHandDone = false;
+    pendingPlucks = null;
+    pluckQueue = [];
+    activePluck = null;
+    trumpSuit = null;
+    trumpOpen = false;
+    trick = [];
+    leadSuit = null;
+    trickNumber = 0;
+    turnIndex = 0;
+    dealerIndex = null;
+    phase = "PICK_DEALER";
+    engineBusy = false;
+    pluckSuitUsedByPair = new Map();
+
+    resetMatchTotals();
+
+    players.forEach(p => {
+      p.hand = [];
+      p.tricks = 0;
+      p.plucksEarned = 0;
+      p.plucksSuffered = 0;
+    });
+
+    clearPickUI();
+    show(pickPanelEl, true);
+    show(pluckPanelEl, false);
+    show(trumpPanelEl, false);
+    if (gameOverModalEl) gameOverModalEl.style.display = "none";
+
+    setText(phaseValEl, phaseDisplay(phase));
+    setText(trickNumEl, "0");
+    setText(trickMaxEl, String(TOTAL_TRICKS));
+    msg("Pick first to begin.");
+    renderAll();
+  }
+
+  // ---------- events ----------
+  function bindOnce() {
+    if (isBound) return;
+    isBound = true;
+
+    document.querySelectorAll(".gameLengthBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (phase !== "PICK_DEALER") return;
+        const value = parseInt(btn.dataset.threshold, 10);
+        if (!Number.isFinite(value)) return;
+        setGameThreshold(value);
+      });
+    });
+
+    pickBtn.addEventListener("click", () => {
+      if (phase !== "PICK_DEALER") return;
+      doPick();
+      renderAll();
+    });
+
+    pickReBtn.addEventListener("click", () => {
+      if (phase !== "PICK_DEALER") return;
+      doPick();
+      renderAll();
+    });
+
+    pickOkBtn.addEventListener("click", () => {
+      if (phase !== "PICK_DEALER") return;
+      if (dealerIndex === null) {
+        setText(pickStatusEl, "No dealer set. Pick again.");
+        return;
+      }
+
+      applyQuotasForDealer();
+      setDealer(dealerIndex);
+
+      pickOkBtn.disabled = true;
+      pickReBtn.disabled = true;
+      pickBtn.disabled = true;
+
+      msg(`Dealer set to ${players[dealerIndex].id}. Starting hand 1.`);
+      renderAll();
+
+      toDeal();
+      engineKick();
+    });
+
+    pluckNextBtn.addEventListener("click", () => {
+      if (phase !== "PLUCK") return;
+      runOnePluck();
+      renderAll();
+    });
+
+    trumpPanelEl.querySelectorAll("button[data-trump]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (phase !== "TRUMP_PICK") return;
+        if (dealerIndex !== 2) return;
+        if (trumpSuit) return;
+
+        const s = btn.getAttribute("data-trump");
+        if (!SUITS.includes(s)) return;
+
+        setTrump(s);
+        setText(trumpStatusEl, `Trump set: ${suitName(s)}.`);
+        msg(`You selected trump: ${suitName(s)}.`);
+        setTimeout(() => {
+          if (gameOverTriggered) return;
+          toPlay();
+          renderAll();
+          engineKick();
+        }, 150);
+      });
+    });
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        resetToPick();
+      });
+    }
+
+    if (newGameBtn) {
+      newGameBtn.addEventListener("click", () => {
+        resetToPick();
+      });
+    }
+  }
+
+  // ---------- boot ----------
+  function boot() {
+    bindOnce();
+    firstHandDone = false;
+    pendingPlucks = null;
+    pluckQueue = [];
+    activePluck = null;
+    trumpSuit = null;
+    trumpOpen = false;
+    trick = [];
+    leadSuit = null;
+    trickNumber = 0;
+    turnIndex = 0;
+    resetMatchTotals();
+
+    players.forEach(p => {
+      p.hand = [];
+      p.tricks = 0;
+      p.plucksEarned = 0;
+      p.plucksSuffered = 0;
+    });
+
+    phase = "PICK_DEALER";
+    setText(trickNumEl, "0");
+    setText(trickMaxEl, String(TOTAL_TRICKS));
+    clearPickUI();
+    show(pickPanelEl, true);
+    show(pluckPanelEl, false);
+    show(trumpPanelEl, false);
+    if (gameOverModalEl) gameOverModalEl.style.display = "none";
+    setGameThreshold(10);
+    setText(phaseValEl, phaseDisplay(phase));
+    msg("Pick first to begin.");
+    renderAll();
+  }
+
+  boot();
+});
