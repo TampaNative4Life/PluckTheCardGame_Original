@@ -1,49 +1,44 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-28 19:35 (-0400)
+// 2026-03-31 13:45 (-0400)
 //
 // FILE
-// New Rollback point 3/29/2026
+// docs/js/demo2.js
 //
 // ACTION
-// New Rollback point 3/29/2026
+// Full file replacement.
 //
 // ISSUE
-// Pluck messages exposed hidden AI-to-AI card exchange details,
-// and the user could not see how many plucks they still had,
-// or which players owed those plucks.
+// The game had no cumulative match-end system tied to plucks
+// against, and no way to use the new 8 / 10 / 12 match-length
+// controls or the new Game Over modal.
 //
 // ROOT CAUSE
-// The current pluck messaging always showed exact exchanged cards,
-// regardless of whether the user was involved. The code also did
-// not summarize the user's remaining plucks in the main message box.
+// Per-hand plucks were calculated correctly, but not carried
+// forward into a cumulative match total and not checked against
+// a selected threshold.
 //
 // FIX
-// • Hide exact pluck card details for AI-to-AI plucks
-// • Show full pluck detail only when YOU are involved
-// • Show user's remaining pluck count in the same message box
-// • Show which players owe those remaining plucks
-// • Leave all pluck mechanics, dealer rotation, quotas, HTML,
-//   CSS, and trick logic unchanged
-//
-// MESSAGE RULES
-// • AI vs AI: "AI3 plucked AI2."
-// • You pluck AI: "You plucked AI2. Gave 3C, received KC."
-// • AI plucks you: "AI2 plucked you. You gave KC, received 3C."
-// • Same box also shows: "Your plucks: 3. AI2 owes 2, AI3 owes 1."
+// • Add match length selection using existing HTML buttons
+// • Add cumulative plucks earned / against across hands
+// • Add game-over trigger at end of hand only
+// • Add winner calculation by differential
+// • Add Game Over modal rendering
+// • Add Start New Game reset flow
 //
 // ROW COUNT
-// Previous File Row Count: 743
-// Current File Row Count: 803
+// Previous File Row Count: 803
+// Current File Row Count: 944
 //
 // UNTOUCHED AREAS
-// • No HTML changes
-// • No CSS changes
-// • No dealer rotation changes
-// • No quota logic changes
-// • No Pick logic changes
-// • No Trump logic changes
-// • No Trick play logic changes
+// • Dealer rotation logic
+// • Quota assignment logic
+// • Pick logic
+// • Trump logic
+// • Pluck mechanics
+// • Trick play logic
+// • AI choice logic
+// • Existing rendering structure
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -105,6 +100,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai2TricksEl    = $("ai2Tricks");
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
+
+  // New UI, optional but expected in current HTML
+  const gameLen8Btn        = $("gameLen8");
+  const gameLen10Btn       = $("gameLen10");
+  const gameLen12Btn       = $("gameLen12");
+  const gameLengthHintEl   = $("gameLengthHint");
+
+  const gameOverModalEl    = $("gameOverModal");
+  const gameOverThresholdEl= $("gameOverThreshold");
+  const gameOverBodyEl     = $("gameOverBody");
+  const gameOverFooterEl   = $("gameOverFooter");
+  const newGameBtn         = $("newGameBtn");
 
   const required = [
     ["youHand", youHandEl],
@@ -176,6 +183,129 @@ document.addEventListener("DOMContentLoaded", () => {
   let engineBusy = false;
   let isBound = false;
 
+  // ---------- match state ----------
+  let GAME_THRESHOLD = 10;
+  let gameOverTriggered = false;
+
+  const gameTotals = [
+    { earned: 0, against: 0 },
+    { earned: 0, against: 0 },
+    { earned: 0, against: 0 }
+  ];
+
+  function resetMatchTotals() {
+    for (let i = 0; i < 3; i++) {
+      gameTotals[i].earned = 0;
+      gameTotals[i].against = 0;
+    }
+    gameOverTriggered = false;
+  }
+
+  function playerDiff(pi) {
+    return gameTotals[pi].earned - gameTotals[pi].against;
+  }
+
+  function setGameThreshold(threshold) {
+    GAME_THRESHOLD = threshold;
+
+    const btns = [gameLen8Btn, gameLen10Btn, gameLen12Btn].filter(Boolean);
+    for (const btn of btns) {
+      const isActive = Number(btn.dataset.threshold) === threshold;
+      btn.classList.toggle("activeLength", isActive);
+      btn.classList.toggle("btn-secondary", !isActive);
+    }
+
+    if (gameLengthHintEl) {
+      gameLengthHintEl.textContent = `Game ends when a player reaches ${GAME_THRESHOLD} plucks against.`;
+    }
+  }
+
+  function getWinnerIndex() {
+    let winner = 0;
+    let bestDiff = playerDiff(0);
+    let bestAgainst = gameTotals[0].against;
+    let bestEarned = gameTotals[0].earned;
+
+    for (let i = 1; i < 3; i++) {
+      const diff = playerDiff(i);
+      const against = gameTotals[i].against;
+      const earned = gameTotals[i].earned;
+
+      if (
+        diff > bestDiff ||
+        (diff === bestDiff && against < bestAgainst) ||
+        (diff === bestDiff && against === bestAgainst && earned > bestEarned)
+      ) {
+        winner = i;
+        bestDiff = diff;
+        bestAgainst = against;
+        bestEarned = earned;
+      }
+    }
+    return winner;
+  }
+
+  function showGameOver(loserIndex) {
+    gameOverTriggered = true;
+    phase = "GAME_OVER";
+    renderAll();
+
+    show(pickPanelEl, false);
+    show(pluckPanelEl, false);
+    show(trumpPanelEl, false);
+
+    const winnerIndex = getWinnerIndex();
+
+    if (!gameOverModalEl || !gameOverBodyEl || !gameOverFooterEl || !gameOverThresholdEl) {
+      msg(
+        `Game Over. ${players[loserIndex].id} reached ${GAME_THRESHOLD} plucks against. ` +
+        `Winner: ${players[winnerIndex].id}.`
+      );
+      return;
+    }
+
+    gameOverThresholdEl.textContent = `Threshold: ${GAME_THRESHOLD} Plucks Against`;
+    gameOverBodyEl.innerHTML = "";
+
+    const winnerLine = document.createElement("div");
+    winnerLine.className = "winnerLine";
+    winnerLine.textContent = `WINNER: ${players[winnerIndex].id}`;
+    gameOverBodyEl.appendChild(winnerLine);
+
+    for (let i = 0; i < 3; i++) {
+      const row = document.createElement("div");
+      row.className = "playerRow" + (i === loserIndex ? " loser" : "");
+
+      const name = document.createElement("div");
+      name.className = "playerName";
+      name.textContent = players[i].id + (i === loserIndex ? " OUT" : "");
+
+      const stats = document.createElement("div");
+      stats.className = "playerStats";
+      stats.textContent =
+        `Earned: ${gameTotals[i].earned} • Against: ${gameTotals[i].against} • Diff: ${playerDiff(i)}`;
+
+      row.appendChild(name);
+      row.appendChild(stats);
+      gameOverBodyEl.appendChild(row);
+    }
+
+    gameOverFooterEl.textContent =
+      `${players[loserIndex].id} reached ${GAME_THRESHOLD} and leaves the table.`;
+
+    gameOverModalEl.style.display = "flex";
+  }
+
+  function checkGameOver() {
+    for (let i = 0; i < 3; i++) {
+      if (gameTotals[i].against >= GAME_THRESHOLD) {
+        showGameOver(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
   // ---------- position helpers ----------
   // Correct seat math for this table:
   // AI2 = 0, AI3 = 1, YOU = 2
@@ -186,6 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function phaseDisplay(p) {
     if (p === "PICK_DEALER") return "PICK";
     if (p === "TRUMP_PICK") return "TRUMP";
+    if (p === "GAME_OVER") return "GAME OVER";
     return p.replaceAll("_", " ");
   }
 
@@ -403,7 +534,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (turnBannerEl) {
       const who = phase === "PLAY"
         ? (turnIndex === 2 ? "YOUR TURN" : `${players[turnIndex].id} TURN`)
-        : "—";
+        : phase === "GAME_OVER"
+          ? "MATCH COMPLETE"
+          : "—";
       turnBannerEl.textContent = `Phase: ${phaseDisplay(phase)} • ${who} • Trick ${trickNumber}/${TOTAL_TRICKS}`;
     }
   }
@@ -525,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    const yourTurn = phase === "PLAY" && turnIndex === 2;
+    const yourTurn = phase === "PLAY" && turnIndex === 2 && !gameOverTriggered;
     const legal = yourTurn ? legalCardsFor(2) : [];
 
     for (const item of mapped) {
@@ -1068,6 +1201,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- phase transitions ----------
   function toDeal() {
+    if (gameOverTriggered) return;
+
     phase = "DEAL";
     setText(phaseValEl, phaseDisplay(phase));
     msg("Dealing...");
@@ -1079,12 +1214,14 @@ document.addEventListener("DOMContentLoaded", () => {
       pendingPlucks = null;
       activePluck = null;
       setTimeout(() => {
+        if (gameOverTriggered) return;
         toPluck();
         renderAll();
       }, 60);
     } else {
       pendingPlucks = null;
       setTimeout(() => {
+        if (gameOverTriggered) return;
         toTrumpPick();
         renderAll();
       }, 60);
@@ -1092,6 +1229,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toPluck() {
+    if (gameOverTriggered) return;
+
     phase = "PLUCK";
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -1103,6 +1242,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activePluck && activePluck.pluckerIndex === 2) return;
 
     setTimeout(() => {
+      if (gameOverTriggered) return;
       if (phase === "PLUCK" && (!activePluck || activePluck.pluckerIndex !== 2)) {
         runOnePluck();
       }
@@ -1110,6 +1250,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toTrumpPick() {
+    if (gameOverTriggered) return;
+
     phase = "TRUMP_PICK";
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -1122,6 +1264,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTrump(suit);
       msg(`${players[dealerIndex].id} selected trump: ${suitName(suit)}.`);
       setTimeout(() => {
+        if (gameOverTriggered) return;
         toPlay();
         renderAll();
         engineKick();
@@ -1132,6 +1275,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toPlay() {
+    if (gameOverTriggered) return;
+
     phase = "PLAY";
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -1157,6 +1302,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function endOfHand() {
     computePlucksEarnedSuffered();
+
+    for (let i = 0; i < 3; i++) {
+      gameTotals[i].earned += players[i].plucksEarned;
+      gameTotals[i].against += players[i].plucksSuffered;
+    }
+
+    if (checkGameOver()) return;
+
     pendingPlucks = buildPluckQueue();
     firstHandDone = true;
 
@@ -1169,6 +1322,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAll();
 
     setTimeout(() => {
+      if (gameOverTriggered) return;
       rotateDealerLeft();
       toDeal();
       engineKick();
@@ -1200,6 +1354,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- engine ----------
   function engineStep() {
+    if (gameOverTriggered) return;
     if (engineBusy) return;
     engineBusy = true;
 
@@ -1211,6 +1366,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (trick.length === 3) {
         setTimeout(() => {
+          if (gameOverTriggered) {
+            engineBusy = false;
+            return;
+          }
           resolveTrick();
           engineBusy = false;
         }, RESOLVE_DELAY);
@@ -1220,6 +1379,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (turnIndex !== 2) {
         const pi = turnIndex;
         setTimeout(() => {
+          if (gameOverTriggered) {
+            engineBusy = false;
+            return;
+          }
           if (phase !== "PLAY") {
             engineBusy = false;
             return;
@@ -1240,13 +1403,62 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function engineKick() {
+    if (gameOverTriggered) return;
     setTimeout(engineStep, 0);
+  }
+
+  // ---------- reset ----------
+  function resetToPick() {
+    firstHandDone = false;
+    pendingPlucks = null;
+    pluckQueue = [];
+    activePluck = null;
+    trumpSuit = null;
+    trumpOpen = false;
+    trick = [];
+    leadSuit = null;
+    trickNumber = 0;
+    turnIndex = 0;
+    dealerIndex = null;
+    phase = "PICK_DEALER";
+    engineBusy = false;
+    pluckSuitUsedByPair = new Map();
+
+    resetMatchTotals();
+
+    players.forEach(p => {
+      p.hand = [];
+      p.tricks = 0;
+      p.plucksEarned = 0;
+      p.plucksSuffered = 0;
+    });
+
+    clearPickUI();
+    show(pickPanelEl, true);
+    show(pluckPanelEl, false);
+    show(trumpPanelEl, false);
+    if (gameOverModalEl) gameOverModalEl.style.display = "none";
+
+    setText(phaseValEl, phaseDisplay(phase));
+    setText(trickNumEl, "0");
+    setText(trickMaxEl, String(TOTAL_TRICKS));
+    msg("Pick first to begin.");
+    renderAll();
   }
 
   // ---------- events ----------
   function bindOnce() {
     if (isBound) return;
     isBound = true;
+
+    document.querySelectorAll(".gameLengthBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (phase !== "PICK_DEALER") return;
+        const value = parseInt(btn.dataset.threshold, 10);
+        if (!Number.isFinite(value)) return;
+        setGameThreshold(value);
+      });
+    });
 
     pickBtn.addEventListener("click", () => {
       if (phase !== "PICK_DEALER") return;
@@ -1300,6 +1512,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setText(trumpStatusEl, `Trump set: ${suitName(s)}.`);
         msg(`You selected trump: ${suitName(s)}.`);
         setTimeout(() => {
+          if (gameOverTriggered) return;
           toPlay();
           renderAll();
           engineKick();
@@ -1309,33 +1522,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (resetBtn) {
       resetBtn.addEventListener("click", () => {
-        firstHandDone = false;
-        pendingPlucks = null;
-        pluckQueue = [];
-        activePluck = null;
-        trumpSuit = null;
-        trumpOpen = false;
+        resetToPick();
+      });
+    }
 
-        players.forEach(p => {
-          p.hand = [];
-          p.tricks = 0;
-          p.plucksEarned = 0;
-          p.plucksSuffered = 0;
-        });
-
-        trick = [];
-        leadSuit = null;
-        trickNumber = 0;
-        turnIndex = 0;
-
-        clearPickUI();
-        phase = "PICK_DEALER";
-        show(pickPanelEl, true);
-        show(pluckPanelEl, false);
-        show(trumpPanelEl, false);
-        setText(phaseValEl, phaseDisplay(phase));
-        msg("Reset. Pick first to begin.");
-        renderAll();
+    if (newGameBtn) {
+      newGameBtn.addEventListener("click", () => {
+        resetToPick();
       });
     }
   }
@@ -1353,6 +1546,7 @@ document.addEventListener("DOMContentLoaded", () => {
     leadSuit = null;
     trickNumber = 0;
     turnIndex = 0;
+    resetMatchTotals();
 
     players.forEach(p => {
       p.hand = [];
@@ -1368,6 +1562,8 @@ document.addEventListener("DOMContentLoaded", () => {
     show(pickPanelEl, true);
     show(pluckPanelEl, false);
     show(trumpPanelEl, false);
+    if (gameOverModalEl) gameOverModalEl.style.display = "none";
+    setGameThreshold(10);
     setText(phaseValEl, phaseDisplay(phase));
     msg("Pick first to begin.");
     renderAll();
