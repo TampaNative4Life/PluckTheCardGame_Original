@@ -1,34 +1,45 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-03-21 20:45 (-0400)
+2026-03-31 13:05 (-0400)
 
 FILE
 docs/demo2.html
 
 ACTION
-New Rollback point 03/29/2026
+Full file replacement.
 
 PURPOSE
-New Rollback point 03/29/2026
+Preserve the current working Demo 2 HTML while adding:
+1. Match length selection controls
+2. Hidden Game Over modal markup
 
 FIXES / CHANGES
-• Removes second duplicated HTML document
-• Removes duplicated script tag
-• Preserves Demo 2 HUD
-• Preserves Demo 2 table layout
-• Preserves AI hand rows
-• Preserves pluck panel
-• Preserves pick panel
-• Keeps script tag at end of body
-
-DEPENDENCIES
-• docs/css/style.css
-• docs/js/demo2.js
+• Keeps current rollback page structure
+• Keeps current DOM IDs used by demo2.js
+• Adds game length selector inside Pick panel
+• Adds hidden Game Over modal before script tag
 
 ROW COUNT
-Previous File Row Count: corrupted / duplicated
-Current File Row Count: 191
+Previous File Row Count: 191
+Current File Row Count: 219
+
+UNTOUCHED AREAS
+• Header
+• HUD
+• Table layout
+• AI hand containers
+• Trick area
+• Your hand panel
+• Trump panel
+• Pluck panel
+• Existing pick controls
+
+FAILURE TEST
+• Page should visually match current working rollback
+• No raw HTML fallback
+• No layout shift on table
+• No change in gameplay from HTML alone
 =========================================================
 -->
 <!doctype html>
@@ -250,14 +261,28 @@ Current File Row Count: 191
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Pick First — Choose Dealer</div>
         <div class="overlaySub">Each player draws 1 card. Lowest card becomes Dealer. Ties re-pick.</div>
-        <div class="overlayButtons">
+
+        <div class="overlayStatus" style="margin-top:10px;">
+          <strong>Match Length:</strong>
+          <span id="gameLengthHint">Game ends when a player reaches 10 plucks against.</span>
+        </div>
+
+        <div class="overlayButtons" style="margin-top:10px;">
+          <button class="btn btn-secondary gameLengthBtn" id="gameLen8" type="button" data-threshold="8">Short, 8</button>
+          <button class="btn gameLengthBtn activeLength" id="gameLen10" type="button" data-threshold="10">Standard, 10</button>
+          <button class="btn btn-secondary gameLengthBtn" id="gameLen12" type="button" data-threshold="12">Long, 12</button>
+        </div>
+
+        <div class="overlayButtons" style="margin-top:12px;">
           <button class="btn" id="pickBtn" type="button">Pick</button>
           <button class="btn btn-secondary" id="pickOkBtn" type="button" disabled>OK — Start</button>
           <button class="btn btn-secondary" id="pickReBtn" type="button" disabled>Re-Pick</button>
         </div>
+
         <div class="overlayStatus" style="margin-top:10px;">
           <strong>Status:</strong> <span id="pickStatus">Click Pick.</span>
         </div>
+
         <div class="pickRow">
           <div class="pickSlot">
             <div class="pickName">AI2</div>
@@ -278,6 +303,17 @@ Current File Row Count: 191
     <footer class="footer">© 2026 Pluck The Card Game</footer>
   </main>
 
+  <div id="gameOverModal" class="gameOverModal" style="display:none;">
+    <div class="gameOverCard">
+      <div class="gameOverTitle">GAME OVER</div>
+      <div class="gameOverSub" id="gameOverThreshold">Threshold: 10 Plucks Against</div>
+      <div class="gameOverBody" id="gameOverBody"></div>
+      <div class="gameOverFooter" id="gameOverFooter"></div>
+      <button class="btn" id="newGameBtn" type="button">Start New Game</button>
+    </div>
+  </div>
+
   <script src="js/demo2.js"></script>
 </body>
 </html>
+
