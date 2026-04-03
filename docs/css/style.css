@@ -845,6 +845,24 @@ body{
 }
 
 /* =========================================
+   MATCH LENGTH BUTTONS
+   ========================================= */
+
+.gameLengthBtn{
+  min-width:128px;
+}
+
+.gameLengthBtn.activeLength{
+  background:linear-gradient(145deg, #d4b254, #b7923b);
+  color:#101624;
+  border-color:rgba(212,178,84,.58);
+}
+
+#gameLengthHint{
+  color:#d8e2f0;
+}
+
+/* =========================================
    GAME OVER MODAL
    ========================================= */
 
@@ -1021,5 +1039,3 @@ body{
     font-size:.86rem;
   }
 }
-
-If you want, next I’ll repost the full demo2.html so the modal markup is already in the right place.
