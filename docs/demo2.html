@@ -1,27 +1,25 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-03-31 16:00 (-0400)
+2026-03-31 13:05 (-0400)
 
 FILE
 docs/demo2.html
 
 ACTION
-Full file replacement.
+Rollback 04022026
 
 PURPOSE
-Add running cumulative "Against" counters for all 3 players.
+Rollback 04022026
 
 FIXES / CHANGES
-• Adds ai2Against span
-• Adds ai3Against span
-• Adds youAgainst span
-• Keeps current match length controls
-• Keeps current game over modal markup
-• Keeps current working page structure
+• Keeps current rollback page structure
+• Keeps current DOM IDs used by demo2.js
+• Adds game length selector inside Pick panel
+• Adds hidden Game Over modal before script tag
 
 ROW COUNT
-Previous File Row Count: 219
+Previous File Row Count: 191
 Current File Row Count: 219
 
 UNTOUCHED AREAS
@@ -34,6 +32,12 @@ UNTOUCHED AREAS
 • Trump panel
 • Pluck panel
 • Existing pick controls
+
+FAILURE TEST
+• Page should visually match current working rollback
+• No raw HTML fallback
+• No layout shift on table
+• No change in gameplay from HTML alone
 =========================================================
 -->
 <!doctype html>
@@ -177,7 +181,7 @@ UNTOUCHED AREAS
             <div>
               <div class="seatName">AI2 (Left)</div>
               <div class="aiHandRow" id="ai2Hand"></div>
-              <div class="seatSub">Quota: <strong id="ai2Quota">7</strong> &nbsp;|&nbsp; Tricks: <strong id="ai2Tricks">0</strong> &nbsp;|&nbsp; Against: <strong id="ai2Against">0</strong></div>
+              <div class="seatSub">Quota: <strong id="ai2Quota">7</strong> &nbsp;|&nbsp; Tricks: <strong id="ai2Tricks">0</strong></div>
             </div>
           </div>
         </div>
@@ -188,7 +192,7 @@ UNTOUCHED AREAS
             <div>
               <div class="seatName">AI3 (Right)</div>
               <div class="aiHandRow" id="ai3Hand"></div>
-              <div class="seatSub">Quota: <strong id="ai3Quota">6</strong> &nbsp;|&nbsp; Tricks: <strong id="ai3Tricks">0</strong> &nbsp;|&nbsp; Against: <strong id="ai3Against">0</strong></div>
+              <div class="seatSub">Quota: <strong id="ai3Quota">6</strong> &nbsp;|&nbsp; Tricks: <strong id="ai3Tricks">0</strong></div>
             </div>
           </div>
         </div>
@@ -206,7 +210,7 @@ UNTOUCHED AREAS
           <div class="avatarWrap">
             <div class="avatar avatar-you" aria-hidden="true"></div>
             <div style="flex:1">
-              <div class="seatName">YOU &nbsp;|&nbsp; Quota: <strong id="youQuota">4</strong> &nbsp;|&nbsp; Tricks: <strong id="youTricks">0</strong> &nbsp;|&nbsp; Against: <strong id="youAgainst">0</strong></div>
+              <div class="seatName">YOU &nbsp;|&nbsp; Quota: <strong id="youQuota">4</strong> &nbsp;|&nbsp; Tricks: <strong id="youTricks">0</strong></div>
               <div class="seatSub">Your cards are below</div>
             </div>
           </div>
