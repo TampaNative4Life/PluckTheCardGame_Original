@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-31 13:45 (-0400)
+// 2026-03-31 15:05 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,35 +9,38 @@
 // Full file replacement.
 //
 // ISSUE
-// The game had no cumulative match-end system tied to plucks
-// against, and no way to use the new 8 / 10 / 12 match-length
-// controls or the new Game Over modal.
+// Pluck procedure and pluck math ordering did not match the
+// intended table rules.
 //
 // ROOT CAUSE
-// Per-hand plucks were calculated correctly, but not carried
-// forward into a cumulative match total and not checked against
-// a selected threshold.
+// The prior queue builder assigned plucks greedily by totals,
+// but did not:
+// • prioritize victims by highest plucks against first
+// • resolve ties with pick-card draws
+// • keep a plucker locked on one victim until done
+// • prevent returning to that same victim later in the round
+// • choose AI pluck suits with enough hand-value awareness
 //
 // FIX
-// • Add match length selection using existing HTML buttons
-// • Add cumulative plucks earned / against across hands
-// • Add game-over trigger at end of hand only
-// • Add winner calculation by differential
-// • Add Game Over modal rendering
-// • Add Start New Game reset flow
+// • Add victim ordering by plucks against desc
+// • Add plucker ordering by plucks earned desc
+// • Add pick-card tie-breaks, highest card first
+// • Rebuild pluck queue by victim rounds
+// • Keep each plucker’s plucks against a victim consecutive
+// • Improve AI suit selection during plucks
+// • Preserve current match length and game over logic
 //
 // ROW COUNT
-// Previous File Row Count: 803
-// Current File Row Count: 944
+// Previous Working File Row Count: 944
+// Current File Row Count: 1064
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
 // • Trump logic
-// • Pluck mechanics
 // • Trick play logic
-// • AI choice logic
+// • AI trick-play logic
 // • Existing rendering structure
 // =========================================================
 
@@ -101,17 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
 
-  // New UI, optional but expected in current HTML
+  // New UI
   const gameLen8Btn        = $("gameLen8");
   const gameLen10Btn       = $("gameLen10");
   const gameLen12Btn       = $("gameLen12");
   const gameLengthHintEl   = $("gameLengthHint");
 
-  const gameOverModalEl    = $("gameOverModal");
-  const gameOverThresholdEl= $("gameOverThreshold");
-  const gameOverBodyEl     = $("gameOverBody");
-  const gameOverFooterEl   = $("gameOverFooter");
-  const newGameBtn         = $("newGameBtn");
+  const gameOverModalEl     = $("gameOverModal");
+  const gameOverThresholdEl = $("gameOverThreshold");
+  const gameOverBodyEl      = $("gameOverBody");
+  const gameOverFooterEl    = $("gameOverFooter");
+  const newGameBtn          = $("newGameBtn");
 
   const required = [
     ["youHand", youHandEl],
@@ -171,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let phase = "PICK_DEALER";
   let trumpSuit = null;
   let trumpOpen = false;
-  let trick = [];              // [{ playerIndex, cardStr }]
+  let trick = [];
   let leadSuit = null;
   let trickNumber = 0;
   let turnIndex = 0;
@@ -307,9 +310,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- position helpers ----------
-  // Correct seat math for this table:
-  // AI2 = 0, AI3 = 1, YOU = 2
-  // left pass order: YOU -> AI2 -> AI3 -> YOU
   function leftOf(i)  { return (i + 1) % 3; }
   function rightOf(i) { return (i + 2) % 3; }
 
@@ -389,6 +389,75 @@ document.addEventListener("DOMContentLoaded", () => {
     const c = parseCard(cs);
     if (isTrumpCard(cs)) return 10000 + c.value;
     return c.value;
+  }
+
+  // ---------- pluck ordering helpers ----------
+  function drawPickCardsForOrder(indices) {
+    if (indices.length <= 1) {
+      return { ordered: indices.slice(), text: "" };
+    }
+
+    while (true) {
+      const deck = shuffle(makeDeck51()).filter(c => !isJoker(c));
+      const draws = indices.map((pi, idx) => ({
+        pi,
+        card: deck[idx],
+        value: pickRankValue(deck[idx])
+      }));
+
+      const valueSet = new Set(draws.map(d => d.value));
+      if (valueSet.size !== draws.length) continue;
+
+      draws.sort((a, b) => b.value - a.value);
+
+      const text = draws
+        .map(d => `${players[d.pi].id} ${d.card}`)
+        .join(" • ");
+
+      return {
+        ordered: draws.map(d => d.pi),
+        text
+      };
+    }
+  }
+
+  function sortWithTieBreaker(indices, scoreFn, label) {
+    const groups = new Map();
+
+    for (const pi of indices) {
+      const key = scoreFn(pi);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(pi);
+    }
+
+    const scores = [...groups.keys()].sort((a, b) => b - a);
+    const ordered = [];
+    const messages = [];
+
+    for (const score of scores) {
+      const group = groups.get(score);
+      if (group.length === 1) {
+        ordered.push(group[0]);
+      } else {
+        const result = drawPickCardsForOrder(group);
+        ordered.push(...result.ordered);
+        if (result.text) {
+          messages.push(`${label} tie break: ${result.text}.`);
+        }
+      }
+    }
+
+    return { ordered, messages };
+  }
+
+  function getVictimOrder() {
+    const victims = [0, 1, 2].filter(i => players[i].plucksSuffered > 0);
+    return sortWithTieBreaker(victims, (i) => players[i].plucksSuffered, "Victim");
+  }
+
+  function getPluckerOrder() {
+    const pluckers = [0, 1, 2].filter(i => players[i].plucksEarned > 0);
+    return sortWithTieBreaker(pluckers, (i) => players[i].plucksEarned, "Plucker");
   }
 
   // ---------- pluck messaging ----------
@@ -885,62 +954,67 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function pluckerOrder() {
-    const tie = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
-    return [0,1,2].slice().sort((a,b) => {
-      const da = players[a].plucksEarned, db = players[b].plucksEarned;
-      if (db !== da) return db - da;
-      return tie.indexOf(a) - tie.indexOf(b);
-    }).filter(i => players[i].plucksEarned > 0);
-  }
-
-  function victimOrder() {
-    const tie = [dealerIndex, leftOf(dealerIndex), rightOf(dealerIndex)];
-    return [0,1,2].slice().sort((a,b) => {
-      const da = players[a].plucksSuffered, db = players[b].plucksSuffered;
-      if (db !== da) return db - da;
-      return tie.indexOf(a) - tie.indexOf(b);
-    }).filter(i => players[i].plucksSuffered > 0);
-  }
-
   function buildPluckQueue() {
-    const q = [];
-    const pluckers = pluckerOrder();
-    const victims = victimOrder();
-    const earned = new Map(pluckers.map(i => [i, players[i].plucksEarned]));
-    const suffered = new Map(victims.map(i => [i, players[i].plucksSuffered]));
+    const queue = [];
+    const victimResult = getVictimOrder();
+    const pluckerResult = getPluckerOrder();
 
+    const victims = victimResult.ordered;
+    const pluckers = pluckerResult.ordered;
+
+    const remainingEarned = new Map();
     for (const plucker of pluckers) {
-      while ((earned.get(plucker) || 0) > 0) {
-        const victim = victims
-          .filter(v => (suffered.get(v) || 0) > 0)
-          .sort((a,b) => (suffered.get(b) || 0) - (suffered.get(a) || 0))[0];
-        if (victim === undefined) break;
+      remainingEarned.set(plucker, players[plucker].plucksEarned);
+    }
 
-        q.push({ pluckerIndex: plucker, pluckeeIndex: victim });
-        earned.set(plucker, (earned.get(plucker) || 0) - 1);
-        suffered.set(victim, (suffered.get(victim) || 0) - 1);
+    const tieMsgs = [...victimResult.messages, ...pluckerResult.messages];
+    if (tieMsgs.length) {
+      msg(tieMsgs.join(" "));
+    }
+
+    for (const victim of victims) {
+      let victimNeed = players[victim].plucksSuffered;
+      if (victimNeed <= 0) continue;
+
+      for (const plucker of pluckers) {
+        let earnedLeft = remainingEarned.get(plucker) || 0;
+        if (earnedLeft <= 0) continue;
+        if (victimNeed <= 0) break;
+
+        const assignCount = Math.min(earnedLeft, victimNeed);
+
+        for (let i = 0; i < assignCount; i++) {
+          queue.push({ pluckerIndex: plucker, pluckeeIndex: victim });
+        }
+
+        remainingEarned.set(plucker, earnedLeft - assignCount);
+        victimNeed -= assignCount;
       }
     }
-    return q;
+
+    return queue;
   }
 
   function pairKey(a,b) {
     return `${a}-${b}`;
   }
 
+  function getSuitCards(pi, suit) {
+    return players[pi].hand
+      .filter(c => !isJoker(c) && c.slice(-1) === suit)
+      .sort((a, b) => (RANK_VALUE[a.slice(0,-1)] || 99) - (RANK_VALUE[b.slice(0,-1)] || 99));
+  }
+
   function lowestOfSuitNonJoker(pi, suit) {
-    const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
-    if (!cards.length) return null;
-    cards.sort((a,b) => (RANK_VALUE[a.slice(0,-1)] || 99) - (RANK_VALUE[b.slice(0,-1)] || 99));
-    return cards[0];
+    const cards = getSuitCards(pi, suit);
+    return cards.length ? cards[0] : null;
   }
 
   function highestOfSuitNonJoker(pi, suit) {
-    const cards = players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit);
-    if (!cards.length) return null;
-    cards.sort((a,b) => (RANK_VALUE[b.slice(0,-1)] || 0) - (RANK_VALUE[a.slice(0,-1)] || 0));
-    return cards[0];
+    const cards = players[pi].hand
+      .filter(c => !isJoker(c) && c.slice(-1) === suit)
+      .sort((a, b) => (RANK_VALUE[b.slice(0,-1)] || 0) - (RANK_VALUE[a.slice(0,-1)] || 0));
+    return cards.length ? cards[0] : null;
   }
 
   function removeFromHand(pi, cardStr) {
@@ -981,6 +1055,45 @@ document.addEventListener("DOMContentLoaded", () => {
     return { ok:true, giveLow, takeHigh };
   }
 
+  function getSuitPluckCost(pi, suit) {
+    const cards = getSuitCards(pi, suit);
+    if (!cards.length) return Infinity;
+
+    const values = cards.map(c => RANK_VALUE[c.slice(0,-1)] || 0);
+    const low = values[0];
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    const highCount = values.filter(v => v >= 11).length;
+    const allHigh = values.every(v => v >= 11);
+
+    let cost = low * 10;
+    cost += avg;
+    cost += highCount * 6;
+    if (values.length === 1) cost += 40;
+    if (values.length === 2) cost += 15;
+    if (allHigh) cost += 20;
+
+    return cost;
+  }
+
+  function chooseBestPluckSuit(pluckerI, pluckeeI) {
+    const suits = availablePluckSuits(pluckerI, pluckeeI);
+    if (!suits.length) return null;
+
+    let bestSuit = suits[0];
+    let bestCost = getSuitPluckCost(pluckerI, bestSuit);
+
+    for (let i = 1; i < suits.length; i++) {
+      const suit = suits[i];
+      const cost = getSuitPluckCost(pluckerI, suit);
+      if (cost < bestCost) {
+        bestCost = cost;
+        bestSuit = suit;
+      }
+    }
+
+    return bestSuit;
+  }
+
   function runOnePluck() {
     if (phase !== "PLUCK") return;
     if (!pluckQueue.length) return;
@@ -1009,17 +1122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let bestSuit = suits[0];
-    let bestVal = 999;
-    for (const s of suits) {
-      const give = lowestOfSuitNonJoker(pluckerI, s);
-      const v = give ? (RANK_VALUE[give.slice(0,-1)] || 99) : 99;
-      if (v < bestVal) {
-        bestVal = v;
-        bestSuit = s;
-      }
-    }
-
+    const bestSuit = chooseBestPluckSuit(pluckerI, pluckeeI);
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
     if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
 
