@@ -1,32 +1,26 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-31 13:45 (-0400)
+// 2026-04-04 14:35 (-0400)
 //
 // FILE
 // docs/js/demo2.js
 //
 // ACTION
-// Full Rollback 04032026
+// Full file replacement.
 //
 // ISSUE
-// Full Rollback 04032026
+// Card shading was appearing outside live gameplay and made
+// cards look unnecessarily dark in non-play phases.
 //
 // ROOT CAUSE
-// Horribly bad replacement code from ChtGpt
-// 
-// 
+// renderHand() was marking cards as visually disabled whenever
+// it was not your turn, instead of only during active play when
+// the game is preventing a renege.
 //
 // FIX
-// • Add match length selection using existing HTML buttons
-// • Add cumulative plucks earned / against across hands
-// • Add game-over trigger at end of hand only
-// • Add winner calculation by differential
-// • Add Game Over modal rendering
-// • Add Start New Game reset flow
-//
-// ROW COUNT
-// Previous File Row Count: 803
-// Current File Row Count: 944
+// • Card shading now appears only during your live PLAY turn
+// • Illegal cards gray out only when follow-suit / play rules apply
+// • Non-play phases show normal cards with no shading
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -37,6 +31,7 @@
 // • Trick play logic
 // • AI choice logic
 // • Existing rendering structure
+// • Game over popup logic
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -660,10 +655,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const legal = yourTurn ? legalCardsFor(2) : [];
 
     for (const item of mapped) {
-      const disabled = !yourTurn || !legal.includes(item.realIdx);
-      const cardEl = makeMiniCard(item.cardStr, disabled);
+      const visuallyDisabled = yourTurn && !legal.includes(item.realIdx);
+      const cardEl = makeMiniCard(item.cardStr, visuallyDisabled);
 
-      if (!disabled) {
+      if (yourTurn && legal.includes(item.realIdx)) {
         cardEl.addEventListener("click", () => {
           const legalNow = legalCardsFor(2);
           if (!legalNow.includes(item.realIdx)) {
