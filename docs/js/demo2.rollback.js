@@ -1,22 +1,20 @@
 // =========================================================
 // CHANGE LOG
-// 2026-03-31 13:45 (-0400)
+// 2026-04-04 14:27 (-0400)
 //
 // FILE
 // docs/js/demo2.js
 //
 // ACTION
-// Full file replacement.
+// Full Rollback 04042026
 //
 // ISSUE
-// The game had no cumulative match-end system tied to plucks
-// against, and no way to use the new 8 / 10 / 12 match-length
-// controls or the new Game Over modal.
+// Full Rollback 04042026
 //
 // ROOT CAUSE
-// Per-hand plucks were calculated correctly, but not carried
-// forward into a cumulative match total and not checked against
-// a selected threshold.
+// Horribly bad replacement code from ChtGpt
+// 
+// 
 //
 // FIX
 // • Add match length selection using existing HTML buttons
