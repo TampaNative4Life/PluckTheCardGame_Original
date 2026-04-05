@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-04 14:35 (-0400)
+// 2026-04-04 15:35 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,18 +9,17 @@
 // Full file replacement.
 //
 // ISSUE
-// Card shading was appearing outside live gameplay and made
-// cards look unnecessarily dark in non-play phases.
+// Pick phase wording was vague and inconsistent.
 //
 // ROOT CAUSE
-// renderHand() was marking cards as visually disabled whenever
-// it was not your turn, instead of only during active play when
-// the game is preventing a renege.
+// The UI mixed "PICK", "Pick First", and "Choose Dealer",
+// which made the opening phase less clear than it should be.
 //
 // FIX
-// • Card shading now appears only during your live PLAY turn
-// • Illegal cards gray out only when follow-suit / play rules apply
-// • Non-play phases show normal cards with no shading
+// • "PICK_DEALER" now displays as "PICK DEALER"
+// • Opening message now says "Pick dealer to begin."
+// • Pick panel status now says "Click Pick to choose dealer."
+// • Dealer selection message now says "Dealer selected: X. Click OK."
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -164,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let phase = "PICK_DEALER";
   let trumpSuit = null;
   let trumpOpen = false;
-  let trick = [];              // [{ playerIndex, cardStr }]
+  let trick = [];
   let leadSuit = null;
   let trickNumber = 0;
   let turnIndex = 0;
@@ -300,14 +299,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- position helpers ----------
-  // Correct seat math for this table:
-  // AI2 = 0, AI3 = 1, YOU = 2
-  // left pass order: YOU -> AI2 -> AI3 -> YOU
   function leftOf(i)  { return (i + 1) % 3; }
   function rightOf(i) { return (i + 2) % 3; }
 
   function phaseDisplay(p) {
-  if (p === "PICK_DEALER") return "PICK DEALER";
+    if (p === "PICK_DEALER") return "PICK DEALER";
     if (p === "TRUMP_PICK") return "TRUMP";
     if (p === "GAME_OVER") return "GAME OVER";
     return p.replaceAll("_", " ");
@@ -782,7 +778,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPickCard(pickAI2El, null);
     renderPickCard(pickAI3El, null);
     renderPickCard(pickYOUEl, null);
-    setText(pickStatusEl, "Click Pick.");
+    setText(pickStatusEl, "Click Pick to choose dealer.");
     pickOkBtn.disabled = true;
     pickReBtn.disabled = true;
     pickBtn.disabled = false;
@@ -814,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setDealer(vals[0].pi);
-    setText(pickStatusEl, `Dealer will be ${players[dealerIndex].id}. Click OK.`);
+    setText(pickStatusEl, `Dealer selected: ${players[dealerIndex].id}. Click OK.`);
     pickOkBtn.disabled = false;
     pickReBtn.disabled = true;
   }
@@ -1435,7 +1431,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setText(phaseValEl, phaseDisplay(phase));
     setText(trickNumEl, "0");
     setText(trickMaxEl, String(TOTAL_TRICKS));
-    msg("Pick a Dealer to Begin.");
+    msg("Pick dealer to begin.");
     renderAll();
   }
 
@@ -1558,7 +1554,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverModalEl) gameOverModalEl.style.display = "none";
     setGameThreshold(10);
     setText(phaseValEl, phaseDisplay(phase));
-    msg("Pick first to begin.");
+    msg("Pick dealer to begin.");
     renderAll();
   }
 
