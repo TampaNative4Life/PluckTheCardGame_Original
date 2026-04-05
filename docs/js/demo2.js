@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function rightOf(i) { return (i + 2) % 3; }
 
   function phaseDisplay(p) {
-    if (p === "PICK_DEALER") return "PICK";
+  if (p === "PICK_DEALER") return "PICK DEALER";
     if (p === "TRUMP_PICK") return "TRUMP";
     if (p === "GAME_OVER") return "GAME OVER";
     return p.replaceAll("_", " ");
@@ -1435,7 +1435,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setText(phaseValEl, phaseDisplay(phase));
     setText(trickNumEl, "0");
     setText(trickMaxEl, String(TOTAL_TRICKS));
-    msg("Pick first to begin.");
+    msg("Pick a Dealer to Begin.");
     renderAll();
   }
 
