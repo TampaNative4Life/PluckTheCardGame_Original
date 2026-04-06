@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-04 15:35 (-0400)
+// 2026-04-06 16:05 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,17 +9,27 @@
 // Full file replacement.
 //
 // ISSUE
-// Pick phase wording was vague and inconsistent.
+// AI quota logic was too blunt.
+// It treated play as mostly "need tricks, play high"
+// or "do not need tricks, play low."
+// It also overpaid to win by choosing the highest
+// winning card instead of the cheapest winning card.
 //
 // ROOT CAUSE
-// The UI mixed "PICK", "Pick First", and "Choose Dealer",
-// which made the opening phase less clear than it should be.
+// aiChooseIndex(pi) did not distinguish enough between:
+// • urgent need
+// • behind but not desperate
+// • exactly on quota
+// • already over quota
 //
 // FIX
-// • "PICK_DEALER" now displays as "PICK DEALER"
-// • Opening message now says "Pick dealer to begin."
-// • Pick panel status now says "Click Pick to choose dealer."
-// • Dealer selection message now says "Dealer selected: X. Click OK."
+// • Add quota-aware AI helper functions
+// • Add cheapest-winner logic
+// • Add strongest-winner logic for urgent spots
+// • Add safer lead logic
+// • Add low-pressure dump logic when on or over quota
+// • Keep all game flow, pick flow, pluck flow, UI flow,
+//   scoring flow, and popup logic unchanged
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -27,8 +37,7 @@
 // • Pick logic
 // • Trump logic
 // • Pluck mechanics
-// • Trick play logic
-// • AI choice logic
+// • Trick play engine flow
 // • Existing rendering structure
 // • Game over popup logic
 // =========================================================
@@ -94,16 +103,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const youTricksEl    = $("youTricks");
 
   // New UI, optional but expected in current HTML
-  const gameLen8Btn        = $("gameLen8");
-  const gameLen10Btn       = $("gameLen10");
-  const gameLen12Btn       = $("gameLen12");
-  const gameLengthHintEl   = $("gameLengthHint");
+  const gameLen8Btn         = $("gameLen8");
+  const gameLen10Btn        = $("gameLen10");
+  const gameLen12Btn        = $("gameLen12");
+  const gameLengthHintEl    = $("gameLengthHint");
 
-  const gameOverModalEl    = $("gameOverModal");
-  const gameOverThresholdEl= $("gameOverThreshold");
-  const gameOverBodyEl     = $("gameOverBody");
-  const gameOverFooterEl   = $("gameOverFooter");
-  const newGameBtn         = $("newGameBtn");
+  const gameOverModalEl     = $("gameOverModal");
+  const gameOverThresholdEl = $("gameOverThreshold");
+  const gameOverBodyEl      = $("gameOverBody");
+  const gameOverFooterEl    = $("gameOverFooter");
+  const newGameBtn          = $("newGameBtn");
 
   const required = [
     ["youHand", youHandEl],
@@ -1109,19 +1118,147 @@ document.addEventListener("DOMContentLoaded", () => {
     return bestPi;
   }
 
-  function aiChooseIndex(pi) {
-    const legal = legalCardsFor(pi);
-    const hand = players[pi].hand;
-    const need = players[pi].quota - players[pi].tricks;
+  // ---------- AI quota helpers ----------
+  // These helpers are intentionally isolated here so the rest
+  // of the game flow stays untouched.
 
-    if (trick.length === 0) {
+  function tricksRemainingForPlayer(pi) {
+    return players[pi].hand.length;
+  }
+
+  function aiCandidateWinsTrick(pi, cardStr) {
+    const temp = trick.concat([{ playerIndex: pi, cardStr }]);
+    const anyTrump = temp.some(t => isTrumpCard(t.cardStr));
+
+    if (anyTrump) {
+      let bestPi = temp[0].playerIndex;
+      let bestP = -1;
+      for (const t of temp) {
+        if (!isTrumpCard(t.cardStr)) continue;
+        const pow = cardPower(t.cardStr);
+        if (pow > bestP) {
+          bestP = pow;
+          bestPi = t.playerIndex;
+        }
+      }
+      return bestPi === pi;
+    }
+
+    let bestPi = temp[0].playerIndex;
+    let bestV = -1;
+    for (const t of temp) {
+      if (cardSuitForFollow(t.cardStr) !== leadSuit) continue;
+      const v = parseCard(t.cardStr).value;
+      if (v > bestV) {
+        bestV = v;
+        bestPi = t.playerIndex;
+      }
+    }
+    return bestPi === pi;
+  }
+
+  function aiWinningChoices(pi, legal, hand) {
+    const wins = [];
+    for (const idx of legal) {
+      const c = hand[idx];
+      if (aiCandidateWinsTrick(pi, c)) {
+        wins.push({
+          idx,
+          cardStr: c,
+          power: cardPower(c),
+          isTrump: isTrumpCard(c),
+          isJoker: isJoker(c)
+        });
+      }
+    }
+    return wins;
+  }
+
+  function aiCheapestWinnerIndex(pi, legal, hand) {
+    const wins = aiWinningChoices(pi, legal, hand);
+    if (!wins.length) return null;
+
+    wins.sort((a, b) => {
+      if (a.isTrump !== b.isTrump) return a.isTrump ? 1 : -1;
+      if (a.isJoker !== b.isJoker) return a.isJoker ? 1 : -1;
+      return a.power - b.power;
+    });
+
+    return wins[0].idx;
+  }
+
+  function aiStrongestWinnerIndex(pi, legal, hand) {
+    const wins = aiWinningChoices(pi, legal, hand);
+    if (!wins.length) return null;
+
+    wins.sort((a, b) => b.power - a.power);
+    return wins[0].idx;
+  }
+
+  function aiLowestPressureIndex(legal, hand) {
+    let best = legal[0];
+    let bestScore = Infinity;
+
+    for (const idx of legal) {
+      const c = hand[idx];
+      let score = cardPower(c);
+
+      // Prefer dumping non-trump before dumping trump.
+      if (isTrumpCard(c)) score += 10000;
+
+      // Preserve jokers unless absolutely necessary.
+      if (isJoker(c)) score += 50000;
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = idx;
+      }
+    }
+
+    return best;
+  }
+
+  function aiLeadPreferenceScore(c, need, remainingAfterThis) {
+    let score = cardPower(c);
+
+    // Preserve trump and jokers unless urgency is high.
+    if (isTrumpCard(c)) score += 4000;
+    if (isJoker(c)) score += 20000;
+
+    // When urgent, strength matters more.
+    if (need > remainingAfterThis) {
+      score -= cardPower(c) * 2;
+    }
+
+    return score;
+  }
+
+  function aiBestLeadIndex(pi, legal, hand, need) {
+    const remainingAfterThis = tricksRemainingForPlayer(pi) - 1;
+
+    // Urgent: must win now or run out of chances.
+    if (need > remainingAfterThis) {
       let best = legal[0];
-      let bestScore = -999999;
+      let bestPower = -1;
+      for (const idx of legal) {
+        const p = cardPower(hand[idx]);
+        if (p > bestPower) {
+          bestPower = p;
+          best = idx;
+        }
+      }
+      return best;
+    }
+
+    // Behind quota, but not desperate:
+    // prefer practical strength without wasting top assets.
+    if (need > 0) {
+      let best = legal[0];
+      let bestScore = Infinity;
       for (const idx of legal) {
         const c = hand[idx];
-        const p = cardPower(c);
-        const score = need > 0 ? p : -p;
-        if (score > bestScore) {
+        const score = aiLeadPreferenceScore(c, need, remainingAfterThis);
+        if (score < bestScore) {
           bestScore = score;
           best = idx;
         }
@@ -1129,63 +1266,63 @@ document.addEventListener("DOMContentLoaded", () => {
       return best;
     }
 
-    let winBest = null;
-    let winBestP = -1;
+    // On quota or above: dump low-pressure cards.
+    return aiLowestPressureIndex(legal, hand);
+  }
 
-    for (const idx of legal) {
-      const c = hand[idx];
-      const temp = trick.concat([{ playerIndex: pi, cardStr: c }]);
-      const anyTrump = temp.some(t => isTrumpCard(t.cardStr));
+  function aiChooseIndex(pi) {
+    const legal = legalCardsFor(pi);
+    const hand = players[pi].hand;
+    const need = players[pi].quota - players[pi].tricks;
+    const remainingNow = tricksRemainingForPlayer(pi);
+    const remainingAfterThis = remainingNow - 1;
 
-      let wouldWin = false;
-
-      if (anyTrump) {
-        let bestPi = temp[0].playerIndex;
-        let bestP = -1;
-        for (const t of temp) {
-          if (!isTrumpCard(t.cardStr)) continue;
-          const pow = cardPower(t.cardStr);
-          if (pow > bestP) {
-            bestP = pow;
-            bestPi = t.playerIndex;
-          }
-        }
-        wouldWin = bestPi === pi;
-      } else {
-        let bestPi = temp[0].playerIndex;
-        let bestV = -1;
-        for (const t of temp) {
-          if (cardSuitForFollow(t.cardStr) !== leadSuit) continue;
-          const v = parseCard(t.cardStr).value;
-          if (v > bestV) {
-            bestV = v;
-            bestPi = t.playerIndex;
-          }
-        }
-        wouldWin = bestPi === pi;
-      }
-
-      if (wouldWin) {
-        const pow = cardPower(c);
-        if (pow > winBestP) {
-          winBestP = pow;
-          winBest = idx;
-        }
-      }
+    // ------------------------------------------------
+    // STATE A: AI is leading the trick
+    // ------------------------------------------------
+    // Logic:
+    // • urgent and behind -> push hard
+    // • behind but not desperate -> win efficiently
+    // • on quota or over -> avoid extra tricks
+    if (trick.length === 0) {
+      return aiBestLeadIndex(pi, legal, hand, need);
     }
 
-    if (need > 0 && winBest !== null) return winBest;
+    // ------------------------------------------------
+    // STATE B: AI is following
+    // ------------------------------------------------
+    const strongestWinner = aiStrongestWinnerIndex(pi, legal, hand);
+    const cheapestWinner = aiCheapestWinnerIndex(pi, legal, hand);
 
-    let low = legal[0];
-    let lowP = 99999999;
-    for (const idx of legal) {
-      const p = cardPower(hand[idx]);
-      if (p < lowP) {
-        lowP = p;
-        low = idx;
-      }
+    // Urgent state:
+    // if AI needs more tricks than it will have chances left
+    // after this card, it should try to force the win now.
+    if (need > remainingAfterThis && strongestWinner !== null) {
+      return strongestWinner;
     }
-    return low;
+
+    // Behind quota, but not desperate:
+    // take the trick only as expensively as needed.
+    if (need > 0 && cheapestWinner !== null) {
+      return cheapestWinner;
+    }
+
+    // Exactly on quota:
+    // stop chasing tricks and dump pressure.
+    if (need === 0) {
+      return aiLowestPressureIndex(legal, hand);
+    }
+
+    // Already over quota:
+    // actively avoid extra tricks.
+    if (need < 0) {
+      return aiLowestPressureIndex(legal, hand);
+    }
+
+    // Fallback:
+    // if still behind but this trick cannot be won,
+    // dump the lowest-pressure legal card.
+    return aiLowestPressureIndex(legal, hand);
   }
 
   // ---------- phase transitions ----------
