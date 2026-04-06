@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-06 16:40 (-0400)
+// 2026-04-06 17:10 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,35 +9,34 @@
 // Full file replacement.
 //
 // ISSUE
-// AI pluck choice was too primitive.
-// It mostly chose the suit where it could send the lowest
-// card, instead of choosing the suit that produced the best
-// overall gain.
+// AI trump selection was serviceable but too generic.
+// It mostly counted suit weight and honors, without enough
+// regard for hand shape, real control, joker synergy, or
+// quota context.
 //
 // ROOT CAUSE
-// runOnePluck() used a lowest-give shortcut for AI plucks.
-// That was safe, but not strategic.
-// It did not properly value:
-// • how strong a card AI would receive
-// • how little it would give away
-// • whether the new card helps a behind-quota AI
-// • whether the suit choice is worth the pluck at all
+// chooseTrumpFromOwnHand(pi) used a broad additive score.
+// That made some weak-looking long suits rate too high and
+// some strong control suits rate too low.
 //
 // FIX
-// • Add AI pluck scoring helpers
-// • Score each legal pluck suit before AI selects one
-// • Keep the "send lowest card in chosen suit" rule
-// • Prefer suits with better net gain
-// • Give extra weight to high-value steals
-// • Give extra weight to suits that help a behind-quota AI
-// • Slightly reduce preference for overbuilding a suit when AI
-//   is already on or over quota
+// • Add trump evaluation helpers
+// • Score each suit by:
+//   - suit length
+//   - top-card control
+//   - honor concentration
+//   - joker synergy
+//   - weak filler penalty
+//   - void / short-suit protection value
+//   - quota pressure context
+// • Keep all game flow, pick flow, pluck flow, UI flow,
+//   scoring flow, and popup logic unchanged
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
-// • Trump logic
+// • Pluck logic
 // • Human pluck interaction
 // • Trick play engine flow
 // • Existing rendering structure
@@ -1093,30 +1092,135 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- trump ----------
-  function chooseTrumpFromOwnHand(pi) {
-    const suitScore = { S:0, H:0, D:0, C:0 };
-    for (const c of players[pi].hand) {
-      if (isJoker(c)) {
-        SUITS.forEach(s => suitScore[s] += 6);
-        continue;
-      }
-      const suit = c.slice(-1);
-      const rank = c.slice(0,-1);
-      const v = RANK_VALUE[rank] || 0;
-      suitScore[suit] += 2;
-      if (v >= 11) suitScore[suit] += (v - 10) * 2;
-      else suitScore[suit] += Math.max(0, v - 6) * 0.5;
+  // Trump selection now scores the whole hand by suit shape,
+  // top-card control, joker synergy, and quota context.
+
+  function suitCardsNonJoker(pi, suit) {
+    return players[pi].hand
+      .filter(c => !isJoker(c) && c.slice(-1) === suit)
+      .map(c => ({ cardStr: c, value: RANK_VALUE[c.slice(0, -1)] || 0 }))
+      .sort((a, b) => b.value - a.value);
+  }
+
+  function countJokersInHand(pi) {
+    return players[pi].hand.filter(isJoker).length;
+  }
+
+  function countShortSideSuits(pi, trumpSuitCandidate) {
+    let count = 0;
+    for (const s of SUITS) {
+      if (s === trumpSuitCandidate) continue;
+      const n = suitCountNonJoker(pi, s);
+      if (n <= 1) count += 1;
+    }
+    return count;
+  }
+
+  function trumpSuitControlScore(cards) {
+    let score = 0;
+    const values = cards.map(c => c.value);
+
+    if (values.includes(14)) score += 18;
+    if (values.includes(13)) score += 13;
+    if (values.includes(12)) score += 9;
+    if (values.includes(11)) score += 6;
+    if (values.includes(10)) score += 3;
+
+    if (values.length >= 2 && values[0] >= 14 && values[1] >= 13) score += 12;
+    if (values.length >= 2 && values[0] >= 13 && values[1] >= 12) score += 7;
+    if (values.length >= 3 && values[0] >= 12 && values[1] >= 11 && values[2] >= 10) score += 6;
+
+    return score;
+  }
+
+  function trumpSuitFillerPenalty(cards) {
+    let penalty = 0;
+    for (const c of cards) {
+      if (c.value <= 5) penalty += 2;
+      else if (c.value <= 7) penalty += 1;
+    }
+    return penalty;
+  }
+
+  function suitLengthScore(length) {
+    if (length === 0) return -40;
+    if (length === 1) return -8;
+    if (length === 2) return 4;
+    if (length === 3) return 11;
+    if (length === 4) return 19;
+    if (length === 5) return 26;
+    return 32 + ((length - 6) * 4);
+  }
+
+  function jokerSynergyScore(jokerCount, length, topValue) {
+    let score = 0;
+    if (jokerCount === 0) return 0;
+
+    score += jokerCount * 8;
+
+    if (length >= 3) score += jokerCount * 6;
+    if (length >= 4) score += jokerCount * 8;
+    if (topValue >= 13) score += jokerCount * 5;
+    if (topValue >= 14) score += jokerCount * 3;
+
+    return score;
+  }
+
+  function quotaTrumpBias(need, length, topValue) {
+    let score = 0;
+
+    if (need > 0) {
+      score += length * 2;
+      if (topValue >= 13) score += 6;
+      if (topValue >= 14) score += 4;
+    } else {
+      // If already on or over quota, still choose a sane trump,
+      // but slightly prefer cleaner control over brute length.
+      if (length >= 5 && topValue < 12) score -= 5;
+      if (length === 2 && topValue >= 14) score += 4;
     }
 
-    let best = "H";
-    let bestScore = -999;
-    for (const s of SUITS) {
-      if (suitScore[s] > bestScore) {
-        bestScore = suitScore[s];
-        best = s;
+    return score;
+  }
+
+  function evaluateTrumpSuit(pi, suit) {
+    const cards = suitCardsNonJoker(pi, suit);
+    const length = cards.length;
+    const jokerCount = countJokersInHand(pi);
+    const need = players[pi].quota - players[pi].tricks;
+    const topValue = cards.length ? cards[0].value : 0;
+    const shortSideCount = countShortSideSuits(pi, suit);
+
+    let score = 0;
+
+    score += suitLengthScore(length);
+    score += trumpSuitControlScore(cards);
+    score -= trumpSuitFillerPenalty(cards);
+    score += jokerSynergyScore(jokerCount, length, topValue);
+    score += quotaTrumpBias(need, length, topValue);
+
+    // Short side suits become more playable when this suit is trump.
+    score += shortSideCount * 3;
+
+    // Tiny extra reward for a compact strong suit.
+    if (length >= 3 && topValue >= 12) score += 5;
+
+    return score;
+  }
+
+  function chooseTrumpFromOwnHand(pi) {
+    let bestSuit = "H";
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (const suit of SUITS) {
+      const score = evaluateTrumpSuit(pi, suit);
+      if (score > bestScore) {
+        bestScore = score;
+        bestSuit = suit;
       }
     }
-    return best;
+
+    return bestSuit;
   }
 
   function setTrump(suit) {
@@ -1180,9 +1284,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- AI quota helpers ----------
-  // These helpers are intentionally isolated here so the rest
-  // of the game flow stays untouched.
-
   function tricksRemainingForPlayer(pi) {
     return players[pi].hand.length;
   }
@@ -1264,10 +1365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const c = hand[idx];
       let score = cardPower(c);
 
-      // Prefer dumping non-trump before dumping trump.
       if (isTrumpCard(c)) score += 10000;
-
-      // Preserve jokers unless absolutely necessary.
       if (isJoker(c)) score += 50000;
 
       if (score < bestScore) {
@@ -1282,11 +1380,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function aiLeadPreferenceScore(c, need, remainingAfterThis) {
     let score = cardPower(c);
 
-    // Preserve trump and jokers unless urgency is high.
     if (isTrumpCard(c)) score += 4000;
     if (isJoker(c)) score += 20000;
 
-    // When urgent, strength matters more.
     if (need > remainingAfterThis) {
       score -= cardPower(c) * 2;
     }
@@ -1297,7 +1393,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function aiBestLeadIndex(pi, legal, hand, need) {
     const remainingAfterThis = tricksRemainingForPlayer(pi) - 1;
 
-    // Urgent: must win now or run out of chances.
     if (need > remainingAfterThis) {
       let best = legal[0];
       let bestPower = -1;
@@ -1311,8 +1406,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return best;
     }
 
-    // Behind quota, but not desperate:
-    // prefer practical strength without wasting top assets.
     if (need > 0) {
       let best = legal[0];
       let bestScore = Infinity;
@@ -1327,7 +1420,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return best;
     }
 
-    // On quota or above: dump low-pressure cards.
     return aiLowestPressureIndex(legal, hand);
   }
 
@@ -1338,51 +1430,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const remainingNow = tricksRemainingForPlayer(pi);
     const remainingAfterThis = remainingNow - 1;
 
-    // ------------------------------------------------
-    // STATE A: AI is leading the trick
-    // ------------------------------------------------
-    // Logic:
-    // • urgent and behind -> push hard
-    // • behind but not desperate -> win efficiently
-    // • on quota or over -> avoid extra tricks
     if (trick.length === 0) {
       return aiBestLeadIndex(pi, legal, hand, need);
     }
 
-    // ------------------------------------------------
-    // STATE B: AI is following
-    // ------------------------------------------------
     const strongestWinner = aiStrongestWinnerIndex(pi, legal, hand);
     const cheapestWinner = aiCheapestWinnerIndex(pi, legal, hand);
 
-    // Urgent state:
-    // if AI needs more tricks than it will have chances left
-    // after this card, it should try to force the win now.
     if (need > remainingAfterThis && strongestWinner !== null) {
       return strongestWinner;
     }
 
-    // Behind quota, but not desperate:
-    // take the trick only as expensively as needed.
     if (need > 0 && cheapestWinner !== null) {
       return cheapestWinner;
     }
 
-    // Exactly on quota:
-    // stop chasing tricks and dump pressure.
     if (need === 0) {
       return aiLowestPressureIndex(legal, hand);
     }
 
-    // Already over quota:
-    // actively avoid extra tricks.
     if (need < 0) {
       return aiLowestPressureIndex(legal, hand);
     }
 
-    // Fallback:
-    // if still behind but this trick cannot be won,
-    // dump the lowest-pressure legal card.
     return aiLowestPressureIndex(legal, hand);
   }
 
