@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-06 16:05 (-0400)
+// 2026-04-06 16:40 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,34 +9,36 @@
 // Full file replacement.
 //
 // ISSUE
-// AI quota logic was too blunt.
-// It treated play as mostly "need tricks, play high"
-// or "do not need tricks, play low."
-// It also overpaid to win by choosing the highest
-// winning card instead of the cheapest winning card.
+// AI pluck choice was too primitive.
+// It mostly chose the suit where it could send the lowest
+// card, instead of choosing the suit that produced the best
+// overall gain.
 //
 // ROOT CAUSE
-// aiChooseIndex(pi) did not distinguish enough between:
-// • urgent need
-// • behind but not desperate
-// • exactly on quota
-// • already over quota
+// runOnePluck() used a lowest-give shortcut for AI plucks.
+// That was safe, but not strategic.
+// It did not properly value:
+// • how strong a card AI would receive
+// • how little it would give away
+// • whether the new card helps a behind-quota AI
+// • whether the suit choice is worth the pluck at all
 //
 // FIX
-// • Add quota-aware AI helper functions
-// • Add cheapest-winner logic
-// • Add strongest-winner logic for urgent spots
-// • Add safer lead logic
-// • Add low-pressure dump logic when on or over quota
-// • Keep all game flow, pick flow, pluck flow, UI flow,
-//   scoring flow, and popup logic unchanged
+// • Add AI pluck scoring helpers
+// • Score each legal pluck suit before AI selects one
+// • Keep the "send lowest card in chosen suit" rule
+// • Prefer suits with better net gain
+// • Give extra weight to high-value steals
+// • Give extra weight to suits that help a behind-quota AI
+// • Slightly reduce preference for overbuilding a suit when AI
+//   is already on or over quota
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
 // • Trump logic
-// • Pluck mechanics
+// • Human pluck interaction
 // • Trick play engine flow
 // • Existing rendering structure
 // • Game over popup logic
@@ -979,6 +981,74 @@ document.addEventListener("DOMContentLoaded", () => {
     return { ok:true, giveLow, takeHigh };
   }
 
+  // ---------- AI pluck helpers ----------
+  // The AI still sends the lowest card in the chosen suit.
+  // The upgrade here is only about choosing the best suit.
+
+  function normalCardValue(cardStr) {
+    if (!cardStr || isJoker(cardStr)) return 0;
+    return RANK_VALUE[cardStr.slice(0, -1)] || 0;
+  }
+
+  function suitCountNonJoker(pi, suit) {
+    return players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit).length;
+  }
+
+  function aiPluckSuitScore(pluckerI, pluckeeI, suit) {
+    const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
+    const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
+
+    if (!giveLow || !takeHigh) return Number.NEGATIVE_INFINITY;
+
+    const need = players[pluckerI].quota - players[pluckerI].tricks;
+    const giveVal = normalCardValue(giveLow);
+    const takeVal = normalCardValue(takeHigh);
+    const ownSuitCount = suitCountNonJoker(pluckerI, suit);
+
+    let score = 0;
+
+    // Core value: how much stronger the incoming card is than the outgoing card.
+    score += (takeVal - giveVal) * 12;
+
+    // Extra value for stealing a genuinely strong card.
+    if (takeVal >= 14) score += 16;
+    else if (takeVal >= 13) score += 12;
+    else if (takeVal >= 12) score += 9;
+    else if (takeVal >= 11) score += 6;
+
+    // Small reward when AI gives away true trash.
+    if (giveVal <= 4) score += 4;
+    else if (giveVal <= 6) score += 2;
+
+    // If AI still needs tricks, strengthening an already-held suit is useful.
+    if (need > 0) {
+      score += ownSuitCount * 2;
+      if (takeVal >= 11) score += 4;
+    }
+
+    // If AI is already on or over quota, avoid overbuilding a suit too much.
+    if (need <= 0) {
+      score -= ownSuitCount * 2;
+    }
+
+    return score;
+  }
+
+  function aiBestPluckSuit(pluckerI, pluckeeI, suits) {
+    let bestSuit = suits[0];
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (const suit of suits) {
+      const score = aiPluckSuitScore(pluckerI, pluckeeI, suit);
+      if (score > bestScore) {
+        bestScore = score;
+        bestSuit = suit;
+      }
+    }
+
+    return bestSuit;
+  }
+
   function runOnePluck() {
     if (phase !== "PLUCK") return;
     if (!pluckQueue.length) return;
@@ -1007,16 +1077,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let bestSuit = suits[0];
-    let bestVal = 999;
-    for (const s of suits) {
-      const give = lowestOfSuitNonJoker(pluckerI, s);
-      const v = give ? (RANK_VALUE[give.slice(0,-1)] || 99) : 99;
-      if (v < bestVal) {
-        bestVal = v;
-        bestSuit = s;
-      }
-    }
+    const bestSuit = aiBestPluckSuit(pluckerI, pluckeeI, suits);
 
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
     if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
