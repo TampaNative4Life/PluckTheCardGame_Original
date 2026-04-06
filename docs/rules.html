@@ -32,13 +32,15 @@
       <div class="card">
         <h1 class="pageTitle">Pluck Rules</h1>
         <p class="pageText">
-          Pluck is a three-player trick-taking game with no running score.
-          Miss your job this hand, and next hand somebody gets to improve their future using your cards.
+          Pluck is a three-player trick-taking game built on quotas, consequences, and pressure.
+          This version does <strong>not</strong> use a traditional running score.
+          It uses <strong>plucks earned</strong>, <strong>plucks against</strong>, and a match-ending limit.
         </p>
         <p class="pageText">
-          <strong>Fast version:</strong> 3 players. 17 tricks. Dealer needs 7. Left needs 6. Right needs 4.
-          Dealer declares trump. The player with the 2♣ opens the hand.
-          If you come up short, somebody earns a pluck against you next round.
+          <strong>Fast version:</strong>
+          3 players. 17 tricks. Dealer needs 7. Left of dealer needs 6. Right of dealer needs 4.
+          Players pick dealer first. Dealer declares trump. The player holding 2♣ opens the first trick.
+          If you miss your quota, the game remembers.
         </p>
         <div class="pageButtons">
           <a class="btn" href="learn-pluck.html">Learn Pluck in 60 Seconds</a>
@@ -50,52 +52,203 @@
       <div class="card">
         <h2 class="pageTitle">What Makes Pluck Different</h2>
         <p class="pageText">
-          Most trick games make you track points. Pluck makes you feel consequences.
+          Most trick games ask you to collect points.
+          Pluck asks you to survive consequences.
+        </p>
+        <p class="pageText">
           If you do not win enough tricks for your seat, another player may earn the right to pluck you before the next hand begins.
+          If you keep coming up short, your running total of <strong>plucks against</strong> keeps rising until you hit the match limit and you are out.
         </p>
       </div>
     </section>
 
     <section class="pageSection">
       <div class="card">
-        <h2 class="pageTitle">The Deck</h2>
+        <h2 class="pageTitle">1) The Deck</h2>
         <p class="pageText">
-          Start with a standard 52-card deck. Remove the 2♦, 2♥, and 2♠. Keep the 2♣.
-          Add both Jokers. One Joker is the Big Joker. One Joker is the Little Joker.
-          That leaves 51 cards, which creates exactly 17 tricks for 3 players.
+          Start with a standard 52-card deck.
+          Remove the 2♦, 2♥, and 2♠.
+          Keep the 2♣.
+          Add both Jokers, one Big Joker and one Little Joker.
         </p>
-      </div>
-    </section>
-
-    <section class="pageSection">
-      <div class="card">
-        <h2 class="pageTitle">Targets</h2>
         <p class="pageText">
-          Dealer: 7 tricks. Left of dealer: 6 tricks. Right of dealer: 4 tricks.
-          Make your number and you are safe. Miss it, and next hand may get ugly.
+          That leaves <strong>51 cards</strong>, which creates exactly <strong>17 tricks</strong> for 3 players.
         </p>
       </div>
     </section>
 
     <section class="pageSection">
       <div class="card">
-        <h2 class="pageTitle">The Pluck</h2>
+        <h2 class="pageTitle">2) Pick Dealer</h2>
         <p class="pageText">
-          Before a hand begins, earned plucks are handled first.
-          The plucker passes one card face down to the pluckee.
-          The pluckee must return their highest card of that same suit.
-          Jokers cannot be forced out during a pluck.
+          Before the hand begins, players <strong>pick dealer</strong>.
+          Each player draws one card.
+          The <strong>lowest card becomes dealer</strong>.
+          If there is a tie for lowest, players re-pick.
+        </p>
+        <p class="pageText">
+          Dealer matters because the dealer seat carries the biggest quota that hand.
+          Good luck with that.
         </p>
       </div>
     </section>
 
     <section class="pageSection">
       <div class="card">
-        <h2 class="pageTitle">Dealer Declares Trump</h2>
+        <h2 class="pageTitle">3) Seat Targets</h2>
+        <p class="pageText">
+          Every hand has three seat quotas:
+        </p>
+        <p class="pageText">
+          <strong>Dealer:</strong> 7 tricks<br />
+          <strong>Left of dealer:</strong> 6 tricks<br />
+          <strong>Right of dealer:</strong> 4 tricks
+        </p>
+        <p class="pageText">
+          The deal rotates left each hand, so the quotas rotate too.
+          Nobody gets to hide in one easy seat forever.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">4) Order of the Hand</h2>
+        <p class="pageText">
+          On the <strong>first hand</strong>, there are no plucks yet.
+          The flow is:
+        </p>
+        <p class="pageText">
+          <strong>Pick Dealer → Deal → Trump → Play</strong>
+        </p>
+        <p class="pageText">
+          After the first hand, the flow becomes:
+        </p>
+        <p class="pageText">
+          <strong>Pick Dealer → Deal → Pluck → Trump → Play</strong>
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">5) Dealer Declares Trump</h2>
         <p class="pageText">
           After plucks are finished, the dealer names the trump suit.
-          The player holding the 2♣ leads the first trick.
-          If clubs are trump, trump is open immediately.
+          The player holding <strong>2♣</strong> leads the first trick.
+        </p>
+        <p class="pageText">
+          If clubs are trump, then trump is open immediately.
+          Otherwise, normal trump-opening rules apply during play.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">6) The Pluck</h2>
+        <p class="pageText">
+          A pluck happens before play begins on later hands.
+          The plucker passes one card face down to the pluckee.
+          The pluckee must return their <strong>highest card in that same suit</strong>.
+        </p>
+        <p class="pageText">
+          Jokers cannot be forced out during a pluck.
+          A pluck is suit-for-suit only.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">7) How Plucks Are Earned</h2>
+        <p class="pageText">
+          Plucks come from the difference between what a player <strong>needed</strong> and what that player <strong>actually won</strong>.
+        </p>
+        <p class="pageText">
+          <strong>Plucks Earned</strong> means tricks won <strong>above quota</strong>.<br />
+          <strong>Plucks Against</strong> means tricks missed <strong>below quota</strong>.
+        </p>
+        <p class="pageText">
+          Example:
+          If your quota was 7 and you won 9 tricks, you earned <strong>2 plucks</strong>.
+          If your quota was 7 and you won only 4 tricks, you now have <strong>3 plucks against</strong>.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">8) The New Scoring System</h2>
+        <p class="pageText">
+          This version of Pluck does <strong>not</strong> use a traditional running score.
+          It uses a running total of <strong>plucks against</strong>.
+        </p>
+        <p class="pageText">
+          At the start of the match, players choose a match length:
+          <strong>8</strong>, <strong>10</strong>, or <strong>12 plucks against</strong>.
+        </p>
+        <p class="pageText">
+          That number is the danger line.
+          The first player to reach it is out, and the match ends immediately.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">9) Running Total Means Running Total</h2>
+        <p class="pageText">
+          <strong>Plucks against are cumulative.</strong>
+          They carry from hand to hand.
+          They do not reset just because the cards were shuffled again.
+        </p>
+        <p class="pageText">
+          Example:
+          If you took 2 plucks against in one hand and 3 more in a later hand, your running total is now <strong>5 plucks against</strong>.
+        </p>
+        <p class="pageText">
+          The game keeps receipts.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">10) How the Winner Is Decided</h2>
+        <p class="pageText">
+          When a player hits the chosen plucks-against limit, the match ends.
+          The winner is the player with the best <strong>differential</strong>.
+        </p>
+        <p class="pageText">
+          Differential means:
+          <strong>plucks earned minus plucks against</strong>.
+        </p>
+        <p class="pageText">
+          Example:
+          If you earned 14 plucks and only had 2 against, your differential is <strong>+12</strong>.
+          If another player earned 2 and had 10 against, that player’s differential is <strong>-8</strong>.
+          One player was driving the table.
+          The other was holding on for dear life.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">11) Why This Version Works</h2>
+        <p class="pageText">
+          Old-school table games can run forever because nobody has a built-in reason to leave the chair.
+          This version fixes that.
+        </p>
+        <p class="pageText">
+          If you keep missing your quota, the pressure builds.
+          If you keep beating your quota, your edge builds.
+          Every hand matters.
+          Every quota matters.
+        </p>
+        <p class="pageText">
+          In plain English, the game now remembers who is cooking and who keeps getting cooked.
         </p>
       </div>
     </section>
