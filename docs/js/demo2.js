@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-06 18:05 (-0400)
+// 2026-04-06 18:30 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,38 +9,35 @@
 // Full file replacement.
 //
 // ISSUE
-// AI had one stronger baseline, but no difficulty framework.
+// AI difficulty existed in code only.
+// There was no UI selector to change difficulty without
+// manually editing the file.
 //
 // ROOT CAUSE
-// AI decisions were hard-coded as one behavior level.
-// That made tuning and future expansion harder.
+// AI_DIFFICULTY was hard-coded and had no live control.
 //
 // FIX
-// • Add AI difficulty framework for EASY, NORMAL, HARD
-// • Keep one shared AI system
-// • Tune behavior through profile weights, not separate AI codebases
-// • Default difficulty set to NORMAL
-// • Apply difficulty profile to:
-//   - trick play urgency
-//   - cheapest winner vs stronger winner pressure
-//   - lead behavior
-//   - pluck suit scoring
-//   - trump selection scoring
-//   - trump-open willingness
+// • Add injected UI selectors for EASY, NORMAL, HARD
+// • No HTML changes required
+// • Difficulty can now be changed from the page before play
+// • Current selection is visually highlighted
+// • Default remains NORMAL
 //
-// HOW TO CHANGE DIFFICULTY
-// • Set AI_DIFFICULTY to "EASY", "NORMAL", or "HARD"
+// HOW IT WORKS
+// • A difficulty control block is injected near the game
+//   length controls on page load
+// • Clicking EASY, NORMAL, or HARD updates AI_DIFFICULTY
+// • Difficulty can only be changed during PICK DEALER phase
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
+// • Pluck logic
+// • Trump logic
 // • Human pluck interaction
 // • Existing rendering structure
 // • Game over popup logic
-//
-// LINE COUNT NOTE
-// • Exact before/after line count not claimed here to avoid false precision.
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -114,6 +111,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const gameOverBodyEl      = $("gameOverBody");
   const gameOverFooterEl    = $("gameOverFooter");
   const newGameBtn          = $("newGameBtn");
+
+  let aiDifficultyWrapEl    = null;
+  let aiDifficultyHintEl    = null;
+  let aiEasyBtn             = null;
+  let aiNormalBtn           = null;
+  let aiHardBtn             = null;
 
   const required = [
     ["youHand", youHandEl],
@@ -209,6 +212,95 @@ document.addEventListener("DOMContentLoaded", () => {
     const profile = aiProfile();
     if (!profile.randomness) return 0;
     return (Math.random() - 0.5) * scale * profile.randomness;
+  }
+
+  function updateDifficultyUI() {
+    const btns = [aiEasyBtn, aiNormalBtn, aiHardBtn].filter(Boolean);
+
+    for (const btn of btns) {
+      const isActive = btn.dataset.aiDifficulty === AI_DIFFICULTY;
+      btn.classList.toggle("activeLength", isActive);
+      btn.classList.toggle("btn-secondary", !isActive);
+      btn.disabled = phase !== "PICK_DEALER";
+    }
+
+    if (aiDifficultyHintEl) {
+      aiDifficultyHintEl.textContent = `AI Difficulty: ${AI_DIFFICULTY}`;
+    }
+  }
+
+  function setAIDifficulty(level) {
+    if (!["EASY", "NORMAL", "HARD"].includes(level)) return;
+    if (phase !== "PICK_DEALER") return;
+    AI_DIFFICULTY = level;
+    updateDifficultyUI();
+  }
+
+  function createDifficultyControls() {
+    if (aiDifficultyWrapEl) return;
+
+    const host = gameLengthHintEl?.parentElement || pickPanelEl;
+    if (!host) return;
+
+    aiDifficultyWrapEl = document.createElement("div");
+    aiDifficultyWrapEl.id = "aiDifficultyWrap";
+    aiDifficultyWrapEl.style.marginTop = "12px";
+    aiDifficultyWrapEl.style.display = "flex";
+    aiDifficultyWrapEl.style.flexDirection = "column";
+    aiDifficultyWrapEl.style.gap = "8px";
+
+    const title = document.createElement("div");
+    title.textContent = "AI Difficulty";
+    title.style.fontWeight = "700";
+    title.style.letterSpacing = ".04em";
+
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.flexWrap = "wrap";
+    row.style.gap = "8px";
+
+    aiEasyBtn = document.createElement("button");
+    aiEasyBtn.type = "button";
+    aiEasyBtn.className = "btn gameLengthBtn";
+    aiEasyBtn.dataset.aiDifficulty = "EASY";
+    aiEasyBtn.textContent = "Easy";
+
+    aiNormalBtn = document.createElement("button");
+    aiNormalBtn.type = "button";
+    aiNormalBtn.className = "btn gameLengthBtn";
+    aiNormalBtn.dataset.aiDifficulty = "NORMAL";
+    aiNormalBtn.textContent = "Normal";
+
+    aiHardBtn = document.createElement("button");
+    aiHardBtn.type = "button";
+    aiHardBtn.className = "btn gameLengthBtn";
+    aiHardBtn.dataset.aiDifficulty = "HARD";
+    aiHardBtn.textContent = "Hard";
+
+    aiDifficultyHintEl = document.createElement("div");
+    aiDifficultyHintEl.id = "aiDifficultyHint";
+    aiDifficultyHintEl.style.opacity = ".9";
+    aiDifficultyHintEl.style.fontSize = ".95rem";
+
+    row.appendChild(aiEasyBtn);
+    row.appendChild(aiNormalBtn);
+    row.appendChild(aiHardBtn);
+
+    aiDifficultyWrapEl.appendChild(title);
+    aiDifficultyWrapEl.appendChild(row);
+    aiDifficultyWrapEl.appendChild(aiDifficultyHintEl);
+
+    if (gameLengthHintEl && gameLengthHintEl.parentElement === host) {
+      gameLengthHintEl.insertAdjacentElement("afterend", aiDifficultyWrapEl);
+    } else {
+      host.appendChild(aiDifficultyWrapEl);
+    }
+
+    aiEasyBtn.addEventListener("click", () => setAIDifficulty("EASY"));
+    aiNormalBtn.addEventListener("click", () => setAIDifficulty("NORMAL"));
+    aiHardBtn.addEventListener("click", () => setAIDifficulty("HARD"));
+
+    updateDifficultyUI();
   }
 
   // ---------- game state ----------
@@ -587,6 +679,8 @@ document.addEventListener("DOMContentLoaded", () => {
           : "—";
       turnBannerEl.textContent = `Phase: ${phaseDisplay(phase)} • ${who} • Trick ${trickNumber}/${TOTAL_TRICKS}`;
     }
+
+    updateDifficultyUI();
   }
 
   function renderAIHands() {
@@ -1811,7 +1905,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isBound) return;
     isBound = true;
 
+    createDifficultyControls();
+
     document.querySelectorAll(".gameLengthBtn").forEach(btn => {
+      if (btn.dataset.aiDifficulty) return;
       btn.addEventListener("click", () => {
         if (phase !== "PICK_DEALER") return;
         const value = parseInt(btn.dataset.threshold, 10);
