@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-04-04 15:10
+   2026-04-06 18:50
 
    FILE
    docs/css/style.css
@@ -9,17 +9,16 @@
    Full file replacement.
 
    PURPOSE
-   Preserve the current stable Demo 2 layout while reducing
-   vertical scroll as much as possible without changing HTML
-   or gameplay logic.
+   Preserve the current stable Demo 2 layout while fixing
+   AI difficulty selector visibility and usability on tablet
+   and smaller screens.
 
    FIXES / CHANGES
-   • Tightens top and bottom page spacing
-   • Reduces HUD padding and outer spacing
-   • Reduces felt table height slightly
-   • Tightens trick area height slightly
-   • Pulls bottom seat and lower panels upward
-   • Reduces footer spacing
+   • Keeps existing stable Demo 2 spacing work intact
+   • Adds responsive styling for injected AI difficulty controls
+   • Makes AI difficulty buttons wrap cleanly on tablet
+   • Makes AI difficulty buttons stack cleanly on small screens
+   • Increases tap target usability for tablet/mobile
    • Keeps popup styling intact
    • Keeps AI hand stacks intact
    • Keeps current theme intact
@@ -867,6 +866,43 @@ body{
 }
 
 /* =========================================
+   AI DIFFICULTY CONTROLS
+   ========================================= */
+
+#aiDifficultyWrap{
+  width:100%;
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+#aiDifficultyWrap > div:first-child{
+  color:#f3f6fa;
+  font-size:.95rem;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+
+#aiDifficultyWrap > div:nth-child(2){
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  width:100%;
+}
+
+#aiDifficultyWrap .gameLengthBtn{
+  flex:1 1 140px;
+  min-width:120px;
+  max-width:220px;
+}
+
+#aiDifficultyHint{
+  color:#d8e2f0;
+  line-height:1.4;
+}
+
+/* =========================================
    GAME OVER MODAL
    ========================================= */
 
@@ -965,6 +1001,26 @@ body{
   }
 }
 
+@media (max-width:900px){
+  #aiDifficultyWrap > div:nth-child(2){
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:10px;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn{
+    min-width:0;
+    max-width:none;
+    width:100%;
+    min-height:48px;
+    font-size:1rem;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn:last-child{
+    grid-column:1 / -1;
+  }
+}
+
 @media (max-width:860px){
   .feltTable{
     min-height:440px;
@@ -1013,6 +1069,21 @@ body{
   }
 }
 
+@media (max-width:600px){
+  #aiDifficultyWrap > div:nth-child(2){
+    grid-template-columns:1fr;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn:last-child{
+    grid-column:auto;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn{
+    min-height:50px;
+    font-size:1rem;
+  }
+}
+
 @media (max-width:520px){
   .navlinks{
     gap:10px;
@@ -1043,12 +1114,3 @@ body{
     font-size:.86rem;
   }
 }
-
-Test only this:
-
-gameplay still looks the same
-popup still looks the same
-vertical scroll is reduced
-nothing overlaps or feels cramped
-
-If this behaves, lock another rollback before any more UI work.
