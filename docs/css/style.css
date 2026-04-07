@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-04-06 18:50
+   2026-04-06 19:20
 
    FILE
    docs/css/style.css
@@ -9,22 +9,24 @@
    Full file replacement.
 
    PURPOSE
-   Preserve the current stable Demo 2 layout while fixing
-   AI difficulty selector visibility and usability on tablet
-   and smaller screens.
+   Preserve the current stable Demo 2 layout while improving
+   the Pick Dealer area layout and keeping AI difficulty
+   controls visible on tablet and smaller screens.
 
    FIXES / CHANGES
    • Keeps existing stable Demo 2 spacing work intact
    • Adds responsive styling for injected AI difficulty controls
    • Makes AI difficulty buttons wrap cleanly on tablet
    • Makes AI difficulty buttons stack cleanly on small screens
-   • Increases tap target usability for tablet/mobile
+   • Converts Pick Dealer lower section into two balanced boxes
+   • Left box is status only
+   • Right box is pick cards only
+   • Makes both boxes equal visual height
    • Keeps popup styling intact
    • Keeps AI hand stacks intact
    • Keeps current theme intact
 
    UNTOUCHED AREAS
-   • No HTML structure assumptions changed here
    • No JS logic changed here
    • No dealer rotation changed here
    • No quota logic changed here
@@ -735,7 +737,42 @@ body{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
+  margin-top:0;
+}
+
+.pickLowerGrid{
+  display:grid;
+  grid-template-columns:minmax(220px, 280px) minmax(0, 1fr);
+  gap:12px;
+  align-items:stretch;
   margin-top:12px;
+}
+
+.pickStatusBox,
+.pickCardsBox{
+  min-height:106px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+.pickInfoTitle{
+  font-size:.95rem;
+  font-weight:800;
+  margin-bottom:8px;
+  color:#f1f4f9;
+}
+
+.pickInfoBody{
+  flex:1;
+  display:flex;
+  align-items:center;
+  line-height:1.55;
+  color:#dbe3ef;
 }
 
 .cardFaceMini{
@@ -997,6 +1034,10 @@ body{
 
 @media (max-width:980px){
   .playLayout{
+    grid-template-columns:1fr;
+  }
+
+  .pickLowerGrid{
     grid-template-columns:1fr;
   }
 }
