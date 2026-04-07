@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-06 17:10 (-0400)
+// 2026-04-06 18:05 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,38 +9,38 @@
 // Full file replacement.
 //
 // ISSUE
-// AI trump selection was serviceable but too generic.
-// It mostly counted suit weight and honors, without enough
-// regard for hand shape, real control, joker synergy, or
-// quota context.
+// AI had one stronger baseline, but no difficulty framework.
 //
 // ROOT CAUSE
-// chooseTrumpFromOwnHand(pi) used a broad additive score.
-// That made some weak-looking long suits rate too high and
-// some strong control suits rate too low.
+// AI decisions were hard-coded as one behavior level.
+// That made tuning and future expansion harder.
 //
 // FIX
-// • Add trump evaluation helpers
-// • Score each suit by:
-//   - suit length
-//   - top-card control
-//   - honor concentration
-//   - joker synergy
-//   - weak filler penalty
-//   - void / short-suit protection value
-//   - quota pressure context
-// • Keep all game flow, pick flow, pluck flow, UI flow,
-//   scoring flow, and popup logic unchanged
+// • Add AI difficulty framework for EASY, NORMAL, HARD
+// • Keep one shared AI system
+// • Tune behavior through profile weights, not separate AI codebases
+// • Default difficulty set to NORMAL
+// • Apply difficulty profile to:
+//   - trick play urgency
+//   - cheapest winner vs stronger winner pressure
+//   - lead behavior
+//   - pluck suit scoring
+//   - trump selection scoring
+//   - trump-open willingness
+//
+// HOW TO CHANGE DIFFICULTY
+// • Set AI_DIFFICULTY to "EASY", "NORMAL", or "HARD"
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
-// • Pluck logic
 // • Human pluck interaction
-// • Trick play engine flow
 // • Existing rendering structure
 // • Game over popup logic
+//
+// LINE COUNT NOTE
+// • Exact before/after line count not claimed here to avoid false precision.
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -161,6 +161,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const AI_DELAY = 240;
   const RESOLVE_DELAY = 260;
   const BETWEEN_TRICKS = 240;
+
+  // ---------- difficulty ----------
+  // EASY | NORMAL | HARD
+  let AI_DIFFICULTY = "NORMAL";
+
+  function aiProfile() {
+    if (AI_DIFFICULTY === "EASY") {
+      return {
+        urgencyAggression: 0.75,
+        leadStrengthBias: 0.80,
+        cheapestWinnerBias: 0.65,
+        pluckValueWeight: 0.70,
+        trumpValueWeight: 0.75,
+        trumpOpenBias: 0.70,
+        preserveTrumpBias: 1.10,
+        randomness: 0.22
+      };
+    }
+
+    if (AI_DIFFICULTY === "HARD") {
+      return {
+        urgencyAggression: 1.30,
+        leadStrengthBias: 1.20,
+        cheapestWinnerBias: 1.25,
+        pluckValueWeight: 1.25,
+        trumpValueWeight: 1.20,
+        trumpOpenBias: 1.20,
+        preserveTrumpBias: 0.90,
+        randomness: 0.00
+      };
+    }
+
+    return {
+      urgencyAggression: 1.00,
+      leadStrengthBias: 1.00,
+      cheapestWinnerBias: 1.00,
+      pluckValueWeight: 1.00,
+      trumpValueWeight: 1.00,
+      trumpOpenBias: 1.00,
+      preserveTrumpBias: 1.00,
+      randomness: 0.08
+    };
+  }
+
+  function aiNoise(scale = 10) {
+    const profile = aiProfile();
+    if (!profile.randomness) return 0;
+    return (Math.random() - 0.5) * scale * profile.randomness;
+  }
 
   // ---------- game state ----------
   const players = [
@@ -981,9 +1030,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- AI pluck helpers ----------
-  // The AI still sends the lowest card in the chosen suit.
-  // The upgrade here is only about choosing the best suit.
-
   function normalCardValue(cardStr) {
     if (!cardStr || isJoker(cardStr)) return 0;
     return RANK_VALUE[cardStr.slice(0, -1)] || 0;
@@ -994,6 +1040,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function aiPluckSuitScore(pluckerI, pluckeeI, suit) {
+    const profile = aiProfile();
+
     const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
     const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
 
@@ -1006,29 +1054,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let score = 0;
 
-    // Core value: how much stronger the incoming card is than the outgoing card.
     score += (takeVal - giveVal) * 12;
 
-    // Extra value for stealing a genuinely strong card.
     if (takeVal >= 14) score += 16;
     else if (takeVal >= 13) score += 12;
     else if (takeVal >= 12) score += 9;
     else if (takeVal >= 11) score += 6;
 
-    // Small reward when AI gives away true trash.
     if (giveVal <= 4) score += 4;
     else if (giveVal <= 6) score += 2;
 
-    // If AI still needs tricks, strengthening an already-held suit is useful.
     if (need > 0) {
       score += ownSuitCount * 2;
       if (takeVal >= 11) score += 4;
     }
 
-    // If AI is already on or over quota, avoid overbuilding a suit too much.
     if (need <= 0) {
       score -= ownSuitCount * 2;
     }
+
+    score *= profile.pluckValueWeight;
+    score += aiNoise(10);
 
     return score;
   }
@@ -1092,9 +1138,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- trump ----------
-  // Trump selection now scores the whole hand by suit shape,
-  // top-card control, joker synergy, and quota context.
-
   function suitCardsNonJoker(pi, suit) {
     return players[pi].hand
       .filter(c => !isJoker(c) && c.slice(-1) === suit)
@@ -1174,8 +1217,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (topValue >= 13) score += 6;
       if (topValue >= 14) score += 4;
     } else {
-      // If already on or over quota, still choose a sane trump,
-      // but slightly prefer cleaner control over brute length.
       if (length >= 5 && topValue < 12) score -= 5;
       if (length === 2 && topValue >= 14) score += 4;
     }
@@ -1184,6 +1225,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function evaluateTrumpSuit(pi, suit) {
+    const profile = aiProfile();
+
     const cards = suitCardsNonJoker(pi, suit);
     const length = cards.length;
     const jokerCount = countJokersInHand(pi);
@@ -1198,12 +1241,12 @@ document.addEventListener("DOMContentLoaded", () => {
     score -= trumpSuitFillerPenalty(cards);
     score += jokerSynergyScore(jokerCount, length, topValue);
     score += quotaTrumpBias(need, length, topValue);
-
-    // Short side suits become more playable when this suit is trump.
     score += shortSideCount * 3;
 
-    // Tiny extra reward for a compact strong suit.
     if (length >= 3 && topValue >= 12) score += 5;
+
+    score *= profile.trumpValueWeight;
+    score += aiNoise(8);
 
     return score;
   }
@@ -1358,6 +1401,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function aiLowestPressureIndex(legal, hand) {
+    const profile = aiProfile();
+
     let best = legal[0];
     let bestScore = Infinity;
 
@@ -1365,8 +1410,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const c = hand[idx];
       let score = cardPower(c);
 
-      if (isTrumpCard(c)) score += 10000;
+      if (isTrumpCard(c)) score += 10000 * profile.preserveTrumpBias;
       if (isJoker(c)) score += 50000;
+
+      if (!trumpOpen && isTrumpCard(c)) score += 6000 * profile.preserveTrumpBias;
+
+      score += aiNoise(6);
 
       if (score < bestScore) {
         bestScore = score;
@@ -1378,26 +1427,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function aiLeadPreferenceScore(c, need, remainingAfterThis) {
+    const profile = aiProfile();
+
     let score = cardPower(c);
 
     if (isTrumpCard(c)) score += 4000;
     if (isJoker(c)) score += 20000;
 
-    if (need > remainingAfterThis) {
-      score -= cardPower(c) * 2;
+    if (need > remainingAfterThis * profile.urgencyAggression) {
+      score -= cardPower(c) * 2 * profile.leadStrengthBias;
     }
+
+    score += aiNoise(6);
 
     return score;
   }
 
   function aiBestLeadIndex(pi, legal, hand, need) {
+    const profile = aiProfile();
     const remainingAfterThis = tricksRemainingForPlayer(pi) - 1;
 
-    if (need > remainingAfterThis) {
+    if (need > remainingAfterThis * profile.urgencyAggression) {
       let best = legal[0];
       let bestPower = -1;
       for (const idx of legal) {
-        const p = cardPower(hand[idx]);
+        const p = cardPower(hand[idx]) + aiNoise(4);
         if (p > bestPower) {
           bestPower = p;
           best = idx;
@@ -1423,7 +1477,48 @@ document.addEventListener("DOMContentLoaded", () => {
     return aiLowestPressureIndex(legal, hand);
   }
 
+  // ---------- AI trump-open helpers ----------
+  function aiChooseTrumpOpenIndex(pi, legal, hand, need, remainingAfterThis) {
+    const profile = aiProfile();
+
+    const hasLeadSuit = players[pi].hand.some(c => cardSuitForFollow(c) === leadSuit);
+    if (hasLeadSuit) return null;
+
+    const trumpLegal = legal.filter(idx => isTrumpCard(hand[idx]));
+    const nonTrumpLegal = legal.filter(idx => !isTrumpCard(hand[idx]));
+
+    if (!trumpLegal.length) {
+      if (nonTrumpLegal.length) return aiLowestPressureIndex(nonTrumpLegal, hand);
+      return null;
+    }
+
+    const strongestTrumpWinner = aiStrongestWinnerIndex(pi, trumpLegal, hand);
+    const cheapestTrumpWinner = aiCheapestWinnerIndex(pi, trumpLegal, hand);
+
+    if (need > remainingAfterThis * profile.urgencyAggression && strongestTrumpWinner !== null) {
+      return strongestTrumpWinner;
+    }
+
+    if (need > 0 && cheapestTrumpWinner !== null) {
+      if (Math.random() < profile.trumpOpenBias || AI_DIFFICULTY === "HARD") {
+        return cheapestTrumpWinner;
+      }
+    }
+
+    if (nonTrumpLegal.length) {
+      return aiLowestPressureIndex(nonTrumpLegal, hand);
+    }
+
+    if (cheapestTrumpWinner !== null) {
+      return cheapestTrumpWinner;
+    }
+
+    return aiLowestPressureIndex(legal, hand);
+  }
+
   function aiChooseIndex(pi) {
+    const profile = aiProfile();
+
     const legal = legalCardsFor(pi);
     const hand = players[pi].hand;
     const need = players[pi].quota - players[pi].tricks;
@@ -1434,14 +1529,22 @@ document.addEventListener("DOMContentLoaded", () => {
       return aiBestLeadIndex(pi, legal, hand, need);
     }
 
+    if (!trumpOpen) {
+      const openChoice = aiChooseTrumpOpenIndex(pi, legal, hand, need, remainingAfterThis);
+      if (openChoice !== null) return openChoice;
+    }
+
     const strongestWinner = aiStrongestWinnerIndex(pi, legal, hand);
     const cheapestWinner = aiCheapestWinnerIndex(pi, legal, hand);
 
-    if (need > remainingAfterThis && strongestWinner !== null) {
+    if (need > remainingAfterThis * profile.urgencyAggression && strongestWinner !== null) {
       return strongestWinner;
     }
 
     if (need > 0 && cheapestWinner !== null) {
+      if (AI_DIFFICULTY === "EASY" && Math.random() < 0.18 && legal.length > 1) {
+        return aiLowestPressureIndex(legal, hand);
+      }
       return cheapestWinner;
     }
 
