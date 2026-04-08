@@ -1,7 +1,7 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-06 19:20 (-0400)
+2026-04-06 20:35 (-0400)
 
 FILE
 docs/demo2.html
@@ -10,24 +10,22 @@ ACTION
 Full file replacement.
 
 PURPOSE
-Restructure the Pick Dealer area so the status sits in its own
-left box and the pick cards sit in a matching right box.
+Rename Demo 2 to Pluck Arena across the page while keeping
+all current DOM IDs and gameplay wiring intact.
 
 FIXES / CHANGES
-• Splits Pick panel lower area into 2 side by side boxes
-• Left box holds Pick status only
-• Right box holds AI2, AI3, YOU pick cards
+• Navigation label changed from Demo 2 to Pluck Arena
+• Page title changed from Pluck Demo 2 to Pluck Arena
+• Active page label changed to Pluck Arena
 • Keeps all existing DOM IDs used by demo2.js
-• Keeps game length controls intact
-• Keeps pick buttons intact
-• Keeps all gameplay wiring intact
+• Keeps current gameplay wiring intact
 
 ROW COUNT
-Previous File Row Count: 219
+Previous File Row Count: 232
 Current File Row Count: 232
 
 UNTOUCHED AREAS
-• Header
+• Header structure
 • HUD
 • Table layout
 • AI hand containers
@@ -41,7 +39,7 @@ UNTOUCHED AREAS
 FAILURE TEST
 • Pick buttons must still work
 • Pick status must still update
-• Pick cards must still render in their current IDs
+• Pick cards must still render
 • No gameplay change from HTML alone
 =========================================================
 -->
@@ -50,7 +48,7 @@ FAILURE TEST
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck Demo 2</title>
+  <title>Pluck Arena</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .cardBack {
@@ -131,8 +129,8 @@ FAILURE TEST
     </div>
     <nav class="navlinks" aria-label="Primary">
       <a href="index.html">Home</a>
-      <a href="game.html">Play Demo</a>
-      <a class="activeLink" href="demo2.html">Demo 2</a>
+      <a href="game.html">Practice Pluck</a>
+      <a class="activeLink" href="demo2.html">Pluck Arena</a>
       <a href="rules.html">Rules</a>
       <a href="learn-pluck.html">Learn Pluck</a>
       <a href="about.html">About</a>
