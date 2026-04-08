@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-06 18:30 (-0400)
+// 2026-04-06 20:20 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,32 +9,37 @@
 // Full file replacement.
 //
 // ISSUE
-// AI difficulty existed in code only.
-// There was no UI selector to change difficulty without
-// manually editing the file.
+// Endgame AI was still too generic in the last few tricks.
+// It played better than before, but it did not explicitly
+// switch into exact quota math soon enough.
 //
 // ROOT CAUSE
-// AI_DIFFICULTY was hard-coded and had no live control.
+// aiChooseIndex(pi) and supporting helpers handled urgency,
+// cheapest winner, trump-open, and general pressure well,
+// but they did not fully separate late-hand states like:
+//
+// • must win all remaining tricks
+// • must win this trick now
+// • needs exactly one more
+// • exactly on quota and must avoid stealing one
+// • already over quota and should not take more
+// • last-to-act endgame where winner steering matters
 //
 // FIX
-// • Add injected UI selectors for EASY, NORMAL, HARD
-// • No HTML changes required
-// • Difficulty can now be changed from the page before play
-// • Current selection is visually highlighted
-// • Default remains NORMAL
-//
-// HOW IT WORKS
-// • A difficulty control block is injected near the game
-//   length controls on page load
-// • Clicking EASY, NORMAL, or HARD updates AI_DIFFICULTY
-// • Difficulty can only be changed during PICK DEALER phase
+// • Add endgame mode helpers
+// • Add last 5 tricks endgame behavior
+// • Add exact quota state logic
+// • Add last-to-act winner steering logic
+// • Add stronger late-hand urgency math
+// • Keep difficulty tiers intact
+// • Keep all UI, pick, pluck, trump, and popup wiring intact
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
 // • Pluck logic
-// • Trump logic
+// • Trump selection flow
 // • Human pluck interaction
 // • Existing rendering structure
 // • Game over popup logic
@@ -160,6 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const CARD_BIG_JOKER = "BJ";
   const CARD_LITTLE_JOKER = "LJ";
   const CARD_OPEN_LEAD = "2C";
+  const ENDGAME_TRICK_THRESHOLD = 5;
 
   const AI_DELAY = 240;
   const RESOLVE_DELAY = 260;
@@ -179,6 +185,8 @@ document.addEventListener("DOMContentLoaded", () => {
         trumpValueWeight: 0.75,
         trumpOpenBias: 0.70,
         preserveTrumpBias: 1.10,
+        endgameBias: 0.75,
+        winnerSteeringBias: 0.70,
         randomness: 0.22
       };
     }
@@ -192,6 +200,8 @@ document.addEventListener("DOMContentLoaded", () => {
         trumpValueWeight: 1.20,
         trumpOpenBias: 1.20,
         preserveTrumpBias: 0.90,
+        endgameBias: 1.35,
+        winnerSteeringBias: 1.30,
         randomness: 0.00
       };
     }
@@ -204,6 +214,8 @@ document.addEventListener("DOMContentLoaded", () => {
       trumpValueWeight: 1.00,
       trumpOpenBias: 1.00,
       preserveTrumpBias: 1.00,
+      endgameBias: 1.00,
+      winnerSteeringBias: 1.00,
       randomness: 0.08
     };
   }
@@ -1425,6 +1437,27 @@ document.addEventListener("DOMContentLoaded", () => {
     return players[pi].hand.length;
   }
 
+  function aiPlayerNeed(pi) {
+    return players[pi].quota - players[pi].tricks;
+  }
+
+  function aiIsEndgame(pi) {
+    return tricksRemainingForPlayer(pi) <= ENDGAME_TRICK_THRESHOLD;
+  }
+
+  function aiEndgameMode(pi) {
+    const need = aiPlayerNeed(pi);
+    const remaining = tricksRemainingForPlayer(pi);
+
+    if (need > remaining) return "DEAD_SHORT";
+    if (need === remaining && remaining > 0) return "MUST_WIN_ALL";
+    if (need === remaining - 1 && remaining > 1) return "MISS_ONLY_ONE";
+    if (need === 1) return "NEED_ONE";
+    if (need > 1) return "NEED_SOME";
+    if (need === 0) return "EXACT";
+    return "OVER";
+  }
+
   function aiCandidateWinsTrick(pi, cardStr) {
     const temp = trick.concat([{ playerIndex: pi, cardStr }]);
     const anyTrump = temp.some(t => isTrumpCard(t.cardStr));
@@ -1520,6 +1553,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return best;
   }
 
+  function aiHighestLoserIndex(pi, legal, hand) {
+    let best = null;
+    let bestPower = -1;
+
+    for (const idx of legal) {
+      const c = hand[idx];
+      if (aiCandidateWinsTrick(pi, c)) continue;
+      const power = cardPower(c);
+      if (power > bestPower) {
+        bestPower = power;
+        best = idx;
+      }
+    }
+
+    return best;
+  }
+
   function aiLeadPreferenceScore(c, need, remainingAfterThis) {
     const profile = aiProfile();
 
@@ -1540,6 +1590,47 @@ document.addEventListener("DOMContentLoaded", () => {
   function aiBestLeadIndex(pi, legal, hand, need) {
     const profile = aiProfile();
     const remainingAfterThis = tricksRemainingForPlayer(pi) - 1;
+    const mode = aiEndgameMode(pi);
+
+    if (aiIsEndgame(pi)) {
+      if (mode === "MUST_WIN_ALL" || mode === "DEAD_SHORT") {
+        let best = legal[0];
+        let bestPower = -1;
+        for (const idx of legal) {
+          const p = cardPower(hand[idx]) + aiNoise(4);
+          if (p > bestPower) {
+            bestPower = p;
+            best = idx;
+          }
+        }
+        return best;
+      }
+
+      if (mode === "NEED_ONE" || mode === "NEED_SOME" || mode === "MISS_ONLY_ONE") {
+        let best = legal[0];
+        let bestScore = Infinity;
+        for (const idx of legal) {
+          const c = hand[idx];
+          let score = aiLeadPreferenceScore(c, need, remainingAfterThis);
+          score -= 14 * profile.endgameBias;
+          if (score < bestScore) {
+            bestScore = score;
+            best = idx;
+          }
+        }
+        return best;
+      }
+
+      if (mode === "EXACT") {
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "OVER") {
+        const bleed = aiHighestLoserIndex(pi, legal, hand);
+        if (bleed !== null) return bleed;
+        return aiLowestPressureIndex(legal, hand);
+      }
+    }
 
     if (need > remainingAfterThis * profile.urgencyAggression) {
       let best = legal[0];
@@ -1610,6 +1701,100 @@ document.addEventListener("DOMContentLoaded", () => {
     return aiLowestPressureIndex(legal, hand);
   }
 
+  // ---------- AI endgame winner steering ----------
+  function aiResolveWinnerForTempTrick(tempTrick) {
+    const anyTrump = tempTrick.some(t => isTrumpCard(t.cardStr));
+
+    if (anyTrump) {
+      let bestPi = tempTrick[0].playerIndex;
+      let bestP = -1;
+      for (const t of tempTrick) {
+        if (!isTrumpCard(t.cardStr)) continue;
+        const p = cardPower(t.cardStr);
+        if (p > bestP) {
+          bestP = p;
+          bestPi = t.playerIndex;
+        }
+      }
+      return bestPi;
+    }
+
+    const tempLeadSuit = cardSuitForFollow(tempTrick[0].cardStr);
+    let bestPi = tempTrick[0].playerIndex;
+    let bestV = -1;
+    for (const t of tempTrick) {
+      if (cardSuitForFollow(t.cardStr) !== tempLeadSuit) continue;
+      const v = parseCard(t.cardStr).value;
+      if (v > bestV) {
+        bestV = v;
+        bestPi = t.playerIndex;
+      }
+    }
+    return bestPi;
+  }
+
+  function aiWinnerSteeringScore(selfPi, winnerPi, idx, hand) {
+    const profile = aiProfile();
+    const selfMode = aiEndgameMode(selfPi);
+    const selfNeed = aiPlayerNeed(selfPi);
+    const winnerNeed = aiPlayerNeed(winnerPi);
+    const cardStr = hand[idx];
+
+    let score = 0;
+
+    if (winnerPi === selfPi) {
+      if (selfMode === "MUST_WIN_ALL") score += 220;
+      else if (selfMode === "MISS_ONLY_ONE") score += 120;
+      else if (selfMode === "NEED_ONE") score += 170;
+      else if (selfMode === "NEED_SOME") score += 140;
+      else if (selfMode === "EXACT") score -= 180;
+      else if (selfMode === "OVER") score -= 220;
+      else if (selfMode === "DEAD_SHORT") score += 70;
+    } else {
+      if (selfNeed <= 0) {
+        if (winnerNeed > 0) score += 90;
+        if (winnerNeed === 0) score += 20;
+        if (winnerNeed < 0) score -= 50;
+      } else {
+        if (winnerNeed > 0) score -= 20;
+      }
+    }
+
+    if (isJoker(cardStr)) score -= 60;
+    if (isTrumpCard(cardStr)) score -= 18;
+    score -= normalCardValue(cardStr) * 1.5;
+
+    score *= profile.winnerSteeringBias;
+    score += aiNoise(4);
+
+    return score;
+  }
+
+  function aiBestLastToActIndex(pi, legal, hand) {
+    let bestIdx = legal[0];
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (const idx of legal) {
+      const temp = trick.concat([{ playerIndex: pi, cardStr: hand[idx] }]);
+      const winnerPi = aiResolveWinnerForTempTrick(temp);
+      let score = aiWinnerSteeringScore(pi, winnerPi, idx, hand);
+
+      if (winnerPi === pi) {
+        const mode = aiEndgameMode(pi);
+        if (mode === "NEED_ONE" || mode === "NEED_SOME" || mode === "MISS_ONLY_ONE" || mode === "MUST_WIN_ALL") {
+          score += 40;
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = idx;
+      }
+    }
+
+    return bestIdx;
+  }
+
   function aiChooseIndex(pi) {
     const profile = aiProfile();
 
@@ -1618,9 +1803,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const need = players[pi].quota - players[pi].tricks;
     const remainingNow = tricksRemainingForPlayer(pi);
     const remainingAfterThis = remainingNow - 1;
+    const mode = aiEndgameMode(pi);
+    const endgame = aiIsEndgame(pi);
 
     if (trick.length === 0) {
       return aiBestLeadIndex(pi, legal, hand, need);
+    }
+
+    if (endgame && trick.length === 2) {
+      return aiBestLastToActIndex(pi, legal, hand);
     }
 
     if (!trumpOpen) {
@@ -1630,6 +1821,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const strongestWinner = aiStrongestWinnerIndex(pi, legal, hand);
     const cheapestWinner = aiCheapestWinnerIndex(pi, legal, hand);
+    const highestLoser = aiHighestLoserIndex(pi, legal, hand);
+
+    if (endgame) {
+      if (mode === "MUST_WIN_ALL") {
+        if (strongestWinner !== null) return strongestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "DEAD_SHORT") {
+        if (strongestWinner !== null) return strongestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "MISS_ONLY_ONE") {
+        if (strongestWinner !== null && remainingAfterThis <= need) return strongestWinner;
+        if (cheapestWinner !== null) return cheapestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "NEED_ONE") {
+        if (remainingAfterThis === 0 && strongestWinner !== null) return strongestWinner;
+        if (cheapestWinner !== null) return cheapestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "NEED_SOME") {
+        if (need > remainingAfterThis * profile.urgencyAggression && strongestWinner !== null) {
+          return strongestWinner;
+        }
+        if (cheapestWinner !== null) {
+          return cheapestWinner;
+        }
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "EXACT") {
+        if (highestLoser !== null) return highestLoser;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "OVER") {
+        if (highestLoser !== null) return highestLoser;
+        return aiLowestPressureIndex(legal, hand);
+      }
+    }
 
     if (need > remainingAfterThis * profile.urgencyAggression && strongestWinner !== null) {
       return strongestWinner;
@@ -1643,10 +1879,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (need === 0) {
+      if (highestLoser !== null) return highestLoser;
       return aiLowestPressureIndex(legal, hand);
     }
 
     if (need < 0) {
+      if (highestLoser !== null) return highestLoser;
       return aiLowestPressureIndex(legal, hand);
     }
 
