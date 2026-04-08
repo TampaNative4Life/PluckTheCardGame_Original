@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck Demo</title>
+  <title>Practice Pluck</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -18,8 +18,8 @@
 
     <nav class="navlinks" aria-label="Main navigation">
       <a href="index.html">Home</a>
-      <a href="game.html" class="activeLink">Play Demo</a>
-      <a href="demo2.html">Demo 2</a>
+      <a href="game.html" class="activeLink">Practice Pluck</a>
+      <a href="demo2.html">Pluck Arena</a>
       <a href="rules.html">Rules</a>
       <a href="learn-pluck.html">Learn Pluck</a>
       <a href="about.html">About</a>
@@ -32,7 +32,7 @@
       <aside class="sidePanel">
 
         <div class="card">
-          <h3 style="margin-top:0;">Initial Pick (Choose Dealer)</h3>
+          <h3 style="margin-top:0;">Initial Pick, Choose Dealer</h3>
           <p class="hint" style="margin-top:6px;">
             Each player draws 1 card. Lowest card becomes Dealer. If tied for lowest, repack and pick again.
           </p>
@@ -40,7 +40,7 @@
           <div id="pickArea" style="margin-top:12px;">
             <div class="buttons" style="justify-content:flex-start;flex-wrap:wrap;">
               <button class="btn" id="pickBtn">Pick</button>
-              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK (Start Game)</button>
+              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK, Start Practice</button>
               <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
             </div>
 
@@ -161,7 +161,7 @@
           <p id="pluckStatus" class="msg"></p>
           <div id="pluckChoices" class="buttons" style="justify-content:flex-start; flex-wrap:wrap;"></div>
           <button class="btn" id="pluckNextBtn">Run Next Pluck</button>
-          <p class="hint">Failed suit attempt = pluck LOST (no re-pick).</p>
+          <p class="hint">Failed suit attempt = pluck LOST. No re-pick.</p>
         </div>
 
         <div class="card" id="trumpPanel" style="display:none; margin-top:14px;">
