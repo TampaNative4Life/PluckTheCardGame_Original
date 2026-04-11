@@ -1,29 +1,15 @@
 /* =========================================================
    CHANGE LOG
-   2026-04-04 14:25 (EST)
+   2026-04-11 14:00
 
    FILE
    docs/css/style.css
 
    ACTION
-   New Rollback Point 04042026
+   Rollback Point 04112026
 
    PURPOSE
-   New Rollback Point 04042026
-
-   FIXES / CHANGES
-   • Keeps recovery stylesheet intact
-   • Keeps current theme intact
-   • Keeps gameplay window layout intact
-   • Keeps AI hands vertical and compact
-   • Adds centered themed game-over modal
-   • Does not touch gameplay logic
-
-   UNTOUCHED AREAS
-   • No HTML structure assumptions changed here
-   • No JS logic changed here
-   • No dealer rotation changed here
-   • No quota logic changed here
+  Rollback Point 04112026
    ========================================================= */
 
 :root{
@@ -64,7 +50,7 @@ body{
   align-items:center;
   justify-content:space-between;
   gap:18px;
-  padding:14px 18px;
+  padding:10px 18px;
   border-bottom:1px solid rgba(255,255,255,.08);
   background:rgba(4,7,13,.95);
   backdrop-filter:blur(8px);
@@ -121,7 +107,7 @@ body{
 .container{
   max-width:1280px;
   margin:0 auto;
-  padding:22px 16px 28px;
+  padding:12px 16px 14px;
 }
 
 /* =========================================
@@ -187,8 +173,8 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:48px;
-  padding:12px 22px;
+  min-height:46px;
+  padding:11px 20px;
   border-radius:14px;
   border:1px solid rgba(124,183,255,.16);
   background:linear-gradient(145deg, #1a2741, #121c31);
@@ -225,8 +211,8 @@ body{
   text-align:center;
   color:#93a1ba;
   font-size:.95rem;
-  padding:18px 0 6px;
-  margin-top:18px;
+  padding:10px 0 4px;
+  margin-top:8px;
 }
 
 /* =========================================
@@ -509,12 +495,12 @@ body{
 .statusBar{
   width:min(1100px, 100%);
   margin:0 auto 0;
-  padding:12px 14px;
+  padding:10px 12px;
   border-radius:16px;
   border:1px solid rgba(124,183,255,.14);
   background:rgba(15,23,42,.9);
   display:flex;
-  gap:12px;
+  gap:10px;
   flex-wrap:wrap;
   align-items:center;
 }
@@ -546,7 +532,7 @@ body{
 
 .tableStage{
   margin-top:0;
-  min-height:540px;
+  min-height:482px;
   position:relative;
 }
 
@@ -556,7 +542,7 @@ body{
 
 .feltTable{
   width:min(1100px, 100%);
-  min-height:500px;
+  min-height:442px;
   margin:0 auto;
   position:relative;
   border-radius:26px;
@@ -595,7 +581,7 @@ body{
 
 .seat-bottom{
   left:50%;
-  bottom:68px;
+  bottom:42px;
   transform:translateX(-50%);
   width:min(900px, 94%);
 }
@@ -604,7 +590,7 @@ body{
   display:flex;
   align-items:center;
   gap:12px;
-  padding:10px 12px;
+  padding:9px 12px;
   border-radius:16px;
   background:rgba(0,0,0,.18);
   border:1px solid rgba(255,255,255,.08);
@@ -640,16 +626,16 @@ body{
 .trickCenter{
   position:absolute;
   left:50%;
-  top:44%;
+  top:43%;
   transform:translate(-50%,-50%);
   width:min(520px, 78%);
-  min-height:220px;
+  min-height:190px;
   z-index:1;
 }
 
 .trickInner{
   width:100%;
-  min-height:220px;
+  min-height:190px;
   border-radius:22px;
   border:2px dashed rgba(255,255,255,.22);
   background:rgba(0,0,0,.14);
@@ -657,8 +643,8 @@ body{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:12px;
-  padding:14px;
+  gap:10px;
+  padding:12px;
 }
 
 .trickTitle{
@@ -670,7 +656,7 @@ body{
   display:flex;
   justify-content:center;
   gap:14px;
-  min-height:110px;
+  min-height:100px;
   flex-wrap:wrap;
 }
 
@@ -688,7 +674,7 @@ body{
 
 .bottomPanel{
   width:min(1100px, 100%);
-  margin:8px auto 0;
+  margin:6px auto 0;
 }
 
 .overlayCard{
@@ -696,7 +682,7 @@ body{
   border:1px solid rgba(124,183,255,.14);
   background:rgba(15,23,42,.92);
   box-shadow:var(--shadow);
-  padding:16px;
+  padding:12px;
 }
 
 .bottomCard{
@@ -706,18 +692,18 @@ body{
 .overlayTitle{
   font-size:1.15rem;
   font-weight:800;
-  margin-bottom:6px;
+  margin-bottom:4px;
 }
 
 .overlaySub{
   color:#d4dceb;
-  margin-bottom:12px;
-  line-height:1.6;
+  margin-bottom:10px;
+  line-height:1.5;
 }
 
 .overlayButtons{
   display:flex;
-  gap:12px;
+  gap:10px;
   flex-wrap:wrap;
   align-items:center;
 }
@@ -730,7 +716,42 @@ body{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
-  margin-top:14px;
+  margin-top:0;
+}
+
+.pickLowerGrid{
+  display:grid;
+  grid-template-columns:minmax(220px, 280px) minmax(0, 1fr);
+  gap:12px;
+  align-items:stretch;
+  margin-top:12px;
+}
+
+.pickStatusBox,
+.pickCardsBox{
+  min-height:106px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+.pickInfoTitle{
+  font-size:.95rem;
+  font-weight:800;
+  margin-bottom:8px;
+  color:#f1f4f9;
+}
+
+.pickInfoBody{
+  flex:1;
+  display:flex;
+  align-items:center;
+  line-height:1.55;
+  color:#dbe3ef;
 }
 
 .cardFaceMini{
@@ -768,7 +789,7 @@ body{
   align-items:flex-end;
   justify-content:flex-start;
   gap:8px;
-  padding:8px 18px;
+  padding:6px 14px;
   border-radius:18px;
   background:rgba(0,0,0,.18);
   border:1px solid rgba(255,255,255,.10);
@@ -826,7 +847,7 @@ body{
   flex-direction:column;
   align-items:center;
   gap:0;
-  padding-top:6px;
+  padding-top:4px;
 }
 
 #ai2Hand .cardBack,
@@ -861,6 +882,43 @@ body{
 }
 
 /* =========================================
+   AI DIFFICULTY CONTROLS
+   ========================================= */
+
+#aiDifficultyWrap{
+  width:100%;
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+#aiDifficultyWrap > div:first-child{
+  color:#f3f6fa;
+  font-size:.95rem;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+
+#aiDifficultyWrap > div:nth-child(2){
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  width:100%;
+}
+
+#aiDifficultyWrap .gameLengthBtn{
+  flex:1 1 140px;
+  min-width:120px;
+  max-width:220px;
+}
+
+#aiDifficultyHint{
+  color:#d8e2f0;
+  line-height:1.4;
+}
+
+/* =========================================
    GAME OVER MODAL
    ========================================= */
 
@@ -872,7 +930,7 @@ body{
   align-items:center;
   justify-content:center;
   z-index:9999;
-  padding:18px;
+  padding:14px;
 }
 
 .gameOverCard{
@@ -957,19 +1015,43 @@ body{
   .playLayout{
     grid-template-columns:1fr;
   }
+
+  .pickLowerGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:900px){
+  #aiDifficultyWrap > div:nth-child(2){
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:10px;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn{
+    min-width:0;
+    max-width:none;
+    width:100%;
+    min-height:48px;
+    font-size:1rem;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn:last-child{
+    grid-column:1 / -1;
+  }
 }
 
 @media (max-width:860px){
   .feltTable{
-    min-height:460px;
+    min-height:440px;
   }
 
   .seat-bottom{
-    bottom:58px;
+    bottom:44px;
   }
 
   .trickCenter{
-    top:43%;
+    top:42%;
   }
 }
 
@@ -1004,6 +1086,21 @@ body{
   .brand img,
   .logo{
     height:38px;
+  }
+}
+
+@media (max-width:600px){
+  #aiDifficultyWrap > div:nth-child(2){
+    grid-template-columns:1fr;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn:last-child{
+    grid-column:auto;
+  }
+
+  #aiDifficultyWrap .gameLengthBtn{
+    min-height:50px;
+    font-size:1rem;
   }
 }
 
