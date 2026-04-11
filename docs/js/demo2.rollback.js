@@ -1,42 +1,18 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-04 14:27 (-0400)
+// 2026-04-11 14:00 (-0400)
 //
 // FILE
 // docs/js/demo2.js
 //
 // ACTION
-// Full Rollback 04042026
+// Rollback Point 04112026
 //
 // ISSUE
-// Full Rollback 04042026
+// Rollback Point 04112026
 //
 // ROOT CAUSE
-// Horribly bad replacement code from ChtGpt
-// 
-// 
-//
-// FIX
-// • Add match length selection using existing HTML buttons
-// • Add cumulative plucks earned / against across hands
-// • Add game-over trigger at end of hand only
-// • Add winner calculation by differential
-// • Add Game Over modal rendering
-// • Add Start New Game reset flow
-//
-// ROW COUNT
-// Previous File Row Count: 803
-// Current File Row Count: 944
-//
-// UNTOUCHED AREAS
-// • Dealer rotation logic
-// • Quota assignment logic
-// • Pick logic
-// • Trump logic
-// • Pluck mechanics
-// • Trick play logic
-// • AI choice logic
-// • Existing rendering structure
+// Rollback Point 04112026
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -100,16 +76,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const youTricksEl    = $("youTricks");
 
   // New UI, optional but expected in current HTML
-  const gameLen8Btn        = $("gameLen8");
-  const gameLen10Btn       = $("gameLen10");
-  const gameLen12Btn       = $("gameLen12");
-  const gameLengthHintEl   = $("gameLengthHint");
+  const gameLen8Btn         = $("gameLen8");
+  const gameLen10Btn        = $("gameLen10");
+  const gameLen12Btn        = $("gameLen12");
+  const gameLengthHintEl    = $("gameLengthHint");
 
-  const gameOverModalEl    = $("gameOverModal");
-  const gameOverThresholdEl= $("gameOverThreshold");
-  const gameOverBodyEl     = $("gameOverBody");
-  const gameOverFooterEl   = $("gameOverFooter");
-  const newGameBtn         = $("newGameBtn");
+  const gameOverModalEl     = $("gameOverModal");
+  const gameOverThresholdEl = $("gameOverThreshold");
+  const gameOverBodyEl      = $("gameOverBody");
+  const gameOverFooterEl    = $("gameOverFooter");
+  const newGameBtn          = $("newGameBtn");
+
+  let aiDifficultyWrapEl    = null;
+  let aiDifficultyHintEl    = null;
+  let aiEasyBtn             = null;
+  let aiNormalBtn           = null;
+  let aiHardBtn             = null;
 
   const required = [
     ["youHand", youHandEl],
@@ -153,10 +135,155 @@ document.addEventListener("DOMContentLoaded", () => {
   const CARD_BIG_JOKER = "BJ";
   const CARD_LITTLE_JOKER = "LJ";
   const CARD_OPEN_LEAD = "2C";
+  const ENDGAME_TRICK_THRESHOLD = 5;
 
   const AI_DELAY = 240;
   const RESOLVE_DELAY = 260;
   const BETWEEN_TRICKS = 240;
+
+  // ---------- difficulty ----------
+  // EASY | NORMAL | HARD
+  let AI_DIFFICULTY = "NORMAL";
+
+  function aiProfile() {
+    if (AI_DIFFICULTY === "EASY") {
+      return {
+        urgencyAggression: 0.75,
+        leadStrengthBias: 0.80,
+        cheapestWinnerBias: 0.65,
+        pluckValueWeight: 0.70,
+        trumpValueWeight: 0.75,
+        trumpOpenBias: 0.70,
+        preserveTrumpBias: 1.10,
+        endgameBias: 0.75,
+        winnerSteeringBias: 0.70,
+        randomness: 0.22
+      };
+    }
+
+    if (AI_DIFFICULTY === "HARD") {
+      return {
+        urgencyAggression: 1.30,
+        leadStrengthBias: 1.20,
+        cheapestWinnerBias: 1.25,
+        pluckValueWeight: 1.25,
+        trumpValueWeight: 1.20,
+        trumpOpenBias: 1.20,
+        preserveTrumpBias: 0.90,
+        endgameBias: 1.35,
+        winnerSteeringBias: 1.30,
+        randomness: 0.00
+      };
+    }
+
+    return {
+      urgencyAggression: 1.00,
+      leadStrengthBias: 1.00,
+      cheapestWinnerBias: 1.00,
+      pluckValueWeight: 1.00,
+      trumpValueWeight: 1.00,
+      trumpOpenBias: 1.00,
+      preserveTrumpBias: 1.00,
+      endgameBias: 1.00,
+      winnerSteeringBias: 1.00,
+      randomness: 0.08
+    };
+  }
+
+  function aiNoise(scale = 10) {
+    const profile = aiProfile();
+    if (!profile.randomness) return 0;
+    return (Math.random() - 0.5) * scale * profile.randomness;
+  }
+
+  function updateDifficultyUI() {
+    const btns = [aiEasyBtn, aiNormalBtn, aiHardBtn].filter(Boolean);
+
+    for (const btn of btns) {
+      const isActive = btn.dataset.aiDifficulty === AI_DIFFICULTY;
+      btn.classList.toggle("activeLength", isActive);
+      btn.classList.toggle("btn-secondary", !isActive);
+      btn.disabled = phase !== "PICK_DEALER";
+    }
+
+    if (aiDifficultyHintEl) {
+      aiDifficultyHintEl.textContent = `AI Difficulty: ${AI_DIFFICULTY}`;
+    }
+  }
+
+  function setAIDifficulty(level) {
+    if (!["EASY", "NORMAL", "HARD"].includes(level)) return;
+    if (phase !== "PICK_DEALER") return;
+    AI_DIFFICULTY = level;
+    updateDifficultyUI();
+  }
+
+  function createDifficultyControls() {
+    if (aiDifficultyWrapEl) return;
+
+    const host = gameLengthHintEl?.parentElement || pickPanelEl;
+    if (!host) return;
+
+    aiDifficultyWrapEl = document.createElement("div");
+    aiDifficultyWrapEl.id = "aiDifficultyWrap";
+    aiDifficultyWrapEl.style.marginTop = "12px";
+    aiDifficultyWrapEl.style.display = "flex";
+    aiDifficultyWrapEl.style.flexDirection = "column";
+    aiDifficultyWrapEl.style.gap = "8px";
+
+    const title = document.createElement("div");
+    title.textContent = "AI Difficulty";
+    title.style.fontWeight = "700";
+    title.style.letterSpacing = ".04em";
+
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.flexWrap = "wrap";
+    row.style.gap = "8px";
+
+    aiEasyBtn = document.createElement("button");
+    aiEasyBtn.type = "button";
+    aiEasyBtn.className = "btn gameLengthBtn";
+    aiEasyBtn.dataset.aiDifficulty = "EASY";
+    aiEasyBtn.textContent = "Easy";
+
+    aiNormalBtn = document.createElement("button");
+    aiNormalBtn.type = "button";
+    aiNormalBtn.className = "btn gameLengthBtn";
+    aiNormalBtn.dataset.aiDifficulty = "NORMAL";
+    aiNormalBtn.textContent = "Normal";
+
+    aiHardBtn = document.createElement("button");
+    aiHardBtn.type = "button";
+    aiHardBtn.className = "btn gameLengthBtn";
+    aiHardBtn.dataset.aiDifficulty = "HARD";
+    aiHardBtn.textContent = "Hard";
+
+    aiDifficultyHintEl = document.createElement("div");
+    aiDifficultyHintEl.id = "aiDifficultyHint";
+    aiDifficultyHintEl.style.opacity = ".9";
+    aiDifficultyHintEl.style.fontSize = ".95rem";
+
+    row.appendChild(aiEasyBtn);
+    row.appendChild(aiNormalBtn);
+    row.appendChild(aiHardBtn);
+
+    aiDifficultyWrapEl.appendChild(title);
+    aiDifficultyWrapEl.appendChild(row);
+    aiDifficultyWrapEl.appendChild(aiDifficultyHintEl);
+
+    if (gameLengthHintEl && gameLengthHintEl.parentElement === host) {
+      gameLengthHintEl.insertAdjacentElement("afterend", aiDifficultyWrapEl);
+    } else {
+      host.appendChild(aiDifficultyWrapEl);
+    }
+
+    aiEasyBtn.addEventListener("click", () => setAIDifficulty("EASY"));
+    aiNormalBtn.addEventListener("click", () => setAIDifficulty("NORMAL"));
+    aiHardBtn.addEventListener("click", () => setAIDifficulty("HARD"));
+
+    updateDifficultyUI();
+  }
 
   // ---------- game state ----------
   const players = [
@@ -169,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let phase = "PICK_DEALER";
   let trumpSuit = null;
   let trumpOpen = false;
-  let trick = [];              // [{ playerIndex, cardStr }]
+  let trick = [];
   let leadSuit = null;
   let trickNumber = 0;
   let turnIndex = 0;
@@ -305,14 +432,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- position helpers ----------
-  // Correct seat math for this table:
-  // AI2 = 0, AI3 = 1, YOU = 2
-  // left pass order: YOU -> AI2 -> AI3 -> YOU
   function leftOf(i)  { return (i + 1) % 3; }
   function rightOf(i) { return (i + 2) % 3; }
 
   function phaseDisplay(p) {
-    if (p === "PICK_DEALER") return "PICK";
+    if (p === "PICK_DEALER") return "PICK DEALER";
     if (p === "TRUMP_PICK") return "TRUMP";
     if (p === "GAME_OVER") return "GAME OVER";
     return p.replaceAll("_", " ");
@@ -537,6 +661,8 @@ document.addEventListener("DOMContentLoaded", () => {
           : "—";
       turnBannerEl.textContent = `Phase: ${phaseDisplay(phase)} • ${who} • Trick ${trickNumber}/${TOTAL_TRICKS}`;
     }
+
+    updateDifficultyUI();
   }
 
   function renderAIHands() {
@@ -660,10 +786,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const legal = yourTurn ? legalCardsFor(2) : [];
 
     for (const item of mapped) {
-      const disabled = !yourTurn || !legal.includes(item.realIdx);
-      const cardEl = makeMiniCard(item.cardStr, disabled);
+      const visuallyDisabled = yourTurn && !legal.includes(item.realIdx);
+      const cardEl = makeMiniCard(item.cardStr, visuallyDisabled);
 
-      if (!disabled) {
+      if (yourTurn && legal.includes(item.realIdx)) {
         cardEl.addEventListener("click", () => {
           const legalNow = legalCardsFor(2);
           if (!legalNow.includes(item.realIdx)) {
@@ -787,7 +913,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPickCard(pickAI2El, null);
     renderPickCard(pickAI3El, null);
     renderPickCard(pickYOUEl, null);
-    setText(pickStatusEl, "Click Pick.");
+    setText(pickStatusEl, "Click Pick to choose dealer.");
     pickOkBtn.disabled = true;
     pickReBtn.disabled = true;
     pickBtn.disabled = false;
@@ -819,7 +945,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setDealer(vals[0].pi);
-    setText(pickStatusEl, `Dealer will be ${players[dealerIndex].id}. Click OK.`);
+    setText(pickStatusEl, `Dealer selected: ${players[dealerIndex].id}. Click OK.`);
     pickOkBtn.disabled = false;
     pickReBtn.disabled = true;
   }
@@ -979,6 +1105,71 @@ document.addEventListener("DOMContentLoaded", () => {
     return { ok:true, giveLow, takeHigh };
   }
 
+  // ---------- AI pluck helpers ----------
+  function normalCardValue(cardStr) {
+    if (!cardStr || isJoker(cardStr)) return 0;
+    return RANK_VALUE[cardStr.slice(0, -1)] || 0;
+  }
+
+  function suitCountNonJoker(pi, suit) {
+    return players[pi].hand.filter(c => !isJoker(c) && c.slice(-1) === suit).length;
+  }
+
+  function aiPluckSuitScore(pluckerI, pluckeeI, suit) {
+    const profile = aiProfile();
+
+    const giveLow = lowestOfSuitNonJoker(pluckerI, suit);
+    const takeHigh = highestOfSuitNonJoker(pluckeeI, suit);
+
+    if (!giveLow || !takeHigh) return Number.NEGATIVE_INFINITY;
+
+    const need = players[pluckerI].quota - players[pluckerI].tricks;
+    const giveVal = normalCardValue(giveLow);
+    const takeVal = normalCardValue(takeHigh);
+    const ownSuitCount = suitCountNonJoker(pluckerI, suit);
+
+    let score = 0;
+
+    score += (takeVal - giveVal) * 12;
+
+    if (takeVal >= 14) score += 16;
+    else if (takeVal >= 13) score += 12;
+    else if (takeVal >= 12) score += 9;
+    else if (takeVal >= 11) score += 6;
+
+    if (giveVal <= 4) score += 4;
+    else if (giveVal <= 6) score += 2;
+
+    if (need > 0) {
+      score += ownSuitCount * 2;
+      if (takeVal >= 11) score += 4;
+    }
+
+    if (need <= 0) {
+      score -= ownSuitCount * 2;
+    }
+
+    score *= profile.pluckValueWeight;
+    score += aiNoise(10);
+
+    return score;
+  }
+
+  function aiBestPluckSuit(pluckerI, pluckeeI, suits) {
+    let bestSuit = suits[0];
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (const suit of suits) {
+      const score = aiPluckSuitScore(pluckerI, pluckeeI, suit);
+      if (score > bestScore) {
+        bestScore = score;
+        bestSuit = suit;
+      }
+    }
+
+    return bestSuit;
+  }
+
   function runOnePluck() {
     if (phase !== "PLUCK") return;
     if (!pluckQueue.length) return;
@@ -1007,16 +1198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let bestSuit = suits[0];
-    let bestVal = 999;
-    for (const s of suits) {
-      const give = lowestOfSuitNonJoker(pluckerI, s);
-      const v = give ? (RANK_VALUE[give.slice(0,-1)] || 99) : 99;
-      if (v < bestVal) {
-        bestVal = v;
-        bestSuit = s;
-      }
-    }
+    const bestSuit = aiBestPluckSuit(pluckerI, pluckeeI, suits);
 
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
     if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
@@ -1032,30 +1214,132 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- trump ----------
-  function chooseTrumpFromOwnHand(pi) {
-    const suitScore = { S:0, H:0, D:0, C:0 };
-    for (const c of players[pi].hand) {
-      if (isJoker(c)) {
-        SUITS.forEach(s => suitScore[s] += 6);
-        continue;
-      }
-      const suit = c.slice(-1);
-      const rank = c.slice(0,-1);
-      const v = RANK_VALUE[rank] || 0;
-      suitScore[suit] += 2;
-      if (v >= 11) suitScore[suit] += (v - 10) * 2;
-      else suitScore[suit] += Math.max(0, v - 6) * 0.5;
+  function suitCardsNonJoker(pi, suit) {
+    return players[pi].hand
+      .filter(c => !isJoker(c) && c.slice(-1) === suit)
+      .map(c => ({ cardStr: c, value: RANK_VALUE[c.slice(0, -1)] || 0 }))
+      .sort((a, b) => b.value - a.value);
+  }
+
+  function countJokersInHand(pi) {
+    return players[pi].hand.filter(isJoker).length;
+  }
+
+  function countShortSideSuits(pi, trumpSuitCandidate) {
+    let count = 0;
+    for (const s of SUITS) {
+      if (s === trumpSuitCandidate) continue;
+      const n = suitCountNonJoker(pi, s);
+      if (n <= 1) count += 1;
+    }
+    return count;
+  }
+
+  function trumpSuitControlScore(cards) {
+    let score = 0;
+    const values = cards.map(c => c.value);
+
+    if (values.includes(14)) score += 18;
+    if (values.includes(13)) score += 13;
+    if (values.includes(12)) score += 9;
+    if (values.includes(11)) score += 6;
+    if (values.includes(10)) score += 3;
+
+    if (values.length >= 2 && values[0] >= 14 && values[1] >= 13) score += 12;
+    if (values.length >= 2 && values[0] >= 13 && values[1] >= 12) score += 7;
+    if (values.length >= 3 && values[0] >= 12 && values[1] >= 11 && values[2] >= 10) score += 6;
+
+    return score;
+  }
+
+  function trumpSuitFillerPenalty(cards) {
+    let penalty = 0;
+    for (const c of cards) {
+      if (c.value <= 5) penalty += 2;
+      else if (c.value <= 7) penalty += 1;
+    }
+    return penalty;
+  }
+
+  function suitLengthScore(length) {
+    if (length === 0) return -40;
+    if (length === 1) return -8;
+    if (length === 2) return 4;
+    if (length === 3) return 11;
+    if (length === 4) return 19;
+    if (length === 5) return 26;
+    return 32 + ((length - 6) * 4);
+  }
+
+  function jokerSynergyScore(jokerCount, length, topValue) {
+    let score = 0;
+    if (jokerCount === 0) return 0;
+
+    score += jokerCount * 8;
+
+    if (length >= 3) score += jokerCount * 6;
+    if (length >= 4) score += jokerCount * 8;
+    if (topValue >= 13) score += jokerCount * 5;
+    if (topValue >= 14) score += jokerCount * 3;
+
+    return score;
+  }
+
+  function quotaTrumpBias(need, length, topValue) {
+    let score = 0;
+
+    if (need > 0) {
+      score += length * 2;
+      if (topValue >= 13) score += 6;
+      if (topValue >= 14) score += 4;
+    } else {
+      if (length >= 5 && topValue < 12) score -= 5;
+      if (length === 2 && topValue >= 14) score += 4;
     }
 
-    let best = "H";
-    let bestScore = -999;
-    for (const s of SUITS) {
-      if (suitScore[s] > bestScore) {
-        bestScore = suitScore[s];
-        best = s;
+    return score;
+  }
+
+  function evaluateTrumpSuit(pi, suit) {
+    const profile = aiProfile();
+
+    const cards = suitCardsNonJoker(pi, suit);
+    const length = cards.length;
+    const jokerCount = countJokersInHand(pi);
+    const need = players[pi].quota - players[pi].tricks;
+    const topValue = cards.length ? cards[0].value : 0;
+    const shortSideCount = countShortSideSuits(pi, suit);
+
+    let score = 0;
+
+    score += suitLengthScore(length);
+    score += trumpSuitControlScore(cards);
+    score -= trumpSuitFillerPenalty(cards);
+    score += jokerSynergyScore(jokerCount, length, topValue);
+    score += quotaTrumpBias(need, length, topValue);
+    score += shortSideCount * 3;
+
+    if (length >= 3 && topValue >= 12) score += 5;
+
+    score *= profile.trumpValueWeight;
+    score += aiNoise(8);
+
+    return score;
+  }
+
+  function chooseTrumpFromOwnHand(pi) {
+    let bestSuit = "H";
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (const suit of SUITS) {
+      const score = evaluateTrumpSuit(pi, suit);
+      if (score > bestScore) {
+        bestScore = score;
+        bestSuit = suit;
       }
     }
-    return best;
+
+    return bestSuit;
   }
 
   function setTrump(suit) {
@@ -1118,19 +1402,226 @@ document.addEventListener("DOMContentLoaded", () => {
     return bestPi;
   }
 
-  function aiChooseIndex(pi) {
-    const legal = legalCardsFor(pi);
-    const hand = players[pi].hand;
-    const need = players[pi].quota - players[pi].tricks;
+  // ---------- AI quota helpers ----------
+  function tricksRemainingForPlayer(pi) {
+    return players[pi].hand.length;
+  }
 
-    if (trick.length === 0) {
+  function aiPlayerNeed(pi) {
+    return players[pi].quota - players[pi].tricks;
+  }
+
+  function aiIsEndgame(pi) {
+    return tricksRemainingForPlayer(pi) <= ENDGAME_TRICK_THRESHOLD;
+  }
+
+  function aiEndgameMode(pi) {
+    const need = aiPlayerNeed(pi);
+    const remaining = tricksRemainingForPlayer(pi);
+
+    if (need > remaining) return "DEAD_SHORT";
+    if (need === remaining && remaining > 0) return "MUST_WIN_ALL";
+    if (need === remaining - 1 && remaining > 1) return "MISS_ONLY_ONE";
+    if (need === 1) return "NEED_ONE";
+    if (need > 1) return "NEED_SOME";
+    if (need === 0) return "EXACT";
+    return "OVER";
+  }
+
+  function aiCandidateWinsTrick(pi, cardStr) {
+    const temp = trick.concat([{ playerIndex: pi, cardStr }]);
+    const anyTrump = temp.some(t => isTrumpCard(t.cardStr));
+
+    if (anyTrump) {
+      let bestPi = temp[0].playerIndex;
+      let bestP = -1;
+      for (const t of temp) {
+        if (!isTrumpCard(t.cardStr)) continue;
+        const pow = cardPower(t.cardStr);
+        if (pow > bestP) {
+          bestP = pow;
+          bestPi = t.playerIndex;
+        }
+      }
+      return bestPi === pi;
+    }
+
+    let bestPi = temp[0].playerIndex;
+    let bestV = -1;
+    for (const t of temp) {
+      if (cardSuitForFollow(t.cardStr) !== leadSuit) continue;
+      const v = parseCard(t.cardStr).value;
+      if (v > bestV) {
+        bestV = v;
+        bestPi = t.playerIndex;
+      }
+    }
+    return bestPi === pi;
+  }
+
+  function aiWinningChoices(pi, legal, hand) {
+    const wins = [];
+    for (const idx of legal) {
+      const c = hand[idx];
+      if (aiCandidateWinsTrick(pi, c)) {
+        wins.push({
+          idx,
+          cardStr: c,
+          power: cardPower(c),
+          isTrump: isTrumpCard(c),
+          isJoker: isJoker(c)
+        });
+      }
+    }
+    return wins;
+  }
+
+  function aiCheapestWinnerIndex(pi, legal, hand) {
+    const wins = aiWinningChoices(pi, legal, hand);
+    if (!wins.length) return null;
+
+    wins.sort((a, b) => {
+      if (a.isTrump !== b.isTrump) return a.isTrump ? 1 : -1;
+      if (a.isJoker !== b.isJoker) return a.isJoker ? 1 : -1;
+      return a.power - b.power;
+    });
+
+    return wins[0].idx;
+  }
+
+  function aiStrongestWinnerIndex(pi, legal, hand) {
+    const wins = aiWinningChoices(pi, legal, hand);
+    if (!wins.length) return null;
+
+    wins.sort((a, b) => b.power - a.power);
+    return wins[0].idx;
+  }
+
+  function aiLowestPressureIndex(legal, hand) {
+    const profile = aiProfile();
+
+    let best = legal[0];
+    let bestScore = Infinity;
+
+    for (const idx of legal) {
+      const c = hand[idx];
+      let score = cardPower(c);
+
+      if (isTrumpCard(c)) score += 10000 * profile.preserveTrumpBias;
+      if (isJoker(c)) score += 50000;
+
+      if (!trumpOpen && isTrumpCard(c)) score += 6000 * profile.preserveTrumpBias;
+
+      score += aiNoise(6);
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = idx;
+      }
+    }
+
+    return best;
+  }
+
+  function aiHighestLoserIndex(pi, legal, hand) {
+    let best = null;
+    let bestPower = -1;
+
+    for (const idx of legal) {
+      const c = hand[idx];
+      if (aiCandidateWinsTrick(pi, c)) continue;
+      const power = cardPower(c);
+      if (power > bestPower) {
+        bestPower = power;
+        best = idx;
+      }
+    }
+
+    return best;
+  }
+
+  function aiLeadPreferenceScore(c, need, remainingAfterThis) {
+    const profile = aiProfile();
+
+    let score = cardPower(c);
+
+    if (isTrumpCard(c)) score += 4000;
+    if (isJoker(c)) score += 20000;
+
+    if (need > remainingAfterThis * profile.urgencyAggression) {
+      score -= cardPower(c) * 2 * profile.leadStrengthBias;
+    }
+
+    score += aiNoise(6);
+
+    return score;
+  }
+
+  function aiBestLeadIndex(pi, legal, hand, need) {
+    const profile = aiProfile();
+    const remainingAfterThis = tricksRemainingForPlayer(pi) - 1;
+    const mode = aiEndgameMode(pi);
+
+    if (aiIsEndgame(pi)) {
+      if (mode === "MUST_WIN_ALL" || mode === "DEAD_SHORT") {
+        let best = legal[0];
+        let bestPower = -1;
+        for (const idx of legal) {
+          const p = cardPower(hand[idx]) + aiNoise(4);
+          if (p > bestPower) {
+            bestPower = p;
+            best = idx;
+          }
+        }
+        return best;
+      }
+
+      if (mode === "NEED_ONE" || mode === "NEED_SOME" || mode === "MISS_ONLY_ONE") {
+        let best = legal[0];
+        let bestScore = Infinity;
+        for (const idx of legal) {
+          const c = hand[idx];
+          let score = aiLeadPreferenceScore(c, need, remainingAfterThis);
+          score -= 14 * profile.endgameBias;
+          if (score < bestScore) {
+            bestScore = score;
+            best = idx;
+          }
+        }
+        return best;
+      }
+
+      if (mode === "EXACT") {
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "OVER") {
+        const bleed = aiHighestLoserIndex(pi, legal, hand);
+        if (bleed !== null) return bleed;
+        return aiLowestPressureIndex(legal, hand);
+      }
+    }
+
+    if (need > remainingAfterThis * profile.urgencyAggression) {
       let best = legal[0];
-      let bestScore = -999999;
+      let bestPower = -1;
+      for (const idx of legal) {
+        const p = cardPower(hand[idx]) + aiNoise(4);
+        if (p > bestPower) {
+          bestPower = p;
+          best = idx;
+        }
+      }
+      return best;
+    }
+
+    if (need > 0) {
+      let best = legal[0];
+      let bestScore = Infinity;
       for (const idx of legal) {
         const c = hand[idx];
-        const p = cardPower(c);
-        const score = need > 0 ? p : -p;
-        if (score > bestScore) {
+        const score = aiLeadPreferenceScore(c, need, remainingAfterThis);
+        if (score < bestScore) {
           bestScore = score;
           best = idx;
         }
@@ -1138,63 +1629,236 @@ document.addEventListener("DOMContentLoaded", () => {
       return best;
     }
 
-    let winBest = null;
-    let winBestP = -1;
+    return aiLowestPressureIndex(legal, hand);
+  }
 
-    for (const idx of legal) {
-      const c = hand[idx];
-      const temp = trick.concat([{ playerIndex: pi, cardStr: c }]);
-      const anyTrump = temp.some(t => isTrumpCard(t.cardStr));
+  // ---------- AI trump-open helpers ----------
+  function aiChooseTrumpOpenIndex(pi, legal, hand, need, remainingAfterThis) {
+    const profile = aiProfile();
 
-      let wouldWin = false;
+    const hasLeadSuit = players[pi].hand.some(c => cardSuitForFollow(c) === leadSuit);
+    if (hasLeadSuit) return null;
 
-      if (anyTrump) {
-        let bestPi = temp[0].playerIndex;
-        let bestP = -1;
-        for (const t of temp) {
-          if (!isTrumpCard(t.cardStr)) continue;
-          const pow = cardPower(t.cardStr);
-          if (pow > bestP) {
-            bestP = pow;
-            bestPi = t.playerIndex;
-          }
+    const trumpLegal = legal.filter(idx => isTrumpCard(hand[idx]));
+    const nonTrumpLegal = legal.filter(idx => !isTrumpCard(hand[idx]));
+
+    if (!trumpLegal.length) {
+      if (nonTrumpLegal.length) return aiLowestPressureIndex(nonTrumpLegal, hand);
+      return null;
+    }
+
+    const strongestTrumpWinner = aiStrongestWinnerIndex(pi, trumpLegal, hand);
+    const cheapestTrumpWinner = aiCheapestWinnerIndex(pi, trumpLegal, hand);
+
+    if (need > remainingAfterThis * profile.urgencyAggression && strongestTrumpWinner !== null) {
+      return strongestTrumpWinner;
+    }
+
+    if (need > 0 && cheapestTrumpWinner !== null) {
+      if (Math.random() < profile.trumpOpenBias || AI_DIFFICULTY === "HARD") {
+        return cheapestTrumpWinner;
+      }
+    }
+
+    if (nonTrumpLegal.length) {
+      return aiLowestPressureIndex(nonTrumpLegal, hand);
+    }
+
+    if (cheapestTrumpWinner !== null) {
+      return cheapestTrumpWinner;
+    }
+
+    return aiLowestPressureIndex(legal, hand);
+  }
+
+  // ---------- AI endgame winner steering ----------
+  function aiResolveWinnerForTempTrick(tempTrick) {
+    const anyTrump = tempTrick.some(t => isTrumpCard(t.cardStr));
+
+    if (anyTrump) {
+      let bestPi = tempTrick[0].playerIndex;
+      let bestP = -1;
+      for (const t of tempTrick) {
+        if (!isTrumpCard(t.cardStr)) continue;
+        const p = cardPower(t.cardStr);
+        if (p > bestP) {
+          bestP = p;
+          bestPi = t.playerIndex;
         }
-        wouldWin = bestPi === pi;
+      }
+      return bestPi;
+    }
+
+    const tempLeadSuit = cardSuitForFollow(tempTrick[0].cardStr);
+    let bestPi = tempTrick[0].playerIndex;
+    let bestV = -1;
+    for (const t of tempTrick) {
+      if (cardSuitForFollow(t.cardStr) !== tempLeadSuit) continue;
+      const v = parseCard(t.cardStr).value;
+      if (v > bestV) {
+        bestV = v;
+        bestPi = t.playerIndex;
+      }
+    }
+    return bestPi;
+  }
+
+  function aiWinnerSteeringScore(selfPi, winnerPi, idx, hand) {
+    const profile = aiProfile();
+    const selfMode = aiEndgameMode(selfPi);
+    const selfNeed = aiPlayerNeed(selfPi);
+    const winnerNeed = aiPlayerNeed(winnerPi);
+    const cardStr = hand[idx];
+
+    let score = 0;
+
+    if (winnerPi === selfPi) {
+      if (selfMode === "MUST_WIN_ALL") score += 220;
+      else if (selfMode === "MISS_ONLY_ONE") score += 120;
+      else if (selfMode === "NEED_ONE") score += 170;
+      else if (selfMode === "NEED_SOME") score += 140;
+      else if (selfMode === "EXACT") score -= 180;
+      else if (selfMode === "OVER") score -= 220;
+      else if (selfMode === "DEAD_SHORT") score += 70;
+    } else {
+      if (selfNeed <= 0) {
+        if (winnerNeed > 0) score += 90;
+        if (winnerNeed === 0) score += 20;
+        if (winnerNeed < 0) score -= 50;
       } else {
-        let bestPi = temp[0].playerIndex;
-        let bestV = -1;
-        for (const t of temp) {
-          if (cardSuitForFollow(t.cardStr) !== leadSuit) continue;
-          const v = parseCard(t.cardStr).value;
-          if (v > bestV) {
-            bestV = v;
-            bestPi = t.playerIndex;
-          }
-        }
-        wouldWin = bestPi === pi;
-      }
-
-      if (wouldWin) {
-        const pow = cardPower(c);
-        if (pow > winBestP) {
-          winBestP = pow;
-          winBest = idx;
-        }
+        if (winnerNeed > 0) score -= 20;
       }
     }
 
-    if (need > 0 && winBest !== null) return winBest;
+    if (isJoker(cardStr)) score -= 60;
+    if (isTrumpCard(cardStr)) score -= 18;
+    score -= normalCardValue(cardStr) * 1.5;
 
-    let low = legal[0];
-    let lowP = 99999999;
+    score *= profile.winnerSteeringBias;
+    score += aiNoise(4);
+
+    return score;
+  }
+
+  function aiBestLastToActIndex(pi, legal, hand) {
+    let bestIdx = legal[0];
+    let bestScore = Number.NEGATIVE_INFINITY;
+
     for (const idx of legal) {
-      const p = cardPower(hand[idx]);
-      if (p < lowP) {
-        lowP = p;
-        low = idx;
+      const temp = trick.concat([{ playerIndex: pi, cardStr: hand[idx] }]);
+      const winnerPi = aiResolveWinnerForTempTrick(temp);
+      let score = aiWinnerSteeringScore(pi, winnerPi, idx, hand);
+
+      if (winnerPi === pi) {
+        const mode = aiEndgameMode(pi);
+        if (mode === "NEED_ONE" || mode === "NEED_SOME" || mode === "MISS_ONLY_ONE" || mode === "MUST_WIN_ALL") {
+          score += 40;
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = idx;
       }
     }
-    return low;
+
+    return bestIdx;
+  }
+
+  function aiChooseIndex(pi) {
+    const profile = aiProfile();
+
+    const legal = legalCardsFor(pi);
+    const hand = players[pi].hand;
+    const need = players[pi].quota - players[pi].tricks;
+    const remainingNow = tricksRemainingForPlayer(pi);
+    const remainingAfterThis = remainingNow - 1;
+    const mode = aiEndgameMode(pi);
+    const endgame = aiIsEndgame(pi);
+
+    if (trick.length === 0) {
+      return aiBestLeadIndex(pi, legal, hand, need);
+    }
+
+    if (endgame && trick.length === 2) {
+      return aiBestLastToActIndex(pi, legal, hand);
+    }
+
+    if (!trumpOpen) {
+      const openChoice = aiChooseTrumpOpenIndex(pi, legal, hand, need, remainingAfterThis);
+      if (openChoice !== null) return openChoice;
+    }
+
+    const strongestWinner = aiStrongestWinnerIndex(pi, legal, hand);
+    const cheapestWinner = aiCheapestWinnerIndex(pi, legal, hand);
+    const highestLoser = aiHighestLoserIndex(pi, legal, hand);
+
+    if (endgame) {
+      if (mode === "MUST_WIN_ALL") {
+        if (strongestWinner !== null) return strongestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "DEAD_SHORT") {
+        if (strongestWinner !== null) return strongestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "MISS_ONLY_ONE") {
+        if (strongestWinner !== null && remainingAfterThis <= need) return strongestWinner;
+        if (cheapestWinner !== null) return cheapestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "NEED_ONE") {
+        if (remainingAfterThis === 0 && strongestWinner !== null) return strongestWinner;
+        if (cheapestWinner !== null) return cheapestWinner;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "NEED_SOME") {
+        if (need > remainingAfterThis * profile.urgencyAggression && strongestWinner !== null) {
+          return strongestWinner;
+        }
+        if (cheapestWinner !== null) {
+          return cheapestWinner;
+        }
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "EXACT") {
+        if (highestLoser !== null) return highestLoser;
+        return aiLowestPressureIndex(legal, hand);
+      }
+
+      if (mode === "OVER") {
+        if (highestLoser !== null) return highestLoser;
+        return aiLowestPressureIndex(legal, hand);
+      }
+    }
+
+    if (need > remainingAfterThis * profile.urgencyAggression && strongestWinner !== null) {
+      return strongestWinner;
+    }
+
+    if (need > 0 && cheapestWinner !== null) {
+      if (AI_DIFFICULTY === "EASY" && Math.random() < 0.18 && legal.length > 1) {
+        return aiLowestPressureIndex(legal, hand);
+      }
+      return cheapestWinner;
+    }
+
+    if (need === 0) {
+      if (highestLoser !== null) return highestLoser;
+      return aiLowestPressureIndex(legal, hand);
+    }
+
+    if (need < 0) {
+      if (highestLoser !== null) return highestLoser;
+      return aiLowestPressureIndex(legal, hand);
+    }
+
+    return aiLowestPressureIndex(legal, hand);
   }
 
   // ---------- phase transitions ----------
@@ -1440,7 +2104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setText(phaseValEl, phaseDisplay(phase));
     setText(trickNumEl, "0");
     setText(trickMaxEl, String(TOTAL_TRICKS));
-    msg("Pick first to begin.");
+    msg("Pick dealer to begin.");
     renderAll();
   }
 
@@ -1449,7 +2113,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isBound) return;
     isBound = true;
 
+    createDifficultyControls();
+
     document.querySelectorAll(".gameLengthBtn").forEach(btn => {
+      if (btn.dataset.aiDifficulty) return;
       btn.addEventListener("click", () => {
         if (phase !== "PICK_DEALER") return;
         const value = parseInt(btn.dataset.threshold, 10);
@@ -1563,7 +2230,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverModalEl) gameOverModalEl.style.display = "none";
     setGameThreshold(10);
     setText(phaseValEl, phaseDisplay(phase));
-    msg("Pick first to begin.");
+    msg("Pick dealer to begin.");
     renderAll();
   }
 
