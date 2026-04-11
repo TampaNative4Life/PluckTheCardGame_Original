@@ -1,40 +1,16 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-04 14:21 (-0400)
+2026-04-11 14:00 (-0400)
 
 FILE
 docs/demo2.html
 
 ACTION
-New Rollback Point 04042026
+Rollback Point 04112026
 
 PURPOSE
-New Rollback Point 04042026
-
-FIXES / CHANGES
-New Rollback Point 04042026
-
-ROW COUNT
-Previous File Row Count: 191
-Current File Row Count: 219
-
-UNTOUCHED AREAS
-• Header
-• HUD
-• Table layout
-• AI hand containers
-• Trick area
-• Your hand panel
-• Trump panel
-• Pluck panel
-• Existing pick controls
-
-FAILURE TEST
-• Page should visually match current working rollback
-• No raw HTML fallback
-• No layout shift on table
-• No change in gameplay from HTML alone
+Rollback Point 04112026
 =========================================================
 -->
 <!doctype html>
@@ -42,7 +18,7 @@ FAILURE TEST
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck Demo 2</title>
+  <title>Pluck Arena</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .cardBack {
@@ -123,8 +99,8 @@ FAILURE TEST
     </div>
     <nav class="navlinks" aria-label="Primary">
       <a href="index.html">Home</a>
-      <a href="game.html">Play Demo</a>
-      <a class="activeLink" href="demo2.html">Demo 2</a>
+      <a href="game.html">Practice Pluck</a>
+      <a class="activeLink" href="demo2.html">Pluck Arena</a>
       <a href="rules.html">Rules</a>
       <a href="learn-pluck.html">Learn Pluck</a>
       <a href="about.html">About</a>
@@ -274,22 +250,30 @@ FAILURE TEST
           <button class="btn btn-secondary" id="pickReBtn" type="button" disabled>Re-Pick</button>
         </div>
 
-        <div class="overlayStatus" style="margin-top:10px;">
-          <strong>Status:</strong> <span id="pickStatus">Click Pick.</span>
-        </div>
+        <div class="pickLowerGrid">
+          <div class="pickStatusBox">
+            <div class="pickInfoTitle">Status</div>
+            <div class="pickInfoBody">
+              <span id="pickStatus">Click Pick.</span>
+            </div>
+          </div>
 
-        <div class="pickRow">
-          <div class="pickSlot">
-            <div class="pickName">AI2</div>
-            <div class="pickCard" id="pickAI2">(none)</div>
-          </div>
-          <div class="pickSlot">
-            <div class="pickName">AI3</div>
-            <div class="pickCard" id="pickAI3">(none)</div>
-          </div>
-          <div class="pickSlot">
-            <div class="pickName">YOU</div>
-            <div class="pickCard" id="pickYOU">(none)</div>
+          <div class="pickCardsBox">
+            <div class="pickInfoTitle">Pick Cards</div>
+            <div class="pickRow">
+              <div class="pickSlot">
+                <div class="pickName">AI2</div>
+                <div class="pickCard" id="pickAI2">(none)</div>
+              </div>
+              <div class="pickSlot">
+                <div class="pickName">AI3</div>
+                <div class="pickCard" id="pickAI3">(none)</div>
+              </div>
+              <div class="pickSlot">
+                <div class="pickName">YOU</div>
+                <div class="pickCard" id="pickYOU">(none)</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
