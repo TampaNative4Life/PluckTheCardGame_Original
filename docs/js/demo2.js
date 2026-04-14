@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-06 20:20 (-0400)
+// 2026-04-13 13:35 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,38 +9,30 @@
 // Full file replacement.
 //
 // ISSUE
-// Endgame AI was still too generic in the last few tricks.
-// It played better than before, but it did not explicitly
-// switch into exact quota math soon enough.
+// Same-pair plucks broke when one player owed more than
+// four plucks to the same player.
 //
 // ROOT CAUSE
-// aiChooseIndex(pi) and supporting helpers handled urgency,
-// cheapest winner, trump-open, and general pressure well,
-// but they did not fully separate late-hand states like:
-//
-// • must win all remaining tricks
-// • must win this trick now
-// • needs exactly one more
-// • exactly on quota and must avoid stealing one
-// • already over quota and should not take more
-// • last-to-act endgame where winner steering matters
+// Suit usage for a plucker-pluckee pair was treated like a
+// permanent lock for the whole hand instead of a rolling
+// suit cycle. The UI also offered suits that the pluckee
+// could not legally return.
 //
 // FIX
-// • Add endgame mode helpers
-// • Add last 5 tricks endgame behavior
-// • Add exact quota state logic
-// • Add last-to-act winner steering logic
-// • Add stronger late-hand urgency math
-// • Keep difficulty tiers intact
-// • Keep all UI, pick, pluck, trump, and popup wiring intact
+// • Same-pair plucks now use rolling 4-suit cycles
+// • After a cycle is exhausted, suit eligibility resets
+// • If a cycle is stuck, it resets before falsely skipping
+// • Human pluck UI only shows actually legal suits
+// • AI pluck logic now evaluates only actually legal suits
+// • Keep all AI difficulty, endgame, trump, pick, popup,
+//   and rendering logic intact
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
-// • Pluck logic
 // • Trump selection flow
-// • Human pluck interaction
+// • Human play interaction
 // • Existing rendering structure
 // • Game over popup logic
 // =========================================================
@@ -105,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
 
-  // New UI, optional but expected in current HTML
   const gameLen8Btn         = $("gameLen8");
   const gameLen10Btn        = $("gameLen10");
   const gameLen12Btn        = $("gameLen12");
@@ -172,7 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const BETWEEN_TRICKS = 240;
 
   // ---------- difficulty ----------
-  // EASY | NORMAL | HARD
   let AI_DIFFICULTY = "NORMAL";
 
   function aiProfile() {
@@ -892,9 +882,6 @@ document.addEventListener("DOMContentLoaded", () => {
         b.textContent = `${suitName(s)} • Give ${give}`;
         b.addEventListener("click", () => {
           const res = attemptPluck(pluckerI, pluckeeI, s);
-          if (!res.ok) {
-            usedSuitSet(pluckerI, pluckeeI).add(s);
-          }
 
           pluckQueue.shift();
           activePluck = null;
@@ -1102,20 +1089,50 @@ document.addEventListener("DOMContentLoaded", () => {
     if (idx >= 0) players[pi].hand.splice(idx, 1);
   }
 
+  // Rolling suit cycle tracking per plucker-pluckee pair.
   function usedSuitSet(pluckerI, pluckeeI) {
     const k = pairKey(pluckerI, pluckeeI);
-    if (!pluckSuitUsedByPair.has(k)) pluckSuitUsedByPair.set(k, new Set());
+    if (!pluckSuitUsedByPair.has(k)) {
+      pluckSuitUsedByPair.set(k, new Set());
+    }
     return pluckSuitUsedByPair.get(k);
+  }
+
+  function computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, usedSet) {
+    const suits = [];
+    for (const s of SUITS) {
+      if (usedSet.has(s)) continue;
+      if (!lowestOfSuitNonJoker(pluckerI, s)) continue;
+      if (!highestOfSuitNonJoker(pluckeeI, s)) continue;
+      suits.push(s);
+    }
+    return suits;
   }
 
   function availablePluckSuits(pluckerI, pluckeeI) {
     const used = usedSuitSet(pluckerI, pluckeeI);
-    const suits = [];
-    for (const s of SUITS) {
-      if (used.has(s)) continue;
-      if (!lowestOfSuitNonJoker(pluckerI, s)) continue;
-      suits.push(s);
+
+    // First pass in current cycle.
+    let suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
+    if (suits.length) return suits;
+
+    // Full 4-suit cycle used. Start a fresh cycle.
+    if (used.size >= SUITS.length) {
+      used.clear();
+      suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
+      if (suits.length) return suits;
     }
+
+    // Current cycle may be stuck because remaining unused suits are impossible.
+    // If a reset would restore legal repeat suits, allow the next cycle to start.
+    if (used.size > 0) {
+      const resetPreview = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, new Set());
+      if (resetPreview.length) {
+        used.clear();
+        suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
+      }
+    }
+
     return suits;
   }
 
@@ -1229,9 +1246,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const bestSuit = aiBestPluckSuit(pluckerI, pluckeeI, suits);
-
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
-    if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
 
     pluckQueue.shift();
     activePluck = null;
