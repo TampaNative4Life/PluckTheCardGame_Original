@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-13 13:35 (-0400)
+// 2026-04-14 14:20 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,28 +9,25 @@
 // Full file replacement.
 //
 // ISSUE
-// Same-pair plucks broke when one player owed more than
-// four plucks to the same player.
+// Back to back deals could feel too similar from one hand
+// to the next, especially when testing strong AI.
 //
 // ROOT CAUSE
-// Suit usage for a plucker-pluckee pair was treated like a
-// permanent lock for the whole hand instead of a rolling
-// suit cycle. The UI also offered suits that the pluckee
-// could not legally return.
+// The prior shuffle logic used a basic shuffle only.
+// It did not compare the new deal against the last full deck.
 //
 // FIX
-// • Same-pair plucks now use rolling 4-suit cycles
-// • After a cycle is exhausted, suit eligibility resets
-// • If a cycle is stuck, it resets before falsely skipping
-// • Human pluck UI only shows actually legal suits
-// • AI pluck logic now evaluates only actually legal suits
-// • Keep all AI difficulty, endgame, trump, pick, popup,
-//   and rendering logic intact
+// • Add stronger 3-pass shuffle with random cuts
+// • Track the last dealt full deck
+// • Reject overly similar new decks when possible
+// • Keep all AI, pluck, trump, endgame, difficulty,
+//   popup, and rendering logic intact
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
 // • Quota assignment logic
 // • Pick logic
+// • Pluck cycle logic
 // • Trump selection flow
 // • Human play interaction
 // • Existing rendering structure
@@ -327,6 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let pluckSuitUsedByPair = new Map();
   let engineBusy = false;
   let isBound = false;
+  let lastDealtDeck = null;
 
   // ---------- match state ----------
   let GAME_THRESHOLD = 10;
@@ -507,11 +505,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function shuffle(arr) {
     const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+
+      const cutMin = 8;
+      const cutMax = a.length - 8;
+      const cutPoint = Math.floor(Math.random() * (cutMax - cutMin + 1)) + cutMin;
+      const top = a.slice(0, cutPoint);
+      const bottom = a.slice(cutPoint);
+      a.length = 0;
+      a.push(...bottom, ...top);
     }
+
     return a;
+  }
+
+  function countSamePositions(deckA, deckB) {
+    if (!deckA || !deckB || deckA.length !== deckB.length) return 0;
+
+    let same = 0;
+    for (let i = 0; i < deckA.length; i++) {
+      if (deckA[i] === deckB[i]) same++;
+    }
+    return same;
+  }
+
+  function countSameSeatCards(deckA, deckB) {
+    if (!deckA || !deckB || deckA.length !== deckB.length) return 0;
+
+    let sameSeat = 0;
+
+    for (let i = 0; i < deckA.length; i++) {
+      const samePlayerSlot = i % 3;
+      for (let j = i; j < deckB.length; j += 3) {
+        if ((j % 3) !== samePlayerSlot) continue;
+        if (deckA[i] === deckB[j]) {
+          sameSeat++;
+          break;
+        }
+      }
+    }
+
+    return sameSeat;
+  }
+
+  function buildShuffledDeck51() {
+    let bestDeck = null;
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const candidate = shuffle(makeDeck51());
+
+      if (!lastDealtDeck) {
+        return candidate;
+      }
+
+      const samePositions = countSamePositions(candidate, lastDealtDeck);
+      const sameSeatCards = countSameSeatCards(candidate, lastDealtDeck);
+      const score = (samePositions * 10) + sameSeatCards;
+
+      if (samePositions <= 2 && sameSeatCards <= 8) {
+        return candidate;
+      }
+
+      if (score < bestScore) {
+        bestScore = score;
+        bestDeck = candidate;
+      }
+    }
+
+    return bestDeck || shuffle(makeDeck51());
   }
 
   function cardSuitForFollow(cs) {
@@ -1010,7 +1077,9 @@ document.addEventListener("DOMContentLoaded", () => {
     resetHandState();
     applyQuotasForDealer();
 
-    const deck = shuffle(makeDeck51());
+    const deck = buildShuffledDeck51();
+    lastDealtDeck = deck.slice();
+
     for (let i = 0; i < TOTAL_TRICKS; i++) {
       players[0].hand.push(deck.pop());
       players[1].hand.push(deck.pop());
@@ -1089,7 +1158,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (idx >= 0) players[pi].hand.splice(idx, 1);
   }
 
-  // Rolling suit cycle tracking per plucker-pluckee pair.
   function usedSuitSet(pluckerI, pluckeeI) {
     const k = pairKey(pluckerI, pluckeeI);
     if (!pluckSuitUsedByPair.has(k)) {
@@ -1112,19 +1180,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function availablePluckSuits(pluckerI, pluckeeI) {
     const used = usedSuitSet(pluckerI, pluckeeI);
 
-    // First pass in current cycle.
     let suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
     if (suits.length) return suits;
 
-    // Full 4-suit cycle used. Start a fresh cycle.
     if (used.size >= SUITS.length) {
       used.clear();
       suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
       if (suits.length) return suits;
     }
 
-    // Current cycle may be stuck because remaining unused suits are impossible.
-    // If a reset would restore legal repeat suits, allow the next cycle to start.
     if (used.size > 0) {
       const resetPreview = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, new Set());
       if (resetPreview.length) {
