@@ -1,18 +1,31 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-11 14:00 (-0400)
+// 2026-04-14 14:20 (-0400)
 //
 // FILE
-// docs/js/demo2.js
+// Full Rollback 04192026 docs/js/demo2.js
 //
 // ACTION
-// Rollback Point 04112026
+// Full Rollback 04192026 
 //
 // ISSUE
-// Rollback Point 04112026
+// Full Rollback 04192026 
 //
 // ROOT CAUSE
-// Rollback Point 04112026
+// Full Rollback 04192026 
+//
+// FIX
+// Full Rollback 04192026 
+//
+// UNTOUCHED AREAS
+// • Dealer rotation logic
+// • Quota assignment logic
+// • Pick logic
+// • Pluck cycle logic
+// • Trump selection flow
+// • Human play interaction
+// • Existing rendering structure
+// • Game over popup logic
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -75,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const ai3TricksEl    = $("ai3Tricks");
   const youTricksEl    = $("youTricks");
 
-  // New UI, optional but expected in current HTML
   const gameLen8Btn         = $("gameLen8");
   const gameLen10Btn        = $("gameLen10");
   const gameLen12Btn        = $("gameLen12");
@@ -142,7 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const BETWEEN_TRICKS = 240;
 
   // ---------- difficulty ----------
-  // EASY | NORMAL | HARD
   let AI_DIFFICULTY = "NORMAL";
 
   function aiProfile() {
@@ -307,6 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let pluckSuitUsedByPair = new Map();
   let engineBusy = false;
   let isBound = false;
+  let lastDealtDeck = null;
 
   // ---------- match state ----------
   let GAME_THRESHOLD = 10;
@@ -487,11 +499,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function shuffle(arr) {
     const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+
+      const cutMin = 8;
+      const cutMax = a.length - 8;
+      const cutPoint = Math.floor(Math.random() * (cutMax - cutMin + 1)) + cutMin;
+      const top = a.slice(0, cutPoint);
+      const bottom = a.slice(cutPoint);
+      a.length = 0;
+      a.push(...bottom, ...top);
     }
+
     return a;
+  }
+
+  function countSamePositions(deckA, deckB) {
+    if (!deckA || !deckB || deckA.length !== deckB.length) return 0;
+
+    let same = 0;
+    for (let i = 0; i < deckA.length; i++) {
+      if (deckA[i] === deckB[i]) same++;
+    }
+    return same;
+  }
+
+  function countSameSeatCards(deckA, deckB) {
+    if (!deckA || !deckB || deckA.length !== deckB.length) return 0;
+
+    let sameSeat = 0;
+
+    for (let i = 0; i < deckA.length; i++) {
+      const samePlayerSlot = i % 3;
+      for (let j = i; j < deckB.length; j += 3) {
+        if ((j % 3) !== samePlayerSlot) continue;
+        if (deckA[i] === deckB[j]) {
+          sameSeat++;
+          break;
+        }
+      }
+    }
+
+    return sameSeat;
+  }
+
+  function buildShuffledDeck51() {
+    let bestDeck = null;
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const candidate = shuffle(makeDeck51());
+
+      if (!lastDealtDeck) {
+        return candidate;
+      }
+
+      const samePositions = countSamePositions(candidate, lastDealtDeck);
+      const sameSeatCards = countSameSeatCards(candidate, lastDealtDeck);
+      const score = (samePositions * 10) + sameSeatCards;
+
+      if (samePositions <= 2 && sameSeatCards <= 8) {
+        return candidate;
+      }
+
+      if (score < bestScore) {
+        bestScore = score;
+        bestDeck = candidate;
+      }
+    }
+
+    return bestDeck || shuffle(makeDeck51());
   }
 
   function cardSuitForFollow(cs) {
@@ -862,9 +943,6 @@ document.addEventListener("DOMContentLoaded", () => {
         b.textContent = `${suitName(s)} • Give ${give}`;
         b.addEventListener("click", () => {
           const res = attemptPluck(pluckerI, pluckeeI, s);
-          if (!res.ok) {
-            usedSuitSet(pluckerI, pluckeeI).add(s);
-          }
 
           pluckQueue.shift();
           activePluck = null;
@@ -993,7 +1071,9 @@ document.addEventListener("DOMContentLoaded", () => {
     resetHandState();
     applyQuotasForDealer();
 
-    const deck = shuffle(makeDeck51());
+    const deck = buildShuffledDeck51();
+    lastDealtDeck = deck.slice();
+
     for (let i = 0; i < TOTAL_TRICKS; i++) {
       players[0].hand.push(deck.pop());
       players[1].hand.push(deck.pop());
@@ -1074,18 +1154,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function usedSuitSet(pluckerI, pluckeeI) {
     const k = pairKey(pluckerI, pluckeeI);
-    if (!pluckSuitUsedByPair.has(k)) pluckSuitUsedByPair.set(k, new Set());
+    if (!pluckSuitUsedByPair.has(k)) {
+      pluckSuitUsedByPair.set(k, new Set());
+    }
     return pluckSuitUsedByPair.get(k);
+  }
+
+  function computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, usedSet) {
+    const suits = [];
+    for (const s of SUITS) {
+      if (usedSet.has(s)) continue;
+      if (!lowestOfSuitNonJoker(pluckerI, s)) continue;
+      if (!highestOfSuitNonJoker(pluckeeI, s)) continue;
+      suits.push(s);
+    }
+    return suits;
   }
 
   function availablePluckSuits(pluckerI, pluckeeI) {
     const used = usedSuitSet(pluckerI, pluckeeI);
-    const suits = [];
-    for (const s of SUITS) {
-      if (used.has(s)) continue;
-      if (!lowestOfSuitNonJoker(pluckerI, s)) continue;
-      suits.push(s);
+
+    let suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
+    if (suits.length) return suits;
+
+    if (used.size >= SUITS.length) {
+      used.clear();
+      suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
+      if (suits.length) return suits;
     }
+
+    if (used.size > 0) {
+      const resetPreview = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, new Set());
+      if (resetPreview.length) {
+        used.clear();
+        suits = computeLegalPluckSuitsForUsedSet(pluckerI, pluckeeI, used);
+      }
+    }
+
     return suits;
   }
 
@@ -1199,9 +1304,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const bestSuit = aiBestPluckSuit(pluckerI, pluckeeI, suits);
-
     const res = attemptPluck(pluckerI, pluckeeI, bestSuit);
-    if (!res.ok) usedSuitSet(pluckerI, pluckeeI).add(bestSuit);
 
     pluckQueue.shift();
     activePluck = null;
