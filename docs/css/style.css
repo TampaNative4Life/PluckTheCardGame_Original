@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-04-06 19:20
+   2026-04-20 12:20
 
    FILE
    docs/css/style.css
@@ -9,28 +9,28 @@
    Full file replacement.
 
    PURPOSE
-   Preserve the current stable Demo 2 layout while improving
-   the Pick Dealer area layout and keeping AI difficulty
-   controls visible on tablet and smaller screens.
+   Preserve the current stable Demo 2 layout while fixing
+   only the AI side player display layout.
 
    FIXES / CHANGES
-   • Keeps existing stable Demo 2 spacing work intact
-   • Adds responsive styling for injected AI difficulty controls
-   • Makes AI difficulty buttons wrap cleanly on tablet
-   • Makes AI difficulty buttons stack cleanly on small screens
-   • Converts Pick Dealer lower section into two balanced boxes
-   • Left box is status only
-   • Right box is pick cards only
-   • Makes both boxes equal visual height
-   • Keeps popup styling intact
-   • Keeps AI hand stacks intact
-   • Keeps current theme intact
+   • Converts AI side displays into rotated player strips
+   • AI2 rotates -90 degrees, bottom to top
+   • AI3 rotates +90 degrees, top to bottom
+   • Keeps AI cards above player info block
+   • Keeps AI cards facing the table
+   • Centers both AI strips vertically on table sides
+   • Makes AI info line match Romando Sr style as closely as
+     possible without changing gameplay or JS
+   • Keeps all existing DOM IDs intact
 
    UNTOUCHED AREAS
-   • No JS logic changed here
-   • No dealer rotation changed here
-   • No quota logic changed here
-   • No popup logic changed here
+   • No HTML assumptions changed outside AI side strips
+   • No JS logic changed
+   • No dealer rotation changed
+   • No quota logic changed
+   • No popup logic changed
+   • No trick area styling changed
+   • No Romando Sr area styling changed
    ========================================================= */
 
 :root{
@@ -737,42 +737,7 @@ body{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
-  margin-top:0;
-}
-
-.pickLowerGrid{
-  display:grid;
-  grid-template-columns:minmax(220px, 280px) minmax(0, 1fr);
-  gap:12px;
-  align-items:stretch;
   margin-top:12px;
-}
-
-.pickStatusBox,
-.pickCardsBox{
-  min-height:106px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.03);
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-}
-
-.pickInfoTitle{
-  font-size:.95rem;
-  font-weight:800;
-  margin-bottom:8px;
-  color:#f1f4f9;
-}
-
-.pickInfoBody{
-  flex:1;
-  display:flex;
-  align-items:center;
-  line-height:1.55;
-  color:#dbe3ef;
 }
 
 .cardFaceMini{
@@ -859,29 +824,84 @@ body{
 }
 
 /* =========================================
-   DEMO 2 AI HAND STACK
+   DEMO 2 AI SIDE STRIPS
    ========================================= */
 
-#ai2Hand,
-#ai3Hand{
+.aiSideWrap{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:210px;
+  height:88px;
+  transform-origin:center center;
+}
+
+.aiSideWrap-left{
+  transform:translate(-50%, -50%) rotate(-90deg);
+}
+
+.aiSideWrap-right{
+  transform:translate(-50%, -50%) rotate(90deg);
+}
+
+.aiSideInner{
+  width:210px;
+  min-height:88px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:0;
-  padding-top:4px;
+  justify-content:center;
+  gap:8px;
+  padding:9px 12px;
+  border-radius:16px;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.08);
 }
 
-#ai2Hand .cardBack,
-#ai3Hand .cardBack{
-  width:22px;
-  height:32px;
-  border-radius:4px;
-  margin-top:-24px;
+.aiHandRow-side{
+  width:100%;
+  min-width:0;
+  min-height:38px;
+  padding:6px 8px;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  flex-wrap:nowrap;
 }
 
-#ai2Hand .cardBack:first-child,
-#ai3Hand .cardBack:first-child{
-  margin-top:0;
+.aiHandRow-side .cardBack{
+  width:24px;
+  height:36px;
+  border-radius:5px;
+  margin:0 -2px 0 0;
+}
+
+.aiHandRow-side .cardBack:last-child{
+  margin-right:0;
+}
+
+.aiSideInfo{
+  width:100%;
+  text-align:center;
+  color:#f2f5fa;
+  font-weight:800;
+  font-size:.95rem;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+.seatBottomInfo{
+  width:100%;
+}
+
+.seatBottomInfo .seatName{
+  font-weight:800;
+  color:#f2f5fa;
+}
+
+.seatBottomInfo .seatSub{
+  font-size:.9rem;
+  color:#d7deea;
 }
 
 /* =========================================
@@ -1036,10 +1056,6 @@ body{
   .playLayout{
     grid-template-columns:1fr;
   }
-
-  .pickLowerGrid{
-    grid-template-columns:1fr;
-  }
 }
 
 @media (max-width:900px){
@@ -1074,6 +1090,26 @@ body{
   .trickCenter{
     top:42%;
   }
+
+  .aiSideWrap{
+    width:188px;
+    height:82px;
+  }
+
+  .aiSideInner{
+    width:188px;
+    min-height:82px;
+    padding:8px 10px;
+  }
+
+  .aiHandRow-side .cardBack{
+    width:22px;
+    height:34px;
+  }
+
+  .aiSideInfo{
+    font-size:.88rem;
+  }
 }
 
 @media (max-width:700px){
@@ -1107,6 +1143,26 @@ body{
   .brand img,
   .logo{
     height:38px;
+  }
+
+  .aiSideWrap{
+    width:172px;
+    height:76px;
+  }
+
+  .aiSideInner{
+    width:172px;
+    min-height:76px;
+    padding:8px 8px;
+  }
+
+  .aiHandRow-side .cardBack{
+    width:20px;
+    height:31px;
+  }
+
+  .aiSideInfo{
+    font-size:.8rem;
   }
 }
 
@@ -1153,5 +1209,25 @@ body{
 
   .playerStats{
     font-size:.86rem;
+  }
+
+  .aiSideWrap{
+    width:156px;
+    height:70px;
+  }
+
+  .aiSideInner{
+    width:156px;
+    min-height:70px;
+    padding:6px 8px;
+  }
+
+  .aiHandRow-side .cardBack{
+    width:18px;
+    height:28px;
+  }
+
+  .aiSideInfo{
+    font-size:.74rem;
   }
 }
