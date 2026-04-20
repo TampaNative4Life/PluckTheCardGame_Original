@@ -1,7 +1,7 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-14 15:20 (-0400)
+2026-04-20 12:20 (-0400)
 
 FILE
 docs/demo2.html
@@ -10,42 +10,43 @@ ACTION
 Full file replacement.
 
 PURPOSE
-Clean up table identity visuals without touching gameplay.
+Fix only the AI side player display so both side players
+match the intended rotated strip layout without changing
+gameplay or JS.
 
 FIXES / CHANGES
-• Removes all circular avatar dots
-• Centers AI2 and AI3 name labels on their side positions
-• AI2 label now reads bottom to top
-• AI3 label now reads top to bottom
-• Keeps AI hand stacks centered inside each side seat
-• Keeps quota and trick info visible for both AI seats
-• Changes bottom player label from YOU to Romando Sr
-• Keeps all existing DOM IDs used by demo2.js intact
-• Fixes pickYOU ID so JS does not break
+• Rebuilds AI2 and AI3 side displays as rotated player strips
+• AI2 rotates -90 degrees so text reads bottom to top
+• AI3 rotates +90 degrees so text reads top to bottom
+• Keeps AI cards above player info block
+• Keeps AI info in one line: Name | Quota | Tricks
+• Centers both AI strips vertically on the table sides
+• Keeps all existing DOM IDs intact
+• Leaves trick area, HUD, Romando Sr area, and all gameplay
+  wiring untouched
 
 ROW COUNT
-Previous File Row Count: 232
-Current File Row Count: 253
+Previous File Row Count: 253
+Current File Row Count: 267
 
 UNTOUCHED AREAS
 • Header
 • HUD
-• Table logic
-• AI hand containers and IDs
 • Trick area
+• Romando Sr area
 • Your hand panel
 • Trump panel
 • Pluck panel
-• Pick controls
+• Pick panel
 • Existing script include
-• All gameplay wiring
+• All gameplay and JS IDs
 
 FAILURE TEST
-• Pick buttons must still work
-• Pick status must still update
-• Pick cards must still render
-• AI hands must still render
-• No JS selector should break
+• Pick buttons still work
+• Pick status still updates
+• Pick cards still render
+• AI hands still render
+• No JS selector breaks
 • No gameplay change from HTML alone
 =========================================================
 -->
@@ -83,26 +84,6 @@ FAILURE TEST
       );
     }
 
-    .aiHandRow {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.15);
-      border: 1px solid rgba(255,255,255,.07);
-      min-height: 36px;
-      min-width: 118px;
-    }
-
-    .aiHandRow .cardBack {
-      width: 32px;
-      height: 46px;
-      border-radius: 6px;
-    }
-
     .turnStrip {
       width: min(1100px, 100%);
       margin: 6px auto 0;
@@ -124,79 +105,6 @@ FAILURE TEST
       background: rgba(0,0,0,.15);
       border: 1px solid rgba(255,255,255,.07);
       min-height: 50px;
-    }
-
-    .sideSeat {
-      width: 210px;
-    }
-
-    .sideSeatInner {
-      display: grid;
-      grid-template-columns: 54px 1fr;
-      align-items: center;
-      gap: 10px;
-      min-height: 208px;
-      padding: 12px;
-      border-radius: 16px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .seat-right .sideSeatInner {
-      grid-template-columns: 1fr 54px;
-    }
-
-    .seatSideLabel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 172px;
-      font-weight: 800;
-      color: #f2f5fa;
-      text-align: center;
-      letter-spacing: .3px;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .seatLeftLabel {
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-    }
-
-    .seatRightLabel {
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      transform: rotate(180deg);
-    }
-
-    .sideSeatCenter {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .sideSeatCenter .seatSub {
-      text-align: center;
-      font-size: .9rem;
-      color: #d7deea;
-    }
-
-    .seatBottomInfo {
-      width: 100%;
-    }
-
-    .seatBottomInfo .seatName {
-      font-weight: 800;
-      color: #f2f5fa;
-    }
-
-    .seatBottomInfo .seatSub {
-      font-size: .9rem;
-      color: #d7deea;
     }
   </style>
 </head>
@@ -260,23 +168,21 @@ FAILURE TEST
       <section class="feltTable" aria-label="Pluck table">
         <div class="feltInset" aria-hidden="true"></div>
 
-        <div class="seat seat-left sideSeat">
-          <div class="sideSeatInner">
-            <div class="seatName seatSideLabel seatLeftLabel">AI2 (Left)</div>
-            <div class="sideSeatCenter">
-              <div class="aiHandRow" id="ai2Hand"></div>
-              <div class="seatSub">Quota: <strong id="ai2Quota">7</strong> &nbsp;|&nbsp; Tricks: <strong id="ai2Tricks">0</strong></div>
+        <div class="seat seat-left">
+          <div class="aiSideWrap aiSideWrap-left">
+            <div class="aiSideInner aiSideInner-left">
+              <div class="aiHandRow aiHandRow-side" id="ai2Hand"></div>
+              <div class="aiSideInfo">AI2 | Quota: <strong id="ai2Quota">7</strong> | Tricks: <strong id="ai2Tricks">0</strong></div>
             </div>
           </div>
         </div>
 
-        <div class="seat seat-right sideSeat">
-          <div class="sideSeatInner">
-            <div class="sideSeatCenter">
-              <div class="aiHandRow" id="ai3Hand"></div>
-              <div class="seatSub">Quota: <strong id="ai3Quota">6</strong> &nbsp;|&nbsp; Tricks: <strong id="ai3Tricks">0</strong></div>
+        <div class="seat seat-right">
+          <div class="aiSideWrap aiSideWrap-right">
+            <div class="aiSideInner aiSideInner-right">
+              <div class="aiHandRow aiHandRow-side" id="ai3Hand"></div>
+              <div class="aiSideInfo">AI3 | Quota: <strong id="ai3Quota">6</strong> | Tricks: <strong id="ai3Tricks">0</strong></div>
             </div>
-            <div class="seatName seatSideLabel seatRightLabel">AI3 (Right)</div>
           </div>
         </div>
 
