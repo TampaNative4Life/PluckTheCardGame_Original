@@ -1,62 +1,144 @@
-<!doctype html>
+<!-- =========================================
+FILE: index.html
+CHANGE DATE: 2026-04-20
+
+ISSUE:
+Homepage lacked clear entry point and emotional hook
+
+ROOT CAUSE:
+Too many options, no visual hierarchy, no dominant action
+
+FIX:
+Added hero section with dominant PLAY NOW button
+Demoted all other navigation below the fold
+
+LINE COUNT:
+Old: Unknown
+New: 143
+
+UNTOUCHED:
+Game files, JS, gameplay logic
+
+========================================= -->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluck The Card Game</title>
-  <meta name="description" content="Pluck The Card Game official homepage." />
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <title>Pluck The Card Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+        }
+
+        .hero {
+            padding: 40px 20px;
+        }
+
+        .logo {
+            width: 220px;
+            margin-bottom: 20px;
+        }
+
+        .tagline {
+            font-size: 22px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .play-btn {
+            display: inline-block;
+            padding: 18px 40px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #000;
+            background: linear-gradient(180deg, #ffd700, #b8860b);
+            border-radius: 12px;
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transition: transform 0.1s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .subtext {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .section {
+            margin-top: 60px;
+            padding: 20px;
+        }
+
+        .card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px auto;
+            max-width: 300px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        a.secondary {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
 </head>
+
 <body>
 
-  <header class="nav">
-    <div class="navLeft">
-      <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
-        <span>PLUCK</span>
-      </a>
+    <div class="hero">
+        <img src="logo.png" alt="Pluck Logo" class="logo">
+
+        <div class="tagline">
+            Win tricks. Take cards. Control the table.
+        </div>
+
+        <a href="demo2.html" class="play-btn">
+            ♠ PLAY NOW ♠
+        </a>
+
+        <div class="subtext">
+            Learn in 60 seconds while you play
+        </div>
     </div>
 
-    <nav class="navlinks" aria-label="Main navigation">
-      <a href="index.html" class="activeLink">Home</a>
-      <a href="game.html">Practice Pluck</a>
-      <a href="demo2.html">Pluck Arena</a>
-      <a href="rules.html">Rules</a>
-      <a href="learn-pluck.html">Learn Pluck</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="hero">
-      <div class="hero-card">
-        <h1>Pluck</h1>
-
-        <p class="hero-subtitle">Three players. Seventeen tricks. Zero excuses.</p>
-
-        <p class="hero-text">
-          A sharp three-player card game built on pressure, table feel, and consequences.
-          Make your number, protect your hand, and do not come up short.
-        </p>
-
-        <div class="buttons">
-          <a href="demo2.html">Pluck Arena</a>
-          <a href="game.html">Practice Pluck</a>
-          <a href="rules.html">Rules</a>
-          <a href="learn-pluck.html">Learn Pluck</a>
-          <a href="about.html">About</a>
+    <div class="section">
+        <div class="card">
+            <h3>Learn the Game</h3>
+            <p>Quick start guide to get you playing fast.</p>
+            <a href="learn-pluck.html" class="secondary">Learn More</a>
         </div>
 
-        <div class="home-callout">
-          <strong>What makes Pluck different?</strong>
-          No running score. Miss your job this hand, and next hand somebody may get stronger off your cards.
-          That is not bad luck. That is the game.
+        <div class="card">
+            <h3>View Rules</h3>
+            <p>Full rules and deeper strategy.</p>
+            <a href="rules.html" class="secondary">View Rules</a>
         </div>
-      </div>
-    </section>
 
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
+        <div class="card">
+            <h3>About Pluck</h3>
+            <p>The story behind the game.</p>
+            <a href="about.html" class="secondary">Learn More</a>
+        </div>
+    </div>
 
 </body>
 </html>
