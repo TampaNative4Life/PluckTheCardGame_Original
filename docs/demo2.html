@@ -1,7 +1,7 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-20 16:20 (-0400)
+2026-04-20 17:10 (-0400)
 
 FILE
 docs/demo2.html
@@ -10,20 +10,19 @@ ACTION
 Full file replacement.
 
 PURPOSE
-Add a dedicated pluck event display so pluck outcomes are
-clear, visible, and emotionally stronger without changing
-core gameplay rules.
+Expand Game Over modal options so players can start a new game,
+leave the arena, or review the most recent completed deal.
 
 FIXES / CHANGES
-• Adds Pluck Event panel under the system message
-• Keeps exact pluck card details visible only when YOU are involved
-• Keeps AI vs AI plucks generic to avoid leaking hidden information
-• Leaves gameplay wiring and existing DOM IDs intact
-• Preserves current Demo 2 structure and script include
+• Adds Review Past Deal button to Game Over modal
+• Adds Leave Arena button to Game Over modal
+• Adds hidden review panel area inside modal
+• Keeps existing New Game button
+• Preserves all current Demo 2 game DOM IDs and layout
 
 ROW COUNT
-Previous File Row Count: 267
-Current File Row Count: 293
+Previous File Row Count: 293
+Current File Row Count: 307
 
 UNTOUCHED AREAS
 • Header
@@ -302,7 +301,17 @@ UNTOUCHED AREAS
       <div class="gameOverSub" id="gameOverThreshold">Threshold: 10 Plucks Against</div>
       <div class="gameOverBody" id="gameOverBody"></div>
       <div class="gameOverFooter" id="gameOverFooter"></div>
-      <button class="btn" id="newGameBtn" type="button">Start New Game</button>
+
+      <div id="pastDealReview" class="playerRow" style="display:none; margin-bottom:14px; text-align:left;">
+        <div class="playerName">LAST DEAL REVIEW</div>
+        <div class="playerStats" id="pastDealReviewBody"></div>
+      </div>
+
+      <div class="overlayButtons" style="justify-content:center; margin-top:8px;">
+        <button class="btn btn-secondary" id="reviewDealBtn" type="button">Review Past Deal</button>
+        <a class="btn btn-secondary" id="leaveArenaBtn" href="game.html">Leave Arena</a>
+        <button class="btn" id="newGameBtn" type="button">Start New Game</button>
+      </div>
     </div>
   </div>
 
