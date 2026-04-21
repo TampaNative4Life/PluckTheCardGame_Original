@@ -1,15 +1,15 @@
 <!-- =========================================
 FILE: docs/index.html
-CHANGE DATE: 2026-04-20 14:40
+CHANGE DATE: 2026-04-20 15:05
 
 ISSUE:
-Poor visual hierarchy, headline overpowering logo and action
+Font lacks identity, logo too small, weak visual hierarchy
 
 ROOT CAUSE:
-Improper sizing and spacing causing visual imbalance
+Generic font choice and undersized branding relative to layout
 
 FIX:
-Rebuilt hero layout so button becomes primary, logo supports, headline reinforces
+Applied Times New Roman globally, increased logo size, rebalanced hierarchy
 
 ========================================= -->
 
@@ -24,7 +24,7 @@ Rebuilt hero layout so button becomes primary, logo supports, headline reinforce
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Times New Roman", Times, serif;
     background: radial-gradient(circle at top, #0b1225, #000);
     color: white;
     text-align: center;
@@ -43,11 +43,16 @@ body {
 .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .brand img {
-    width: 50px;
+    width: 65px;
+}
+
+.brand div {
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .nav a {
@@ -60,35 +65,20 @@ body {
 /* HERO */
 
 .hero {
-    padding: 20px 20px 10px;
+    padding: 25px 20px 10px;
 }
 
-/* LOGO */
+/* LOGO - BIGGER */
 
 .hero img {
-    width: 200px;
+    width: 320px;
     margin-bottom: 10px;
 }
 
-/* BUTTON FIRST MENTALITY */
-
-.play-btn {
-    display: inline-block;
-    margin: 10px 0 20px;
-    padding: 22px 60px;
-    font-size: 32px;
-    font-weight: bold;
-    background: gold;
-    color: black;
-    border-radius: 12px;
-    text-decoration: none;
-    box-shadow: 0 0 20px rgba(255,215,0,0.6);
-}
-
-/* HEADLINE (REDUCED) */
+/* HEADLINE (CONTROLLED) */
 
 .hero h1 {
-    font-size: 34px;
+    font-size: 32px;
     margin: 10px 0;
 }
 
@@ -96,20 +86,34 @@ body {
 
 .hero p {
     max-width: 700px;
-    margin: 10px auto;
+    margin: 8px auto;
     font-size: 16px;
     color: #ccc;
+}
+
+/* BUTTON - STILL KING */
+
+.play-btn {
+    display: inline-block;
+    margin: 15px 0 25px;
+    padding: 22px 60px;
+    font-size: 30px;
+    font-weight: bold;
+    background: gold;
+    color: black;
+    border-radius: 12px;
+    text-decoration: none;
 }
 
 /* CARDS */
 
 .section {
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .card {
     background: #111;
-    padding: 20px;
+    padding: 18px;
     margin: 10px auto;
     max-width: 300px;
     border-radius: 10px;
@@ -138,8 +142,6 @@ body {
 
     <img src="images/logo.png">
 
-    <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
-
     <h1>Win Tricks. Take Cards. Control the Table.</h1>
 
     <p>
@@ -149,6 +151,8 @@ body {
     <p>
         Miss your number and somebody gets stronger off your cards.
     </p>
+
+    <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
 
 </div>
 
