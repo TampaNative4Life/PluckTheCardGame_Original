@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-20 16:20 (-0400)
+// 2026-04-20 16:45 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,25 +9,23 @@
 // Full file replacement.
 //
 // ISSUE
-// Pluck events were mechanically correct but visually weak.
-// Players could miss the exchange and not feel the impact.
+// Pluck event dialog disappeared too quickly.
+// The player could read it, but the moment did not stay alive
+// long enough to carry into the next state.
 //
 // ROOT CAUSE
-// Pluck resolution relied mostly on generic message text.
-// There was no dedicated visual event panel or pause to let
-// the exchange land.
+// completePluckResolution() used a timed auto-hide that cleared
+// the event panel before the next pluck or next phase transition.
 //
 // FIX
-// • Add dedicated pluck event display support
-// • Show exact exchanged cards only when YOU are involved
-// • Keep AI vs AI plucks generic to avoid hidden info leakage
-// • Add impact text tied to the affected suit
-// • Add a short pluck-event pause before continuing
-// • Keep all game rules, pluck rules, AI logic, and flow intact
+// • Keep pluck event visible after resolution
+// • Replace it only when the next pluck occurs
+// • Clear it only when pluck phase ends, game resets, or game over starts
+// • Preserve all existing pluck rules, AI logic, and gameplay flow
 //
 // ROW COUNT
-// Previous File Row Count: 1384
-// Current File Row Count: 1508
+// Previous File Row Count: 1508
+// Current File Row Count: 1507
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -722,9 +720,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       if (gameOverTriggered) return;
 
-      hidePluckEvent();
-
       if (!pluckQueue.length) {
+        hidePluckEvent();
         toTrumpPick();
         renderAll();
         if (phase === "PLAY") engineKick();
