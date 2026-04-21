@@ -1,15 +1,25 @@
 <!-- =========================================
 FILE: docs/index.html
-CHANGE DATE: 2026-04-20 15:05
+CHANGE DATE: 2026-04-20 15:20
 
 ISSUE:
-Font lacks identity, logo too small, weak visual hierarchy
+Homepage required too much vertical space, forcing scroll and weakening first-screen impact
 
 ROOT CAUSE:
-Generic font choice and undersized branding relative to layout
+Secondary buttons were stacked vertically and oversized relative to their importance
 
 FIX:
-Applied Times New Roman globally, increased logo size, rebalanced hierarchy
+Converted secondary buttons to a smaller horizontal row, preserved dominant PLAY NOW action, increased usable space for logo and hero section, and kept Times New Roman sitewide
+
+LINE COUNT:
+Old: 111
+New: 151
+
+UNTOUCHED:
+Game files, JS, gameplay logic, linked pages
+
+REQUIRED FILE:
+docs/images/logo.png
 
 ========================================= -->
 
@@ -21,7 +31,6 @@ Applied Times New Roman globally, increased logo size, rebalanced hierarchy
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
 body {
     margin: 0;
     font-family: "Times New Roman", Times, serif;
@@ -30,11 +39,9 @@ body {
     text-align: center;
 }
 
-/* TOP BAR */
-
 .topbar {
     background: black;
-    padding: 10px 20px;
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -47,78 +54,169 @@ body {
 }
 
 .brand img {
-    width: 65px;
+    width: 64px;
+    height: auto;
+    display: block;
 }
 
 .brand div {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
 }
 
 .nav a {
     color: gold;
-    margin-left: 18px;
     text-decoration: none;
     font-weight: bold;
+    font-size: 18px;
 }
-
-/* HERO */
 
 .hero {
-    padding: 25px 20px 10px;
+    padding: 24px 20px 18px;
+    max-width: 1100px;
+    margin: 0 auto;
 }
-
-/* LOGO - BIGGER */
 
 .hero img {
-    width: 320px;
-    margin-bottom: 10px;
+    width: 340px;
+    max-width: 90%;
+    height: auto;
+    margin-bottom: 12px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
-
-/* HEADLINE (CONTROLLED) */
 
 .hero h1 {
-    font-size: 32px;
-    margin: 10px 0;
+    font-size: 30px;
+    margin: 8px 0 10px;
+    line-height: 1.15;
 }
-
-/* SUPPORT TEXT */
 
 .hero p {
-    max-width: 700px;
-    margin: 8px auto;
+    max-width: 760px;
+    margin: 6px auto;
     font-size: 16px;
-    color: #ccc;
+    color: #ddd;
+    line-height: 1.35;
 }
-
-/* BUTTON - STILL KING */
 
 .play-btn {
     display: inline-block;
-    margin: 15px 0 25px;
-    padding: 22px 60px;
-    font-size: 30px;
+    margin: 18px 0 18px;
+    padding: 18px 54px;
+    font-size: 28px;
     font-weight: bold;
     background: gold;
     color: black;
     border-radius: 12px;
     text-decoration: none;
+    box-shadow: 0 0 18px rgba(255,215,0,0.25);
 }
 
-/* CARDS */
-
 .section {
-    margin-top: 20px;
+    margin: 6px auto 0;
+    max-width: 980px;
+}
+
+.card-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
 }
 
 .card {
     background: #111;
-    padding: 18px;
-    margin: 10px auto;
-    max-width: 300px;
+    padding: 14px 20px;
+    min-width: 190px;
     border-radius: 10px;
 }
 
+.card a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: normal;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .topbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav {
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero img {
+        width: 280px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+
+    .play-btn {
+        font-size: 24px;
+        padding: 16px 40px;
+    }
+}
+
+@media (max-width: 600px) {
+    .brand div {
+        font-size: 22px;
+    }
+
+    .brand img {
+        width: 54px;
+    }
+
+    .nav a {
+        font-size: 16px;
+    }
+
+    .hero {
+        padding: 18px 14px 16px;
+    }
+
+    .hero img {
+        width: 230px;
+    }
+
+    .hero h1 {
+        font-size: 22px;
+    }
+
+    .hero p {
+        font-size: 15px;
+    }
+
+    .play-btn {
+        width: 100%;
+        max-width: 340px;
+        font-size: 22px;
+        padding: 16px 24px;
+    }
+
+    .card {
+        min-width: 0;
+        width: 100%;
+        max-width: 320px;
+    }
+}
 </style>
 </head>
 
@@ -126,7 +224,7 @@ body {
 
 <div class="topbar">
     <div class="brand">
-        <img src="images/logo.png">
+        <img src="images/logo.png" alt="Pluck logo">
         <div>PLUCK</div>
     </div>
 
@@ -139,27 +237,22 @@ body {
 </div>
 
 <div class="hero">
-
-    <img src="images/logo.png">
+    <img src="images/logo.png" alt="Pluck logo">
 
     <h1>Win Tricks. Take Cards. Control the Table.</h1>
 
-    <p>
-        A three-player card game built on pressure, consequences, and table feel.
-    </p>
-
-    <p>
-        Miss your number and somebody gets stronger off your cards.
-    </p>
+    <p>A three-player card game built on pressure, consequences, and table feel.</p>
+    <p>Miss your number and somebody gets stronger off your cards.</p>
 
     <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
-
 </div>
 
 <div class="section">
-    <div class="card">Learn the Game</div>
-    <div class="card">View Rules</div>
-    <div class="card">About Pluck</div>
+    <div class="card-row">
+        <div class="card"><a href="learn-pluck.html">Learn the Game</a></div>
+        <div class="card"><a href="rules.html">View Rules</a></div>
+        <div class="card"><a href="about.html">About Pluck</a></div>
+    </div>
 </div>
 
 </body>
