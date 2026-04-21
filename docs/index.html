@@ -1,15 +1,15 @@
 <!-- =========================================
 FILE: docs/index.html
-CHANGE DATE: 2026-04-20 14:20
+CHANGE DATE: 2026-04-20 14:40
 
 ISSUE:
-Visual hierarchy imbalance, headline overpowering logo
+Poor visual hierarchy, headline overpowering logo and action
 
 ROOT CAUSE:
-Headline font too large, logo too small, poor visual priority
+Improper sizing and spacing causing visual imbalance
 
 FIX:
-Increased logo prominence, reduced headline size, tightened spacing
+Rebuilt hero layout so button becomes primary, logo supports, headline reinforces
 
 ========================================= -->
 
@@ -26,12 +26,14 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: radial-gradient(circle at top, #0b1225, #000);
-    color: #fff;
+    color: white;
     text-align: center;
 }
 
+/* TOP BAR */
+
 .topbar {
-    background: #000;
+    background: black;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
@@ -50,24 +52,47 @@ body {
 
 .nav a {
     color: gold;
-    margin-left: 20px;
+    margin-left: 18px;
     text-decoration: none;
     font-weight: bold;
 }
 
+/* HERO */
+
 .hero {
-    padding: 30px 20px 20px;
+    padding: 20px 20px 10px;
 }
 
+/* LOGO */
+
 .hero img {
-    width: 260px;
+    width: 200px;
     margin-bottom: 10px;
 }
 
+/* BUTTON FIRST MENTALITY */
+
+.play-btn {
+    display: inline-block;
+    margin: 10px 0 20px;
+    padding: 22px 60px;
+    font-size: 32px;
+    font-weight: bold;
+    background: gold;
+    color: black;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(255,215,0,0.6);
+}
+
+/* HEADLINE (REDUCED) */
+
 .hero h1 {
-    font-size: 42px;
+    font-size: 34px;
     margin: 10px 0;
 }
+
+/* SUPPORT TEXT */
 
 .hero p {
     max-width: 700px;
@@ -76,17 +101,7 @@ body {
     color: #ccc;
 }
 
-.play-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 20px 50px;
-    font-size: 28px;
-    font-weight: bold;
-    background: gold;
-    color: black;
-    border-radius: 10px;
-    text-decoration: none;
-}
+/* CARDS */
 
 .section {
     margin-top: 40px;
@@ -120,7 +135,10 @@ body {
 </div>
 
 <div class="hero">
+
     <img src="images/logo.png">
+
+    <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
 
     <h1>Win Tricks. Take Cards. Control the Table.</h1>
 
@@ -132,7 +150,6 @@ body {
         Miss your number and somebody gets stronger off your cards.
     </p>
 
-    <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
 </div>
 
 <div class="section">
