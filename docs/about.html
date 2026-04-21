@@ -1,3 +1,28 @@
+<!--
+=========================================================
+CHANGE LOG
+2026-04-20 16:35 (-0400)
+
+FILE
+docs/about.html
+
+ACTION
+Full file replacement.
+
+PURPOSE
+Standardize About page branding, menu labels, and logo path.
+
+FIXES / CHANGES
+• Fixes top-left logo path to images/logo.png
+• Standardizes top-right navigation labels
+• Uses Practice and Arena labels consistently
+
+UNTOUCHED AREAS
+• About page content
+• Existing CSS classes
+• Footer structure
+=========================================================
+-->
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,15 +37,15 @@
   <header class="nav">
     <div class="navLeft">
       <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
+        <img src="images/logo.png" alt="Pluck The Card Game Logo" class="logo" />
         <span>PLUCK</span>
       </a>
     </div>
 
     <nav class="navlinks" aria-label="Main navigation">
       <a href="index.html">Home</a>
-      <a href="game.html">Practice Pluck</a>
-      <a href="demo2.html">Pluck Arena</a>
+      <a href="game.html">Practice</a>
+      <a href="demo2.html">Arena</a>
       <a href="rules.html">Rules</a>
       <a href="learn-pluck.html">Learn Pluck</a>
       <a href="about.html" class="activeLink">About</a>
