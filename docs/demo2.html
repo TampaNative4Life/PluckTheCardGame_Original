@@ -1,7 +1,7 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-20 12:20 (-0400)
+2026-04-20 16:20 (-0400)
 
 FILE
 docs/demo2.html
@@ -10,44 +10,32 @@ ACTION
 Full file replacement.
 
 PURPOSE
-Fix only the AI side player display so both side players
-match the intended rotated strip layout without changing
-gameplay or JS.
+Add a dedicated pluck event display so pluck outcomes are
+clear, visible, and emotionally stronger without changing
+core gameplay rules.
 
 FIXES / CHANGES
-• Rebuilds AI2 and AI3 side displays as rotated player strips
-• AI2 rotates -90 degrees so text reads bottom to top
-• AI3 rotates +90 degrees so text reads top to bottom
-• Keeps AI cards above player info block
-• Keeps AI info in one line: Name | Quota | Tricks
-• Centers both AI strips vertically on the table sides
-• Keeps all existing DOM IDs intact
-• Leaves trick area, HUD, Romando Sr area, and all gameplay
-  wiring untouched
+• Adds Pluck Event panel under the system message
+• Keeps exact pluck card details visible only when YOU are involved
+• Keeps AI vs AI plucks generic to avoid leaking hidden information
+• Leaves gameplay wiring and existing DOM IDs intact
+• Preserves current Demo 2 structure and script include
 
 ROW COUNT
-Previous File Row Count: 253
-Current File Row Count: 267
+Previous File Row Count: 267
+Current File Row Count: 293
 
 UNTOUCHED AREAS
 • Header
 • HUD
 • Trick area
+• AI side lanes
 • Romando Sr area
 • Your hand panel
 • Trump panel
-• Pluck panel
 • Pick panel
 • Existing script include
-• All gameplay and JS IDs
-
-FAILURE TEST
-• Pick buttons still work
-• Pick status still updates
-• Pick cards still render
-• AI hands still render
-• No JS selector breaks
-• No gameplay change from HTML alone
+• Core gameplay DOM IDs
 =========================================================
 -->
 <!doctype html>
@@ -209,6 +197,17 @@ FAILURE TEST
     <section class="bottomPanel" aria-label="System Message">
       <div class="overlayCard bottomCard">
         <div class="overlayStatus" id="msg">Pick first to begin.</div>
+      </div>
+    </section>
+
+    <section class="bottomPanel" id="pluckEventPanel" aria-label="Pluck Event" style="display:none;">
+      <div class="overlayCard bottomCard pluckEventCard" id="pluckEventCard">
+        <div class="pluckEventTitle" id="pluckEventTitle">Pluck Event</div>
+        <div class="pluckEventRows">
+          <div class="pluckEventRow" id="pluckEventGive"></div>
+          <div class="pluckEventRow" id="pluckEventTake"></div>
+          <div class="pluckEventImpact" id="pluckEventImpact"></div>
+        </div>
       </div>
     </section>
 
