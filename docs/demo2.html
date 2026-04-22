@@ -1,7 +1,7 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-20 17:10 (-0400)
+2026-04-20 17:45 (-0400)
 
 FILE
 docs/demo2.html
@@ -10,19 +10,17 @@ ACTION
 Full file replacement.
 
 PURPOSE
-Expand Game Over modal options so players can start a new game,
-leave the arena, or review the most recent completed deal.
+Add a controlled Undo Last Card button for live gameplay.
 
 FIXES / CHANGES
-• Adds Review Past Deal button to Game Over modal
-• Adds Leave Arena button to Game Over modal
-• Adds hidden review panel area inside modal
-• Keeps existing New Game button
-• Preserves all current Demo 2 game DOM IDs and layout
+• Adds Undo Last Card button under Your Hand
+• Button is disabled until a legal human move can be undone
+• Preserves all existing Demo 2 DOM IDs and layout
+• Keeps Game Over modal options already present
 
 ROW COUNT
-Previous File Row Count: 293
-Current File Row Count: 307
+Previous File Row Count: 307
+Current File Row Count: 311
 
 UNTOUCHED AREAS
 • Header
@@ -30,7 +28,6 @@ UNTOUCHED AREAS
 • Trick area
 • AI side lanes
 • Romando Sr area
-• Your hand panel
 • Trump panel
 • Pick panel
 • Existing script include
@@ -214,6 +211,9 @@ UNTOUCHED AREAS
       <div class="overlayCard bottomCard">
         <div class="overlayTitle">Your Hand</div>
         <div class="yourHandRow tight" id="youHand"></div>
+        <div class="overlayButtons undoRow">
+          <button class="btn btn-secondary" id="undoLastCardBtn" type="button" disabled>Undo Last Card</button>
+        </div>
       </div>
     </section>
 
