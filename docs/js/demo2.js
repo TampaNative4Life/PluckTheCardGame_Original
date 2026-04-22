@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-20 16:45 (-0400)
+// 2026-04-20 17:45 (-0400)
 //
 // FILE
 // docs/js/demo2.js
@@ -9,23 +9,22 @@
 // Full file replacement.
 //
 // ISSUE
-// Pluck event dialog disappeared too quickly.
-// The player could read it, but the moment did not stay alive
-// long enough to carry into the next state.
+// Live gameplay needed a mulligan style back button that
+// erases the player's last move only.
 //
 // ROOT CAUSE
-// completePluckResolution() used a timed auto-hide that cleared
-// the event panel before the next pluck or next phase transition.
+// There was no stored undo state for the last human card play.
 //
 // FIX
-// • Keep pluck event visible after resolution
-// • Replace it only when the next pluck occurs
-// • Clear it only when pluck phase ends, game resets, or game over starts
-// • Preserve all existing pluck rules, AI logic, and gameplay flow
+// • Adds Undo Last Card support
+// • Undo works only for the most recent human card play
+// • Undo is cleared as soon as any AI card is played
+// • Undo does not affect plucks, dealer pick, trump choice,
+//   resolved tricks, end of hand, or game over
 //
 // ROW COUNT
-// Previous File Row Count: 1508
-// Current File Row Count: 1507
+// Previous File Row Count: 1507
+// Current File Row Count: 1598
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -33,8 +32,7 @@
 // • Pick logic
 // • Pluck cycle ordering logic
 // • Trump selection flow
-// • Human play interaction
-// • Existing rendering structure
+// • Existing AI logic
 // • Game over popup logic
 // =========================================================
 
@@ -63,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const youHandEl          = $("youHand");
   const trickSlotsEl       = $("trickSlots");
   const resetBtn           = $("resetBtn");
+  const undoLastCardBtn    = $("undoLastCardBtn");
 
   const trumpLabelEl       = $("trumpLabel");
   const booksSummaryEl     = $("booksSummary");
@@ -148,7 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ["trumpLabel", trumpLabelEl],
     ["booksSummary", booksSummaryEl],
     ["phaseVal", phaseValEl],
-    ["dealerVal", dealerValEl]
+    ["dealerVal", dealerValEl],
+    ["undoLastCardBtn", undoLastCardBtn]
   ];
 
   const missing = required.filter(([, el]) => !el).map(([name]) => name);
@@ -343,6 +343,60 @@ document.addEventListener("DOMContentLoaded", () => {
   let engineBusy = false;
   let isBound = false;
   let lastDealtDeck = null;
+  let undoState = null;
+
+  function clearUndoState() {
+    undoState = null;
+    if (undoLastCardBtn) undoLastCardBtn.disabled = true;
+  }
+
+  function armUndoState(cardStr, trickBeforeLen, leadSuitBefore, trumpOpenBefore, turnIndexBefore) {
+    undoState = {
+      playerIndex: 2,
+      cardStr,
+      trickBeforeLen,
+      leadSuitBefore,
+      trumpOpenBefore,
+      turnIndexBefore
+    };
+    if (undoLastCardBtn) undoLastCardBtn.disabled = false;
+  }
+
+  function canUndoLastHumanPlay() {
+    return !!undoState &&
+      phase === "PLAY" &&
+      !gameOverTriggered &&
+      turnIndex === 2 &&
+      trick.length === undoState.trickBeforeLen + 1 &&
+      trick[trick.length - 1] &&
+      trick[trick.length - 1].playerIndex === 2 &&
+      trick[trick.length - 1].cardStr === undoState.cardStr;
+  }
+
+  function undoLastHumanPlay() {
+    if (!canUndoLastHumanPlay()) {
+      clearUndoState();
+      renderAll();
+      return;
+    }
+
+    const last = trick[trick.length - 1];
+    if (!last || last.playerIndex !== 2) {
+      clearUndoState();
+      renderAll();
+      return;
+    }
+
+    trick.pop();
+    players[2].hand.push(undoState.cardStr);
+    leadSuit = undoState.leadSuitBefore;
+    trumpOpen = undoState.trumpOpenBefore;
+    turnIndex = undoState.turnIndexBefore;
+
+    clearUndoState();
+    msg("Your last card was returned. Choose again.");
+    renderAll();
+  }
 
   // ---------- match state ----------
   let GAME_THRESHOLD = 10;
@@ -409,6 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showGameOver(loserIndex) {
     gameOverTriggered = true;
     phase = "GAME_OVER";
+    clearUndoState();
     renderAll();
 
     show(pickPanelEl, false);
@@ -892,6 +947,10 @@ document.addEventListener("DOMContentLoaded", () => {
       turnBannerEl.textContent = `Phase: ${phaseDisplay(phase)} • ${who} • Trick ${trickNumber}/${TOTAL_TRICKS}`;
     }
 
+    if (undoLastCardBtn) {
+      undoLastCardBtn.disabled = !canUndoLastHumanPlay();
+    }
+
     updateDifficultyUI();
   }
 
@@ -1206,6 +1265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pluckQueue = [];
     activePluck = null;
     pluckSuitUsedByPair = new Map();
+    clearUndoState();
     hidePluckEvent();
   }
 
@@ -1585,6 +1645,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function setTrump(suit) {
     trumpSuit = suit;
     trumpOpen = trumpSuit === "C";
+    clearUndoState();
     renderAll();
   }
 
@@ -1602,12 +1663,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function playCard(pi, handIdx) {
+    const leadSuitBefore = leadSuit;
+    const trumpOpenBefore = trumpOpen;
+    const turnIndexBefore = turnIndex;
+    const trickBeforeLen = trick.length;
+
+    if (pi !== 2) {
+      clearUndoState();
+    }
+
     const cardStr = players[pi].hand.splice(handIdx, 1)[0];
     if (!cardStr) return;
 
     if (trick.length === 0) setLeadSuitFromFirst(cardStr);
     trick.push({ playerIndex: pi, cardStr });
     updateTrumpOpen(cardStr);
+
+    if (pi === 2) {
+      armUndoState(cardStr, trickBeforeLen, leadSuitBefore, trumpOpenBefore, turnIndexBefore);
+    }
 
     turnIndex = (turnIndex + 1) % 3;
     renderAll();
@@ -2106,6 +2180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverTriggered) return;
 
     phase = "DEAL";
+    clearUndoState();
     hidePluckEvent();
     setText(phaseValEl, phaseDisplay(phase));
     msg("Dealing...");
@@ -2135,6 +2210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverTriggered) return;
 
     phase = "PLUCK";
+    clearUndoState();
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
     show(pluckPanelEl, true);
@@ -2156,6 +2232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverTriggered) return;
 
     phase = "TRUMP_PICK";
+    clearUndoState();
     hidePluckEvent();
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -2182,6 +2259,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gameOverTriggered) return;
 
     phase = "PLAY";
+    clearUndoState();
     hidePluckEvent();
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -2206,6 +2284,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function endOfHand() {
+    clearUndoState();
     computePlucksEarnedSuffered();
 
     for (let i = 0; i < 3; i++) {
@@ -2235,6 +2314,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resolveTrick() {
+    clearUndoState();
     const winner = evaluateTrickWinner();
     players[winner].tricks += 1;
 
@@ -2329,6 +2409,7 @@ document.addEventListener("DOMContentLoaded", () => {
     engineBusy = false;
     pluckSuitUsedByPair = new Map();
 
+    clearUndoState();
     resetMatchTotals();
 
     players.forEach(p => {
@@ -2435,6 +2516,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    if (undoLastCardBtn) {
+      undoLastCardBtn.addEventListener("click", () => {
+        undoLastHumanPlay();
+      });
+    }
+
     if (newGameBtn) {
       newGameBtn.addEventListener("click", () => {
         resetToPick();
@@ -2455,6 +2542,7 @@ document.addEventListener("DOMContentLoaded", () => {
     leadSuit = null;
     trickNumber = 0;
     turnIndex = 0;
+    clearUndoState();
     resetMatchTotals();
 
     players.forEach(p => {
