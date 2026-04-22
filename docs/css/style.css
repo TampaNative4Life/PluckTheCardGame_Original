@@ -1,6 +1,6 @@
 /* =========================================================
    CHANGE LOG
-   2026-04-20 16:20 (-0400)
+   2026-04-20 17:45 (-0400)
 
    FILE
    docs/css/style.css
@@ -9,26 +9,22 @@
    Full file replacement.
 
    PURPOSE
-   Clean the shared stylesheet and add dedicated pluck-event
-   feedback styling for Demo 2 without changing gameplay.
+   Preserve current Demo 2 styling and add support for the
+   Undo Last Card button row.
 
    FIXES / CHANGES
-   • Cleans duplicated and broken pasted CSS structure
-   • Preserves stable Demo 2 layout
-   • Adds Pluck Event card styling
-   • Adds suit-based visual emphasis for pluck outcomes
-   • Keeps current AI side strips and table layout intact
+   • Adds undoRow styling under Your Hand
+   • Keeps current layout and visual system intact
 
    ROW COUNT
-   Previous File Row Count: 1100+ pasted with duplicated sections
-   Current File Row Count: 886
+   Previous File Row Count: 886
+   Current File Row Count: 891
 
    UNTOUCHED AREAS
-   • No JS logic changed in CSS
+   • No gameplay logic changed in CSS
    • No dealer rotation changed
    • No quota logic changed
    • No popup logic changed
-   • No gameplay changed
    ========================================================= */
 
 :root{
@@ -722,6 +718,11 @@ body{
 
 .overlayStatus{
   color:#e8edf7;
+}
+
+.undoRow{
+  margin-top:10px;
+  justify-content:center;
 }
 
 .pickLowerGrid{
