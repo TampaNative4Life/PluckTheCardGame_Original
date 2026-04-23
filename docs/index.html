@@ -2,22 +2,9 @@
 FILE: docs/index.html
 CHANGE DATE: 2026-04-23
 
-ISSUE:
-Homepage nav and logo inconsistent with rest of site
-
 FIX:
-Converted to unified nav system (nav/navlinks)
-Standardized logo path to images/logo.png
-Preserved hero + layout
-
-ROW COUNT:
-Old: 151
-New: 136
-
-UNTOUCHED:
-Hero content
-Play button
-Page structure
+- Unified nav
+- Fixed logo path
 ========================================= -->
 
 <!doctype html>
@@ -25,51 +12,46 @@ Page structure
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pluck The Card Game</title>
+<title>Pluck</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
 <header class="nav">
-  <div class="navLeft">
-    <a class="brand" href="index.html">
-      <img src="images/logo.png" class="logo">
-      <span>PLUCK</span>
-    </a>
-  </div>
+<div class="navLeft">
+<a class="brand" href="index.html">
+<img src="images/logo.png" class="logo">
+<span>PLUCK</span>
+</a>
+</div>
 
-  <nav class="navlinks">
-    <a href="index.html" class="activeLink">Home</a>
-    <a href="game.html">Practice</a>
-    <a href="demo2.html">Pluck Arena</a>
-    <a href="rules.html">Rules</a>
-    <a href="learn-pluck.html">Learn Pluck</a>
-    <a href="about.html">About</a>
-  </nav>
+<nav class="navlinks">
+<a href="index.html" class="activeLink">Home</a>
+<a href="game.html">Practice</a>
+<a href="demo2.html">Pluck Arena</a>
+<a href="rules.html">Rules</a>
+<a href="learn-pluck.html">Learn Pluck</a>
+<a href="about.html">About</a>
+</nav>
 </header>
 
 <main class="container">
 
 <section class="pageSection">
-  <div class="card" style="text-align:center">
-    <img src="images/logo.png" style="width:260px;margin-bottom:10px;">
-    <h1 class="pageTitle">Win Tricks. Take Cards. Control the Table.</h1>
+<div class="card" style="text-align:center">
 
-    <p class="pageText">
-      A three-player card game built on pressure, consequences, and table feel.
-    </p>
+<img src="images/logo.png" style="width:260px;margin-bottom:10px">
 
-    <a href="demo2.html" class="btn" style="margin-top:16px;">♠ PLAY NOW ♠</a>
-  </div>
-</section>
+<h1 class="pageTitle">Pluck</h1>
 
-<section class="pageSection">
-  <div class="cardRow">
-    <a class="btn" href="learn-pluck.html">Learn the Game</a>
-    <a class="btn" href="rules.html">View Rules</a>
-    <a class="btn" href="about.html">About Pluck</a>
-  </div>
+<p class="pageText">
+Three players. Seventeen tricks. Zero excuses.
+</p>
+
+<a href="demo2.html" class="btn">PLAY NOW</a>
+
+</div>
 </section>
 
 <footer class="footer">© 2026 Pluck The Card Game</footer>
