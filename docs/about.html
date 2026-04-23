@@ -1,76 +1,75 @@
 <!--
 =========================================================
 CHANGE LOG
-2026-04-20 16:35 (-0400)
+2026-04-23
 
 FILE
 docs/about.html
 
 ACTION
-Full file replacement.
+Full file replacement
 
-PURPOSE
-Standardize About page branding, menu labels, and logo path.
+FIXES
+• Header standardized
+• Logo path fixed
 
-FIXES / CHANGES
-• Fixes top-left logo path to images/logo.png
-• Standardizes top-right navigation labels
-• Uses Practice and Arena labels consistently
-
-UNTOUCHED AREAS
-• About page content
-• Existing CSS classes
-• Footer structure
+UNTOUCHED
+• Core message
 =========================================================
 -->
+
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>About Pluck</title>
-  <meta name="description" content="About Pluck The Card Game." />
-  <link rel="stylesheet" href="css/style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>About Pluck</title>
+<link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
-  <header class="nav">
-    <div class="navLeft">
-      <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="images/logo.png" alt="Pluck The Card Game Logo" class="logo" />
-        <span>PLUCK</span>
-      </a>
-    </div>
+<header class="nav">
+  <div class="navLeft">
+    <a class="brand" href="index.html">
+      <img src="images/logo.png" class="logo">
+      <span>PLUCK</span>
+    </a>
+  </div>
 
-    <nav class="navlinks" aria-label="Main navigation">
-      <a href="index.html">Home</a>
-      <a href="game.html">Practice</a>
-      <a href="demo2.html">Arena</a>
-      <a href="rules.html">Rules</a>
-      <a href="learn-pluck.html">Learn Pluck</a>
-      <a href="about.html" class="activeLink">About</a>
-    </nav>
-  </header>
+  <nav class="navlinks">
+    <a href="index.html">Home</a>
+    <a href="game.html">Practice</a>
+    <a href="demo2.html">Arena</a>
+    <a href="rules.html">Rules</a>
+    <a href="learn-pluck.html">Learn</a>
+    <a href="about.html" class="activeLink">About</a>
+  </nav>
+</header>
 
-  <main class="container">
-    <section class="pageSection">
-      <div class="card">
-        <h1 class="pageTitle">About Pluck</h1>
-        <p class="pageText">
-          Pluck is a three-player trick-taking card game built around pressure, quotas, and consequences.
-        </p>
-        <p class="pageText">
-          Unlike games that rely on long scorekeeping, Pluck keeps the tension alive hand to hand.
-          Miss your number and somebody earns the right to improve their next hand off yours.
-        </p>
-        <p class="pageText">
-          Around the right table, it is not just a game. It becomes talk, memory, style, and reputation.
-        </p>
-      </div>
-    </section>
+<main class="container">
+<section class="pageSection">
+<div class="card">
 
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
+<h1 class="pageTitle">About Pluck</h1>
+
+<p class="pageText">
+Pluck is built on pressure, memory, and consequence.
+</p>
+
+<p class="pageText">
+Miss your number and the next hand gets harder.
+</p>
+
+<p class="pageText">
+Around the right table, this becomes more than a game.
+</p>
+
+</div>
+</section>
+
+<footer class="footer">© 2026 Pluck</footer>
+</main>
 
 </body>
 </html>
