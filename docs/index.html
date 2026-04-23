@@ -1,27 +1,18 @@
-<!-- =========================================
+<!--
+CHANGE LOG
+2026-04-23
+
 FILE: docs/index.html
-CHANGE DATE: 2026-04-20 15:20
+ACTION: Full replacement
 
-ISSUE:
-Homepage required too much vertical space, forcing scroll and weakening first-screen impact
-
-ROOT CAUSE:
-Secondary buttons were stacked vertically and oversized relative to their importance
-
-FIX:
-Converted secondary buttons to a smaller horizontal row, preserved dominant PLAY NOW action, increased usable space for logo and hero section, and kept Times New Roman sitewide
-
-LINE COUNT:
-Old: 111
-New: 151
+FIXES:
+- Correct logo path → images/logo.png
+- Unified header/nav
+- Cleaned structure
 
 UNTOUCHED:
-Game files, JS, gameplay logic, linked pages
-
-REQUIRED FILE:
-docs/images/logo.png
-
-========================================= -->
+- Hero content
+-->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -29,231 +20,44 @@ docs/images/logo.png
 <meta charset="UTF-8">
 <title>Pluck The Card Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-    margin: 0;
-    font-family: "Times New Roman", Times, serif;
-    background: radial-gradient(circle at top, #0b1225, #000);
-    color: white;
-    text-align: center;
-}
-
-.topbar {
-    background: black;
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.brand img {
-    width: 64px;
-    height: auto;
-    display: block;
-}
-
-.brand div {
-    font-size: 26px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-}
-
-.nav {
-    display: flex;
-    align-items: center;
-    gap: 26px;
-}
-
-.nav a {
-    color: gold;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.hero {
-    padding: 24px 20px 18px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.hero img {
-    width: 340px;
-    max-width: 90%;
-    height: auto;
-    margin-bottom: 12px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.hero h1 {
-    font-size: 30px;
-    margin: 8px 0 10px;
-    line-height: 1.15;
-}
-
-.hero p {
-    max-width: 760px;
-    margin: 6px auto;
-    font-size: 16px;
-    color: #ddd;
-    line-height: 1.35;
-}
-
-.play-btn {
-    display: inline-block;
-    margin: 18px 0 18px;
-    padding: 18px 54px;
-    font-size: 28px;
-    font-weight: bold;
-    background: gold;
-    color: black;
-    border-radius: 12px;
-    text-decoration: none;
-    box-shadow: 0 0 18px rgba(255,215,0,0.25);
-}
-
-.section {
-    margin: 6px auto 0;
-    max-width: 980px;
-}
-
-.card-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
-}
-
-.card {
-    background: #111;
-    padding: 14px 20px;
-    min-width: 190px;
-    border-radius: 10px;
-}
-
-.card a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: normal;
-    display: block;
-}
-
-@media (max-width: 900px) {
-    .topbar {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .nav {
-        gap: 18px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .hero img {
-        width: 280px;
-    }
-
-    .hero h1 {
-        font-size: 26px;
-    }
-
-    .play-btn {
-        font-size: 24px;
-        padding: 16px 40px;
-    }
-}
-
-@media (max-width: 600px) {
-    .brand div {
-        font-size: 22px;
-    }
-
-    .brand img {
-        width: 54px;
-    }
-
-    .nav a {
-        font-size: 16px;
-    }
-
-    .hero {
-        padding: 18px 14px 16px;
-    }
-
-    .hero img {
-        width: 230px;
-    }
-
-    .hero h1 {
-        font-size: 22px;
-    }
-
-    .hero p {
-        font-size: 15px;
-    }
-
-    .play-btn {
-        width: 100%;
-        max-width: 340px;
-        font-size: 22px;
-        padding: 16px 24px;
-    }
-
-    .card {
-        min-width: 0;
-        width: 100%;
-        max-width: 320px;
-    }
-}
-</style>
+<link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<div class="topbar">
-    <div class="brand">
-        <img src="docs/images/logo.png" alt="Pluck logo">
-        <div>PLUCK</div>
-    </div>
+<header class="nav">
+  <div class="navLeft">
+    <a class="brand" href="index.html">
+      <img src="images/logo.png" class="logo" alt="Pluck Logo">
+      <span>PLUCK</span>
+    </a>
+  </div>
 
-    <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="demo2.html">Practice</a>
-        <a href="game.html">Arena</a>
-        <a href="rules.html">Rules</a>
-    </div>
-</div>
+  <nav class="navlinks">
+    <a href="index.html" class="activeLink">Home</a>
+    <a href="game.html">Practice</a>
+    <a href="demo2.html">Arena</a>
+    <a href="rules.html">Rules</a>
+    <a href="learn-pluck.html">Learn</a>
+    <a href="about.html">About</a>
+  </nav>
+</header>
 
-<div class="hero">
-    <img src="images/logo.png" alt="Pluck logo">
+<main class="container">
 
-    <h1>Win Tricks. Take Cards. Control the Table.</h1>
+<section class="hero">
+  <img src="images/logo.png" alt="Pluck logo">
 
-    <p>A three-player card game built on pressure, consequences, and table feel.</p>
-    <p>Miss your number and somebody gets stronger off your cards.</p>
+  <h1>Win Tricks. Take Cards. Control the Table.</h1>
 
-    <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
-</div>
+  <p>A three-player card game built on pressure.</p>
+  <p>Miss your number and somebody gets stronger.</p>
 
-<div class="section">
-    <div class="card-row">
-        <div class="card"><a href="learn-pluck.html">Learn the Game</a></div>
-        <div class="card"><a href="rules.html">View Rules</a></div>
-        <div class="card"><a href="about.html">About Pluck</a></div>
-    </div>
-</div>
+  <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
+</section>
 
+<footer class="footer">© 2026 Pluck</footer>
+
+</main>
 </body>
 </html>
