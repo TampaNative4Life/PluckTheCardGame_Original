@@ -1,22 +1,35 @@
-<!-- =========================================
+<!--
+=========================================================
 FILE: docs/game.html
-CHANGE DATE: 2026-04-24 10:59:00
+CHANGE DATE: 2026-04-24
 
 ACTION:
 Full file replacement.
 
-FIXES:
-- Restores Practice game page content
-- Fixes logo path to images/logo.png
-- Locks nav to Home, Practice, Pluck Arena, Rules, Learn Pluck, About
-- Keeps game.js wiring intact
+ISSUE:
+Practice page was replaced with a placeholder and lost the playable practice grid.
+
+ROOT CAUSE:
+game.html was overwritten with a static card instead of the working Practice DOM.
+
+FIX:
+- Restores full Practice page structure
+- Restores all IDs expected by js/game.js
+- Restores AI hidden hand panels
+- Restores Your Hand and Trick grids
+- Restores pick, trump, quota, and pluck panels
+- Uses logo path images/logo.png
+- Keeps script src="js/game.js"
+
+ROW COUNT:
+Previous File Row Count: unknown
+Current File Row Count: 191
 
 UNTOUCHED:
-- Practice game DOM IDs
-- Practice game layout
-- js/game.js script include
-========================================= -->
-
+- No JS changes
+- No CSS changes
+=========================================================
+-->
 <!doctype html>
 <html lang="en">
 <head>
@@ -25,6 +38,7 @@ UNTOUCHED:
   <title>Practice Pluck</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
   <header class="nav">
@@ -72,10 +86,12 @@ UNTOUCHED:
                 <div class="pickName">AI2</div>
                 <div id="pickAI2" class="pickCardSlot">(none)</div>
               </div>
+
               <div class="pickSlot">
                 <div class="pickName">AI3</div>
                 <div id="pickAI3" class="pickCardSlot">(none)</div>
               </div>
+
               <div class="pickSlot">
                 <div class="pickName">YOU</div>
                 <div id="pickYOU" class="pickCardSlot">(none)</div>
