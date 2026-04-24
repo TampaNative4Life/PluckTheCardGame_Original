@@ -7,30 +7,37 @@ ACTION:
 Full file replacement.
 
 ISSUE:
-AI card backs are spreading horizontally across the table and covering
+On mobile/tablet, AI2 and AI3 overlap each other and spread across
 the trick area.
 
 ROOT CAUSE:
-The AI hand containers were using row-style card layout instead of the
-side-table vertical stacked layout previously approved.
+The AI hand rows were still allowed to behave like horizontal rows,
+and the left/right seat boxes did not have mobile-safe positioning.
 
 FIX:
-- Restores AI2 and AI3 to side positions
-- Restores AI card backs to vertical stacked columns
-- Keeps AI cards off the trick area
-- Keeps all required demo2.js DOM IDs
+- Keeps full Pluck Arena table structure
+- Keeps all DOM IDs required by docs/js/demo2.js
 - Keeps pluck event panel IDs
 - Keeps undoLastCardBtn
 - Keeps logo path images/logo.png
-- Keeps nav locked to Home, Practice, Pluck Arena, Rules, Learn Pluck, About
+- Keeps script src="js/demo2.js"
+- Forces AI2 and AI3 cards into vertical stacked columns
+- Prevents AI panels from overlapping the trick area
+- Adds mobile/tablet responsive AI seat positioning
+- Hides avatar dots for AI seats only
+- Keeps Romando Sr player strip untouched
+
+ROW COUNT:
+Previous File Row Count: 330
+Current File Row Count: 454
 
 UNTOUCHED:
-- js/demo2.js
-- Gameplay logic
-- Pick logic
-- Trump logic
-- Pluck logic
-- Game over modal IDs
+- No JS changes
+- No gameplay logic changes
+- No pick logic changes
+- No trump logic changes
+- No pluck logic changes
+- No scoring changes
 =========================================================
 -->
 <!doctype html>
@@ -99,7 +106,7 @@ UNTOUCHED:
     body.demo2 .seat-right {
       top: 50%;
       width: 174px;
-      z-index: 5;
+      z-index: 6;
     }
 
     body.demo2 .seat-left {
@@ -159,6 +166,7 @@ UNTOUCHED:
       background: rgba(0,0,0,.15);
       border: 1px solid rgba(255,255,255,.07);
       overflow: hidden;
+      flex-wrap: nowrap !important;
     }
 
     body.demo2 #ai2Hand .cardBack,
@@ -177,10 +185,215 @@ UNTOUCHED:
 
     body.demo2 .trickCenter {
       z-index: 2;
+      pointer-events: none;
     }
 
     body.demo2 .seat-bottom {
-      z-index: 6;
+      z-index: 7;
+    }
+
+    @media (max-width: 900px) {
+      body.demo2 .feltTable {
+        min-height: 540px;
+      }
+
+      body.demo2 .trickCenter {
+        top: 42%;
+        width: min(520px, 66%);
+      }
+
+      body.demo2 .seat-left,
+      body.demo2 .seat-right {
+        width: 126px;
+      }
+
+      body.demo2 .seat-left {
+        left: 14px;
+      }
+
+      body.demo2 .seat-right {
+        right: 14px;
+      }
+
+      body.demo2 .seat-left .avatarWrap,
+      body.demo2 .seat-right .avatarWrap {
+        width: 116px;
+        min-height: 216px;
+        padding: 8px;
+      }
+
+      body.demo2 #ai2Hand,
+      body.demo2 #ai3Hand {
+        width: 46px;
+        height: 154px;
+      }
+
+      body.demo2 #ai2Hand .cardBack,
+      body.demo2 #ai3Hand .cardBack {
+        width: 22px !important;
+        height: 32px !important;
+        margin-top: -23px !important;
+      }
+
+      body.demo2 .seat-left .seatName,
+      body.demo2 .seat-right .seatName {
+        font-size: .88rem;
+      }
+
+      body.demo2 .seat-left .seatSub,
+      body.demo2 .seat-right .seatSub {
+        font-size: .78rem;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body.demo2 .feltTable {
+        min-height: 560px;
+      }
+
+      body.demo2 .trickCenter {
+        top: 41%;
+        width: 62%;
+      }
+
+      body.demo2 .trickInner {
+        min-height: 170px;
+      }
+
+      body.demo2 .seat-left,
+      body.demo2 .seat-right {
+        top: 50%;
+        width: 104px;
+      }
+
+      body.demo2 .seat-left {
+        left: 8px;
+      }
+
+      body.demo2 .seat-right {
+        right: 8px;
+      }
+
+      body.demo2 .seat-left .avatarWrap,
+      body.demo2 .seat-right .avatarWrap {
+        width: 96px;
+        min-height: 204px;
+        padding: 6px;
+      }
+
+      body.demo2 #ai2Hand,
+      body.demo2 #ai3Hand {
+        width: 42px;
+        height: 142px;
+      }
+
+      body.demo2 #ai2Hand .cardBack,
+      body.demo2 #ai3Hand .cardBack {
+        width: 20px !important;
+        height: 30px !important;
+        margin-top: -22px !important;
+      }
+
+      body.demo2 .seat-left .seatName,
+      body.demo2 .seat-right .seatName {
+        font-size: .76rem;
+        white-space: normal;
+      }
+
+      body.demo2 .seat-left .seatSub,
+      body.demo2 .seat-right .seatSub {
+        font-size: .68rem;
+        white-space: normal;
+      }
+
+      body.demo2 .seat-bottom {
+        bottom: 36px;
+        width: min(520px, 80%);
+      }
+
+      body.demo2 .seat-bottom .avatar {
+        display: none;
+      }
+
+      body.demo2 .seat-bottom .avatarWrap {
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.demo2 .feltTable {
+        min-height: 520px;
+      }
+
+      body.demo2 .trickCenter {
+        top: 40%;
+        width: 58%;
+      }
+
+      body.demo2 .trickInner {
+        min-height: 150px;
+        padding: 10px;
+      }
+
+      body.demo2 .seat-left,
+      body.demo2 .seat-right {
+        top: 50%;
+        width: 88px;
+      }
+
+      body.demo2 .seat-left {
+        left: 5px;
+      }
+
+      body.demo2 .seat-right {
+        right: 5px;
+      }
+
+      body.demo2 .seat-left .avatarWrap,
+      body.demo2 .seat-right .avatarWrap {
+        width: 82px;
+        min-height: 184px;
+        padding: 5px;
+      }
+
+      body.demo2 #ai2Hand,
+      body.demo2 #ai3Hand {
+        width: 36px;
+        height: 130px;
+      }
+
+      body.demo2 #ai2Hand .cardBack,
+      body.demo2 #ai3Hand .cardBack {
+        width: 18px !important;
+        height: 28px !important;
+        margin-top: -21px !important;
+      }
+
+      body.demo2 .seat-left .seatName,
+      body.demo2 .seat-right .seatName {
+        font-size: .68rem;
+        line-height: 1.05;
+      }
+
+      body.demo2 .seat-left .seatSub,
+      body.demo2 .seat-right .seatSub {
+        font-size: .62rem;
+        line-height: 1.05;
+      }
+
+      body.demo2 .seat-bottom {
+        bottom: 32px;
+        width: min(420px, 78%);
+      }
+
+      body.demo2 .seat-bottom .seatName {
+        font-size: .82rem;
+      }
+
+      body.demo2 .seat-bottom .seatSub {
+        font-size: .76rem;
+      }
     }
   </style>
 </head>
