@@ -7,37 +7,35 @@ ACTION:
 Full file replacement.
 
 ISSUE:
-On mobile/tablet, AI2 and AI3 overlap each other and spread across
-the trick area.
+Mobile/tablet Pluck Arena spacing was close but still crowded.
+AI seats sat too far inward and the trick area competed with AI panels.
 
 ROOT CAUSE:
-The AI hand rows were still allowed to behave like horizontal rows,
-and the left/right seat boxes did not have mobile-safe positioning.
+Mobile/tablet CSS left too much horizontal pressure between:
+- AI2 seat
+- AI3 seat
+- trickCenter
 
 FIX:
-- Keeps full Pluck Arena table structure
-- Keeps all DOM IDs required by docs/js/demo2.js
-- Keeps pluck event panel IDs
-- Keeps undoLastCardBtn
-- Keeps logo path images/logo.png
-- Keeps script src="js/demo2.js"
-- Forces AI2 and AI3 cards into vertical stacked columns
-- Prevents AI panels from overlapping the trick area
-- Adds mobile/tablet responsive AI seat positioning
-- Hides avatar dots for AI seats only
-- Keeps Romando Sr player strip untouched
+- Moves AI2 closer to far left edge on mobile/tablet
+- Moves AI3 closer to far right edge on mobile/tablet
+- Narrows trickCenter on mobile/tablet
+- Keeps AI card stacks vertical
+- Keeps AI panels fully visible
+- Keeps Romando Sr strip centered
+- Keeps Your Hand unchanged
 
 ROW COUNT:
-Previous File Row Count: 330
+Previous File Row Count: 454
 Current File Row Count: 454
 
 UNTOUCHED:
+- No HTML structure changes
 - No JS changes
-- No gameplay logic changes
-- No pick logic changes
-- No trump logic changes
-- No pluck logic changes
-- No scoring changes
+- No gameplay changes
+- No nav changes
+- No ID changes
+- No desktop layout changes beyond inherited safety
 =========================================================
 -->
 <!doctype html>
@@ -199,32 +197,32 @@ UNTOUCHED:
 
       body.demo2 .trickCenter {
         top: 42%;
-        width: min(520px, 66%);
+        width: min(470px, 58%);
       }
 
       body.demo2 .seat-left,
       body.demo2 .seat-right {
-        width: 126px;
+        width: 112px;
       }
 
       body.demo2 .seat-left {
-        left: 14px;
+        left: 2px;
       }
 
       body.demo2 .seat-right {
-        right: 14px;
+        right: 2px;
       }
 
       body.demo2 .seat-left .avatarWrap,
       body.demo2 .seat-right .avatarWrap {
-        width: 116px;
+        width: 106px;
         min-height: 216px;
-        padding: 8px;
+        padding: 8px 5px;
       }
 
       body.demo2 #ai2Hand,
       body.demo2 #ai3Hand {
-        width: 46px;
+        width: 44px;
         height: 154px;
       }
 
@@ -237,12 +235,12 @@ UNTOUCHED:
 
       body.demo2 .seat-left .seatName,
       body.demo2 .seat-right .seatName {
-        font-size: .88rem;
+        font-size: .86rem;
       }
 
       body.demo2 .seat-left .seatSub,
       body.demo2 .seat-right .seatSub {
-        font-size: .78rem;
+        font-size: .76rem;
       }
     }
 
@@ -253,7 +251,7 @@ UNTOUCHED:
 
       body.demo2 .trickCenter {
         top: 41%;
-        width: 62%;
+        width: 52%;
       }
 
       body.demo2 .trickInner {
@@ -263,27 +261,27 @@ UNTOUCHED:
       body.demo2 .seat-left,
       body.demo2 .seat-right {
         top: 50%;
-        width: 104px;
+        width: 92px;
       }
 
       body.demo2 .seat-left {
-        left: 8px;
+        left: 0;
       }
 
       body.demo2 .seat-right {
-        right: 8px;
+        right: 0;
       }
 
       body.demo2 .seat-left .avatarWrap,
       body.demo2 .seat-right .avatarWrap {
-        width: 96px;
+        width: 88px;
         min-height: 204px;
-        padding: 6px;
+        padding: 6px 4px;
       }
 
       body.demo2 #ai2Hand,
       body.demo2 #ai3Hand {
-        width: 42px;
+        width: 40px;
         height: 142px;
       }
 
@@ -296,13 +294,13 @@ UNTOUCHED:
 
       body.demo2 .seat-left .seatName,
       body.demo2 .seat-right .seatName {
-        font-size: .76rem;
+        font-size: .72rem;
         white-space: normal;
       }
 
       body.demo2 .seat-left .seatSub,
       body.demo2 .seat-right .seatSub {
-        font-size: .68rem;
+        font-size: .62rem;
         white-space: normal;
       }
 
@@ -328,7 +326,7 @@ UNTOUCHED:
 
       body.demo2 .trickCenter {
         top: 40%;
-        width: 58%;
+        width: 48%;
       }
 
       body.demo2 .trickInner {
@@ -339,27 +337,27 @@ UNTOUCHED:
       body.demo2 .seat-left,
       body.demo2 .seat-right {
         top: 50%;
-        width: 88px;
+        width: 78px;
       }
 
       body.demo2 .seat-left {
-        left: 5px;
+        left: 0;
       }
 
       body.demo2 .seat-right {
-        right: 5px;
+        right: 0;
       }
 
       body.demo2 .seat-left .avatarWrap,
       body.demo2 .seat-right .avatarWrap {
-        width: 82px;
+        width: 74px;
         min-height: 184px;
-        padding: 5px;
+        padding: 5px 3px;
       }
 
       body.demo2 #ai2Hand,
       body.demo2 #ai3Hand {
-        width: 36px;
+        width: 34px;
         height: 130px;
       }
 
@@ -372,13 +370,13 @@ UNTOUCHED:
 
       body.demo2 .seat-left .seatName,
       body.demo2 .seat-right .seatName {
-        font-size: .68rem;
+        font-size: .64rem;
         line-height: 1.05;
       }
 
       body.demo2 .seat-left .seatSub,
       body.demo2 .seat-right .seatSub {
-        font-size: .62rem;
+        font-size: .56rem;
         line-height: 1.05;
       }
 
