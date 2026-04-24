@@ -7,28 +7,30 @@ ACTION:
 Full file replacement.
 
 ISSUE:
-Pluck Arena lost its game table and rendered like raw stacked content.
+AI card backs are spreading horizontally across the table and covering
+the trick area.
 
 ROOT CAUSE:
-demo2.html structure no longer matched docs/css/style.css or docs/js/demo2.js.
+The AI hand containers were using row-style card layout instead of the
+side-table vertical stacked layout previously approved.
 
 FIX:
-- Restores full Pluck Arena table structure
-- Restores all DOM IDs required by docs/js/demo2.js
-- Restores required pluck event panel IDs
-- Restores undoLastCardBtn
-- Restores nav class structure used by style.css
-- Uses logo path images/logo.png
-- Keeps script src="js/demo2.js"
-
-ROW COUNT:
-Previous File Row Count: unknown
-Current File Row Count: 330
+- Restores AI2 and AI3 to side positions
+- Restores AI card backs to vertical stacked columns
+- Keeps AI cards off the trick area
+- Keeps all required demo2.js DOM IDs
+- Keeps pluck event panel IDs
+- Keeps undoLastCardBtn
+- Keeps logo path images/logo.png
+- Keeps nav locked to Home, Practice, Pluck Arena, Rules, Learn Pluck, About
 
 UNTOUCHED:
-- No JS changes
-- No gameplay logic changes
-- No CSS changes
+- js/demo2.js
+- Gameplay logic
+- Pick logic
+- Trump logic
+- Pluck logic
+- Game over modal IDs
 =========================================================
 -->
 <!doctype html>
@@ -66,23 +68,6 @@ UNTOUCHED:
       );
     }
 
-    .aiHandRow {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      padding: 6px 10px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.15);
-      border: 1px solid rgba(255,255,255,.07);
-      min-height: 36px;
-    }
-
-    .aiHandRow .cardBack {
-      width: 32px;
-      height: 46px;
-      border-radius: 6px;
-    }
-
     .turnStrip {
       width: min(1100px, 100%);
       margin: 6px auto 0;
@@ -104,6 +89,98 @@ UNTOUCHED:
       background: rgba(0,0,0,.15);
       border: 1px solid rgba(255,255,255,.07);
       min-height: 50px;
+    }
+
+    body.demo2 .feltTable {
+      min-height: 442px;
+    }
+
+    body.demo2 .seat-left,
+    body.demo2 .seat-right {
+      top: 50%;
+      width: 174px;
+      z-index: 5;
+    }
+
+    body.demo2 .seat-left {
+      left: 18px;
+      transform: translateY(-50%);
+    }
+
+    body.demo2 .seat-right {
+      right: 18px;
+      transform: translateY(-50%);
+    }
+
+    body.demo2 .seat-left .avatarWrap,
+    body.demo2 .seat-right .avatarWrap {
+      width: 156px;
+      min-height: 224px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    body.demo2 .seat-left .avatar,
+    body.demo2 .seat-right .avatar {
+      display: none;
+    }
+
+    body.demo2 .seat-left .seatName,
+    body.demo2 .seat-right .seatName {
+      font-size: 1rem;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    body.demo2 .seat-left .seatSub,
+    body.demo2 .seat-right .seatSub {
+      font-size: .9rem;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    body.demo2 #ai2Hand,
+    body.demo2 #ai3Hand {
+      width: 54px;
+      height: 168px;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0;
+      padding: 6px 0 0;
+      margin: 0 auto;
+      border-radius: 10px;
+      background: rgba(0,0,0,.15);
+      border: 1px solid rgba(255,255,255,.07);
+      overflow: hidden;
+    }
+
+    body.demo2 #ai2Hand .cardBack,
+    body.demo2 #ai3Hand .cardBack {
+      width: 24px !important;
+      height: 34px !important;
+      border-radius: 5px !important;
+      margin-top: -24px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.demo2 #ai2Hand .cardBack:first-child,
+    body.demo2 #ai3Hand .cardBack:first-child {
+      margin-top: 0 !important;
+    }
+
+    body.demo2 .trickCenter {
+      z-index: 2;
+    }
+
+    body.demo2 .seat-bottom {
+      z-index: 6;
     }
   </style>
 </head>
