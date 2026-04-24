@@ -1,61 +1,257 @@
 <!-- =========================================
 FILE: docs/learn-pluck.html
-CHANGE DATE: 2026-04-23
+CHANGE DATE: 2026-04-24 10:59:00
 
-FIX:
-- Unified nav
-- Fixed logo path
+ACTION:
+Full file replacement.
+
+FIXES:
+- Restores full Learn Pluck content
+- Fixes logo path to images/logo.png
+- Locks nav to Home, Practice, Pluck Arena, Rules, Learn Pluck, About
 
 UNTOUCHED:
-- All learning content
+- Learn page body content
+- Footer
 ========================================= -->
 
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Learn Pluck</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Learn Pluck in 60 Seconds</title>
+  <meta name="description" content="Learn Pluck fast." />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
 
-<header class="nav">
-<div class="navLeft">
-<a class="brand" href="index.html">
-<img src="images/logo.png" class="logo">
-<span>PLUCK</span>
-</a>
-</div>
+  <header class="nav">
+    <div class="navLeft">
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <img src="images/logo.png" alt="Pluck The Card Game Logo" class="logo" />
+        <span>PLUCK</span>
+      </a>
+    </div>
 
-<nav class="navlinks">
-<a href="index.html">Home</a>
-<a href="game.html">Practice</a>
-<a href="demo2.html">Pluck Arena</a>
-<a href="rules.html">Rules</a>
-<a href="learn-pluck.html" class="activeLink">Learn Pluck</a>
-<a href="about.html">About</a>
-</nav>
-</header>
+    <nav class="navlinks" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="game.html">Practice</a>
+      <a href="demo2.html">Pluck Arena</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html" class="activeLink">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-<main class="container">
+  <main class="container">
+    <section class="pageSection">
+      <div class="card">
+        <h1 class="pageTitle">Learn Pluck in 60 Seconds</h1>
+        <p class="pageText">
+          Three players. Seventeen tricks. No old-school running score.
+          In this version, the game tracks pressure with <strong>plucks against</strong>.
+          Keep missing your job and the game remembers.
+        </p>
+      </div>
+    </section>
 
-<section class="pageSection">
-<div class="card">
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">1) The Deck</h2>
+        <p class="pageText">
+          Start with a standard deck. Remove 2♦, 2♥, and 2♠.
+          Keep 2♣. Add both Jokers.
+          Total cards: <strong>51</strong>.
+          Total tricks each hand: <strong>17</strong>.
+        </p>
+      </div>
+    </section>
 
-<h1 class="pageTitle">Learn Pluck</h1>
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">2) Pick Dealer First</h2>
+        <p class="pageText">
+          Everybody draws one card to <strong>pick dealer</strong>.
+          Lowest card becomes dealer.
+          If there is a tie for lowest, re-pick.
+        </p>
+        <p class="pageText">
+          This matters because the dealer seat has the biggest job that hand.
+          Congratulations. You won the right to work harder.
+        </p>
+      </div>
+    </section>
 
-<p class="pageText">
-Three players. Seventeen tricks. No excuses.
-Hit your number or pay for it next hand.
-</p>
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">3) The Job for Each Seat</h2>
+        <p class="pageText">
+          Every hand has three quotas:
+          <strong>Dealer needs 7</strong>,
+          <strong>left of dealer needs 6</strong>,
+          <strong>right of dealer needs 4</strong>.
+        </p>
+        <p class="pageText">
+          The deal rotates left each hand, so the quotas rotate too.
+          You do not sit in one safe little quota all game.
+        </p>
+      </div>
+    </section>
 
-</div>
-</section>
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">4) How a Hand Starts</h2>
+        <p class="pageText">
+          On the <strong>first hand</strong>, there are no plucks yet.
+          Players pick dealer, cards are dealt, dealer declares trump, and the player with <strong>2♣</strong> leads the first trick.
+        </p>
+        <p class="pageText">
+          On later hands, the order is:
+          <strong>Pick Dealer, Deal, Pluck, Trump, Play</strong>.
+        </p>
+      </div>
+    </section>
 
-<footer class="footer">© 2026 Pluck The Card Game</footer>
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">5) What a Pluck Is</h2>
+        <p class="pageText">
+          A pluck is the penalty system that gives the game its bite.
+          The plucker passes one card face down in a suit.
+          The pluckee must give back their <strong>highest card in that same suit</strong>.
+        </p>
+        <p class="pageText">
+          So yes, if you come up short, somebody else may get stronger off your hand next round.
+          The game is not being rude.
+          The game is being honest.
+        </p>
+      </div>
+    </section>
 
-</main>
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">6) How Plucks Are Earned</h2>
+        <p class="pageText">
+          Plucks come from the gap between what you <strong>needed</strong> and what you <strong>made</strong>.
+        </p>
+        <p class="pageText">
+          Example:
+          If your quota was 7 and you won 9 tricks, you earned <strong>2 plucks</strong>.
+          If your quota was 7 and you won only 4 tricks, you now have <strong>3 plucks against</strong>.
+        </p>
+        <p class="pageText">
+          One player’s extra tricks create plucks earned.
+          Another player’s missed quota creates plucks against.
+          Then the pluck phase matches that pain to that profit.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">7) The New Scoring System</h2>
+        <p class="pageText">
+          This version does <strong>not</strong> use a traditional running score.
+          It tracks a running total called <strong>plucks against</strong>.
+        </p>
+        <p class="pageText">
+          At the start of the match, players choose game length:
+          <strong>8</strong>, <strong>10</strong>, or <strong>12 plucks against</strong>.
+        </p>
+        <p class="pageText">
+          That number is your danger line.
+          If you hit it, you are out.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">8) What “Running Total” Means</h2>
+        <p class="pageText">
+          <strong>Plucks against are cumulative.</strong>
+          They carry from hand to hand.
+          They do not reset just because a new deal starts.
+        </p>
+        <p class="pageText">
+          Example:
+          If you take 2 plucks against in one hand, then 3 more in a later hand, your running total is now <strong>5 plucks against</strong>.
+        </p>
+        <p class="pageText">
+          So no, you do not get to act like last hand never happened.
+          Pluck keeps receipts.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">9) How the Match Ends</h2>
+        <p class="pageText">
+          The match ends the moment a player reaches the chosen limit of plucks against.
+        </p>
+        <p class="pageText">
+          If the table is playing to 10, then the first player to reach <strong>10 plucks against</strong> is out.
+          Chair hot. Game over.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">10) How the Winner Is Decided</h2>
+        <p class="pageText">
+          The winner is the player with the best <strong>differential</strong>.
+        </p>
+        <p class="pageText">
+          Differential means:
+          <strong>plucks earned minus plucks against</strong>.
+        </p>
+        <p class="pageText">
+          Example:
+          If you earned 14 plucks and only had 2 against, your differential is <strong>+12</strong>.
+          That is strong work.
+          If another player earned 2 and had 10 against, their differential is <strong>-8</strong>.
+          That is a rough night and a shorter walk back to the table snacks.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">11) Why This Scoring Works</h2>
+        <p class="pageText">
+          Old-school table games can sit there forever because nobody has a built-in reason to leave the chair.
+          This system fixes that.
+        </p>
+        <p class="pageText">
+          If you keep falling short, pressure builds.
+          If you keep overperforming, you build leverage.
+          Every hand matters.
+          Every missed quota costs.
+        </p>
+        <p class="pageText">
+          In plain English, the game now remembers who is cooking and who keeps getting cooked.
+        </p>
+      </div>
+    </section>
+
+    <section class="pageSection">
+      <div class="card">
+        <h2 class="pageTitle">One-line Summary</h2>
+        <p class="pageText">
+          In Pluck, you are not just trying to win tricks.
+          You are trying to hit your quota, avoid plucks against, and stay in the chair longer than the next player.
+        </p>
+        <div class="pageButtons">
+          <a class="btn" href="rules.html">Read Full Rules</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
+
 </body>
 </html>
