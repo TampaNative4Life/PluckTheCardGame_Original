@@ -1,22 +1,51 @@
 <!--
 =========================================================
 FILE: docs/game.html
-CHANGE DATE: 2026-04-25
+CHANGE DATE: 2026-04-25 11:52:00
 
 ACTION:
 Full file replacement.
 
 ISSUE:
-Practice page lost the playable practice grid and showed broken stacked text.
+Practice page was overwritten with broken layout and no longer
+renders the working practice game correctly.
+
+ROOT CAUSE:
+game.html structure was replaced with an incomplete page shell
+instead of preserving the working Practice DOM required by js/game.js.
 
 FIX:
-Restores Practice page to working game layout with all required js/game.js IDs.
+- Restores full Practice page structure
+- Restores pick dealer panel
+- Restores phase tracker
+- Restores AI hidden hand panels
+- Restores Your Hand panel
+- Restores Trick panel
+- Restores Trump panel
+- Restores Pluck panel
+- Restores all DOM IDs used by js/game.js
+- Keeps logo path as images/logo.png
+- Keeps nav locked to:
+  Home, Practice, Pluck Arena, Rules, Learn Pluck, About
 
 UNTOUCHED:
-No JS changes.
-No external CSS changes.
+- No JS changes
+- No CSS changes
+- No gameplay logic changes
+- Script remains js/game.js
+
+FAILURE TEST:
+- Practice page loads without raw stacked text
+- Pick button works
+- Pick cards display
+- OK Start Practice works
+- AI2 and AI3 hidden hand areas exist
+- Your Hand and Trick areas exist
+- Trump panel can show when JS calls it
+- Pluck panel can show when JS calls it
 =========================================================
 -->
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -24,170 +53,212 @@ No external CSS changes.
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Practice Pluck</title>
   <link rel="stylesheet" href="css/style.css" />
+</head>
 
-  <style>
-    body {
-      font-family: "Times New Roman", Times, serif;
-    }
+<body>
 
-    .practiceShell {
-      display: grid;
-      grid-template-columns: 330px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-      width: min(1250px, 100%);
-      margin: 0 auto;
-    }
+  <header class="nav">
+    <div class="navLeft">
+      <a class="brand" href="index.html" aria-label="Pluck Home">
+        <img src="images/logo.png" alt="Pluck The Card Game Logo" class="logo" />
+        <span>PLUCK</span>
+      </a>
+    </div>
 
-    .practiceSide,
-    .practiceMain {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    <nav class="navlinks" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="game.html" class="activeLink">Practice</a>
+      <a href="demo2.html">Pluck Arena</a>
+      <a href="rules.html">Rules</a>
+      <a href="learn-pluck.html">Learn Pluck</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-    .practiceCard {
-      background: rgba(15,23,42,.92);
-      border: 1px solid rgba(124,183,255,.14);
-      border-radius: 20px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.35);
-      padding: 18px;
-    }
+  <main class="container">
+    <div class="playLayout">
 
-    .practiceCard h3 {
-      margin: 0 0 10px;
-      font-size: 1.15rem;
-    }
+      <aside class="sidePanel">
 
-    .practicePhaseRow {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+        <div class="card">
+          <h3 style="margin-top:0;">Initial Pick, Choose Dealer</h3>
+          <p class="hint" style="margin-top:6px;">
+            Each player draws 1 card. Lowest card becomes Dealer.
+            If tied for lowest, repack and pick again.
+          </p>
 
-    .phaseChip {
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      border-radius: 999px;
-      padding: 8px 12px;
-      color: #d9e2f0;
-      font-weight: 700;
-    }
+          <div id="pickArea" style="margin-top:12px;">
+            <div class="buttons" style="justify-content:flex-start;flex-wrap:wrap;">
+              <button class="btn" id="pickBtn" type="button">Pick</button>
+              <button class="btn btn-secondary" id="pickOkBtn" type="button" disabled>OK, Start Practice</button>
+              <button class="btn btn-secondary" id="pickReBtn" type="button" disabled>Re-Pick</button>
+            </div>
 
-    .phaseArrow {
-      color: #d0d8e6;
-      font-weight: 700;
-    }
+            <div style="margin-top:12px;">
+              <div class="pmeta">
+                <strong>Status:</strong>
+                <span id="pickStatus">Click “Pick”.</span>
+              </div>
+            </div>
 
-    .practiceGrid2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
+            <div class="pickRowWide" style="margin-top:12px;">
+              <div class="pickSlot">
+                <div class="pickName">AI2</div>
+                <div id="pickAI2" class="pickCardSlot">(none)</div>
+              </div>
 
-    .practicePickGrid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
+              <div class="pickSlot">
+                <div class="pickName">AI3</div>
+                <div id="pickAI3" class="pickCardSlot">(none)</div>
+              </div>
 
-    .practicePickSlot {
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      padding: 10px;
-      min-height: 92px;
-    }
+              <div class="pickSlot">
+                <div class="pickName">YOU</div>
+                <div id="pickYOU" class="pickCardSlot">(none)</div>
+              </div>
+            </div>
 
-    .practicePickName {
-      font-size: .95rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+            <div style="margin-top:12px;" class="pmeta">
+              <strong>Dealer:</strong>
+              <span id="dealerLabel">(not set)</span>
+            </div>
+          </div>
+        </div>
 
-    .pickCardSlot {
-      min-height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #dbe3ef;
-    }
+        <div class="sideRow">
+          <div class="card cardTight">
+            <h3 style="margin-top:0;">Trump</h3>
+            <div class="pmeta">
+              <strong>Suit:</strong> <span id="trumpLabel">(not picked)</span><br />
+              <strong>Open:</strong> <span id="trumpOpenLabel">No</span>
+            </div>
 
-    .practiceButtons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-start;
-    }
+            <div class="trumpAceWrap">
+              <div class="pmeta"><strong>Ace:</strong></div>
+              <div id="trumpAceSlot" class="pickCardSlot">(none)</div>
+            </div>
+          </div>
 
-    .practiceQuotaGrid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
+          <div class="card cardTight">
+            <h3 style="margin-top:0;">Quotas</h3>
 
-    .practiceHandRow,
-    .hand {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      min-height: 90px;
-    }
+            <div class="quotaRow">
+              <div class="quotaPill">
+                <span class="quotaName">AI2</span>
+                <span class="quotaVal" id="ai2Quota">7</span>
+              </div>
 
-    .trickBox {
-      min-height: 120px;
-      border: 1px dashed rgba(255,255,255,.16);
-      border-radius: 16px;
-      padding: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: flex-start;
-    }
+              <div class="quotaPill">
+                <span class="quotaName">AI3</span>
+                <span class="quotaVal" id="ai3Quota">6</span>
+              </div>
 
-    .hint,
-    .pmeta,
-    .turnBanner,
-    .msg {
-      color: #dce4f0;
-      line-height: 1.55;
-    }
+              <div class="quotaPill">
+                <span class="quotaName">YOU</span>
+                <span class="quotaVal" id="youQuota">4</span>
+              </div>
+            </div>
 
-    .quotaPill {
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      background: rgba(255,255,255,.03);
-      padding: 10px;
-      text-align: center;
-    }
+            <div class="quotaRow quotaRow2">
+              <div class="quotaPill">
+                <span class="quotaName">AI2 Tricks</span>
+                <span class="quotaVal" id="ai2Tricks">0</span>
+              </div>
 
-    .quotaName {
-      display: block;
-      color: #c4cfdf;
-      font-size: .9rem;
-      margin-bottom: 4px;
-    }
+              <div class="quotaPill">
+                <span class="quotaName">AI3 Tricks</span>
+                <span class="quotaVal" id="ai3Tricks">0</span>
+              </div>
 
-    .quotaVal {
-      font-size: 1.25rem;
-      font-weight: 800;
-    }
+              <div class="quotaPill">
+                <span class="quotaName">YOU Tricks</span>
+                <span class="quotaVal" id="youTricks">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
 
-    @media (max-width: 980px) {
-      .practiceShell {
-        grid-template-columns: 1fr;
-      }
+      <section class="mainPlay">
 
-      .practiceGrid2 {
-        grid-template-columns: 1fr;
-      }
-    }
+        <div class="card" style="padding:14px;">
+          <div class="phaseRow">
+            <div id="pDeal" class="phaseChip">Deal</div>
+            <div class="phaseArrow">→</div>
+            <div id="pPluck" class="phaseChip">Pluck</div>
+            <div class="phaseArrow">→</div>
+            <div id="pTrump" class="phaseChip">Trump</div>
+            <div class="phaseArrow">→</div>
+            <div id="pPlay" class="phaseChip">Play</div>
+          </div>
 
-    @media (max-width: 700px) {
-      .practicePickGrid,
-      .practiceQuotaGrid {
-        grid-template-columns: 1fr;
+          <div style="margin-top:10px;color:#dce3ef;">
+            <strong>Phase:</strong> <span id="phaseLabel">PICK_DEALER</span>
+            &nbsp;•&nbsp;
+            <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
+            &nbsp;•&nbsp;
+            <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
+          </div>
+
+          <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
+
+          <div class="buttons" style="margin-top:12px; justify-content:flex-start;">
+            <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:14px; grid-template-columns:repeat(2,minmax(0,1fr));">
+          <div class="card">
+            <h3>AI2 (hidden hand)</h3>
+            <div id="ai2Hand" class="handRow"></div>
+          </div>
+
+          <div class="card">
+            <h3>AI3 (hidden hand)</h3>
+            <div id="ai3Hand" class="handRow"></div>
+          </div>
+        </div>
+
+        <div class="card pluckPanel" id="pluckPanel" style="display:none; margin-top:14px;">
+          <h3>Pluck Phase</h3>
+          <p id="pluckStatus" class="msg"></p>
+          <div id="pluckChoices" class="buttons" style="justify-content:flex-start; flex-wrap:wrap;"></div>
+          <button class="btn" id="pluckNextBtn" type="button">Run Next Pluck</button>
+          <p class="hint">Failed suit attempt = pluck LOST. No re-pick.</p>
+        </div>
+
+        <div class="card" id="trumpPanel" style="display:none; margin-top:14px;">
+          <h3>Select Trump</h3>
+          <p id="trumpStatus" class="msg"></p>
+          <div class="buttons" style="justify-content:flex-start; flex-wrap:wrap;">
+            <button class="btn" type="button" data-trump="S">Spades</button>
+            <button class="btn" type="button" data-trump="H">Hearts</button>
+            <button class="btn" type="button" data-trump="D">Diamonds</button>
+            <button class="btn" type="button" data-trump="C">Clubs</button>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:14px; grid-template-columns:repeat(2,minmax(0,1fr));">
+          <div class="card">
+            <h3>Your Hand</h3>
+            <div id="hand" class="hand"></div>
+            <p id="msg" class="msg"></p>
+            <p class="hint">Tap a card to play. Must follow suit if possible.</p>
+          </div>
+
+          <div class="card">
+            <h3>Trick</h3>
+            <div class="trickBox" id="trick">(empty)</div>
+            <p class="hint">Winner leads next trick.</p>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <footer class="footer">© 2026 Pluck The Card Game</footer>
+  </main>
+
+  <script src="js/game.js"></script>
+</body>
+</html>
