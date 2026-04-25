@@ -1,51 +1,31 @@
 <!--
 =========================================================
 FILE: docs/game.html
-CHANGE DATE: 2026-04-25 11:52:00
+CHANGE DATE: 2026-04-25 16:05 (-0400)
 
 ACTION:
 Full file replacement.
 
 ISSUE:
-Practice page was overwritten with broken layout and no longer
-renders the working practice game correctly.
+Practice page appeared empty or stacked because the playable Practice
+DOM and stylesheet support were out of sync.
 
 ROOT CAUSE:
-game.html structure was replaced with an incomplete page shell
-instead of preserving the working Practice DOM required by js/game.js.
+game.html uses js/game.js and the older Practice layout IDs. The page
+needs the full Practice DOM, not a placeholder page and not the Arena DOM.
 
 FIX:
-- Restores full Practice page structure
-- Restores pick dealer panel
-- Restores phase tracker
-- Restores AI hidden hand panels
-- Restores Your Hand panel
-- Restores Trick panel
-- Restores Trump panel
-- Restores Pluck panel
-- Restores all DOM IDs used by js/game.js
-- Keeps logo path as images/logo.png
-- Keeps nav locked to:
-  Home, Practice, Pluck Arena, Rules, Learn Pluck, About
+- Restores full playable Practice page structure
+- Keeps script src="js/game.js"
+- Keeps all IDs used by js/game.js
+- Keeps nav locked to Home, Practice, Pluck Arena, Rules, Learn Pluck, About
+- Keeps logo path images/logo.png
 
 UNTOUCHED:
 - No JS changes
-- No CSS changes
 - No gameplay logic changes
-- Script remains js/game.js
-
-FAILURE TEST:
-- Practice page loads without raw stacked text
-- Pick button works
-- Pick cards display
-- OK Start Practice works
-- AI2 and AI3 hidden hand areas exist
-- Your Hand and Trick areas exist
-- Trump panel can show when JS calls it
-- Pluck panel can show when JS calls it
 =========================================================
 -->
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -95,10 +75,7 @@ FAILURE TEST:
             </div>
 
             <div style="margin-top:12px;">
-              <div class="pmeta">
-                <strong>Status:</strong>
-                <span id="pickStatus">Click “Pick”.</span>
-              </div>
+              <div class="pmeta"><strong>Status:</strong> <span id="pickStatus">Click “Pick”.</span></div>
             </div>
 
             <div class="pickRowWide" style="margin-top:12px;">
@@ -119,8 +96,7 @@ FAILURE TEST:
             </div>
 
             <div style="margin-top:12px;" class="pmeta">
-              <strong>Dealer:</strong>
-              <span id="dealerLabel">(not set)</span>
+              <strong>Dealer:</strong> <span id="dealerLabel">(not set)</span>
             </div>
           </div>
         </div>
@@ -180,7 +156,6 @@ FAILURE TEST:
       </aside>
 
       <section class="mainPlay">
-
         <div class="card" style="padding:14px;">
           <div class="phaseRow">
             <div id="pDeal" class="phaseChip">Deal</div>
@@ -194,10 +169,8 @@ FAILURE TEST:
 
           <div style="margin-top:10px;color:#dce3ef;">
             <strong>Phase:</strong> <span id="phaseLabel">PICK_DEALER</span>
-            &nbsp;•&nbsp;
-            <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
-            &nbsp;•&nbsp;
-            <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
+            &nbsp;•&nbsp; <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
+            &nbsp;•&nbsp; <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
           </div>
 
           <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
@@ -252,7 +225,6 @@ FAILURE TEST:
             <p class="hint">Winner leads next trick.</p>
           </div>
         </div>
-
       </section>
     </div>
 
