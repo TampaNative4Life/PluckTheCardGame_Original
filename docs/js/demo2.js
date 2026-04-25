@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-20 17:45 (-0400)
+// 2026-04-22 16:40
 //
 // FILE
 // docs/js/demo2.js
@@ -9,22 +9,23 @@
 // Full file replacement.
 //
 // ISSUE
-// Live gameplay needed a mulligan style back button that
-// erases the player's last move only.
+// Undo Last Card button appeared, but the move did not actually undo.
 //
 // ROOT CAUSE
-// There was no stored undo state for the last human card play.
+// 1. Undo validation incorrectly required turnIndex to be YOU after your play.
+//    After a valid human play, turnIndex advances to the next player.
+// 2. The AI move timer was still scheduled after your play.
+//    Even if undo ran, the pending AI action could still fire.
 //
 // FIX
-// • Adds Undo Last Card support
-// • Undo works only for the most recent human card play
-// • Undo is cleared as soon as any AI card is played
-// • Undo does not affect plucks, dealer pick, trump choice,
-//   resolved tricks, end of hand, or game over
+// • Undo now works after your play and before any AI card is added
+// • Pending AI timeout is cancelled on undo
+// • Undo success now clearly updates the message
+// • Navigation naming remains aligned with Pluck Arena page behavior
 //
-// ROW COUNT
-// Previous File Row Count: 1507
-// Current File Row Count: 1598
+// LINE COUNT
+// Old: 1598
+// New: 1634
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -32,7 +33,7 @@
 // • Pick logic
 // • Pluck cycle ordering logic
 // • Trump selection flow
-// • Existing AI logic
+// • Existing AI decision logic
 // • Game over popup logic
 // =========================================================
 
@@ -343,7 +344,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let engineBusy = false;
   let isBound = false;
   let lastDealtDeck = null;
+  let pendingAITimeout = null;
   let undoState = null;
+
+  function clearPendingAIAction() {
+    if (pendingAITimeout) {
+      clearTimeout(pendingAITimeout);
+      pendingAITimeout = null;
+    }
+    engineBusy = false;
+  }
 
   function clearUndoState() {
     undoState = null;
@@ -366,7 +376,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return !!undoState &&
       phase === "PLAY" &&
       !gameOverTriggered &&
-      turnIndex === 2 &&
       trick.length === undoState.trickBeforeLen + 1 &&
       trick[trick.length - 1] &&
       trick[trick.length - 1].playerIndex === 2 &&
@@ -379,6 +388,8 @@ document.addEventListener("DOMContentLoaded", () => {
       renderAll();
       return;
     }
+
+    clearPendingAIAction();
 
     const last = trick[trick.length - 1];
     if (!last || last.playerIndex !== 2) {
@@ -394,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
     turnIndex = undoState.turnIndexBefore;
 
     clearUndoState();
-    msg("Your last card was returned. Choose again.");
+    msg("Undo successful. Your last card was returned. Choose again.");
     renderAll();
   }
 
@@ -462,6 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showGameOver(loserIndex) {
     gameOverTriggered = true;
+    clearPendingAIAction();
     phase = "GAME_OVER";
     clearUndoState();
     renderAll();
@@ -1265,6 +1277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pluckQueue = [];
     activePluck = null;
     pluckSuitUsedByPair = new Map();
+    clearPendingAIAction();
     clearUndoState();
     hidePluckEvent();
   }
@@ -1645,6 +1658,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function setTrump(suit) {
     trumpSuit = suit;
     trumpOpen = trumpSuit === "C";
+    clearPendingAIAction();
     clearUndoState();
     renderAll();
   }
@@ -2179,6 +2193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function toDeal() {
     if (gameOverTriggered) return;
 
+    clearPendingAIAction();
     phase = "DEAL";
     clearUndoState();
     hidePluckEvent();
@@ -2209,6 +2224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function toPluck() {
     if (gameOverTriggered) return;
 
+    clearPendingAIAction();
     phase = "PLUCK";
     clearUndoState();
     setText(phaseValEl, phaseDisplay(phase));
@@ -2231,6 +2247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function toTrumpPick() {
     if (gameOverTriggered) return;
 
+    clearPendingAIAction();
     phase = "TRUMP_PICK";
     clearUndoState();
     hidePluckEvent();
@@ -2258,6 +2275,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function toPlay() {
     if (gameOverTriggered) return;
 
+    clearPendingAIAction();
     phase = "PLAY";
     clearUndoState();
     hidePluckEvent();
@@ -2284,6 +2302,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function endOfHand() {
+    clearPendingAIAction();
     clearUndoState();
     computePlucksEarnedSuffered();
 
@@ -2363,15 +2382,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (turnIndex !== 2) {
         const pi = turnIndex;
-        setTimeout(() => {
+        pendingAITimeout = setTimeout(() => {
+          pendingAITimeout = null;
+
           if (gameOverTriggered) {
             engineBusy = false;
             return;
           }
+
           if (phase !== "PLAY") {
             engineBusy = false;
             return;
           }
+
+          if (turnIndex !== pi) {
+            engineBusy = false;
+            return;
+          }
+
           const idx = aiChooseIndex(pi);
           playCard(pi, idx);
           engineBusy = false;
@@ -2394,6 +2422,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- reset ----------
   function resetToPick() {
+    clearPendingAIAction();
     firstHandDone = false;
     pendingPlucks = null;
     pluckQueue = [];
@@ -2542,6 +2571,7 @@ document.addEventListener("DOMContentLoaded", () => {
     leadSuit = null;
     trickNumber = 0;
     turnIndex = 0;
+    clearPendingAIAction();
     clearUndoState();
     resetMatchTotals();
 
