@@ -1,31 +1,263 @@
-<!--
-=========================================================
-FILE: docs/game.html
-CHANGE DATE: 2026-04-25 16:05 (-0400)
-
-ACTION:
-Full file replacement.
+<!-- =========================================
+FILE: docs/index.html
+CHANGE DATE: 2026-04-20 15:20
 
 ISSUE:
-Practice page appeared empty or stacked because the playable Practice
-DOM and stylesheet support were out of sync.
+Homepage required too much vertical space, forcing scroll and weakening first-screen impact
 
 ROOT CAUSE:
-game.html uses js/game.js and the older Practice layout IDs. The page
-needs the full Practice DOM, not a placeholder page and not the Arena DOM.
+Secondary buttons were stacked vertically and oversized relative to their importance
 
 FIX:
-- Restores full playable Practice page structure
-- Keeps script src="js/game.js"
-- Keeps all IDs used by js/game.js
-- Keeps nav locked to Home, Practice, Pluck Arena, Rules, Learn Pluck, About
-- Keeps logo path images/logo.png
+Converted secondary buttons to a smaller horizontal row, preserved dominant PLAY NOW action, increased usable space for logo and hero section, and kept Times New Roman sitewide
+
+LINE COUNT:
+Old: 111
+New: 151
 
 UNTOUCHED:
-- No JS changes
-- No gameplay logic changes
-=========================================================
--->
+Game files, JS, gameplay logic, linked pages
+
+REQUIRED FILE:
+docs/images/logo.png
+
+========================================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pluck The Card Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: "Times New Roman", Times, serif;
+    background: radial-gradient(circle at top, #0b1225, #000);
+    color: white;
+    text-align: center;
+}
+
+.topbar {
+    background: black;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand img {
+    width: 64px;
+    height: auto;
+    display: block;
+}
+
+.brand div {
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+}
+
+.nav a {
+    color: gold;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.hero {
+    padding: 24px 20px 18px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.hero img {
+    width: 340px;
+    max-width: 90%;
+    height: auto;
+    margin-bottom: 12px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero h1 {
+    font-size: 30px;
+    margin: 8px 0 10px;
+    line-height: 1.15;
+}
+
+.hero p {
+    max-width: 760px;
+    margin: 6px auto;
+    font-size: 16px;
+    color: #ddd;
+    line-height: 1.35;
+}
+
+.play-btn {
+    display: inline-block;
+    margin: 18px 0 18px;
+    padding: 18px 54px;
+    font-size: 28px;
+    font-weight: bold;
+    background: gold;
+    color: black;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 0 18px rgba(255,215,0,0.25);
+}
+
+.section {
+    margin: 6px auto 0;
+    max-width: 980px;
+}
+
+.card-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: #111;
+    padding: 14px 20px;
+    min-width: 190px;
+    border-radius: 10px;
+}
+
+.card a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: normal;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .topbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav {
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero img {
+        width: 280px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+
+    .play-btn {
+        font-size: 24px;
+        padding: 16px 40px;
+    }
+}
+
+@media (max-width: 600px) {
+    .brand div {
+        font-size: 22px;
+    }
+
+    .brand img {
+        width: 54px;
+    }
+
+    .nav a {
+        font-size: 16px;
+    }
+
+    .hero {
+        padding: 18px 14px 16px;
+    }
+
+    .hero img {
+        width: 230px;
+    }
+
+    .hero h1 {
+        font-size: 22px;
+    }
+
+    .hero p {
+        font-size: 15px;
+    }
+
+    .play-btn {
+        width: 100%;
+        max-width: 340px;
+        font-size: 22px;
+        padding: 16px 24px;
+    }
+
+    .card {
+        min-width: 0;
+        width: 100%;
+        max-width: 320px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <img src="images/logo.png" alt="Pluck logo">
+        <div>PLUCK</div>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="demo2.html">Practice</a>
+        <a href="game.html">Arena</a>
+        <a href="rules.html">Rules</a>
+    </div>
+</div>
+
+<div class="hero">
+    <img src="images/logo.png" alt="Pluck logo">
+
+    <h1>Win Tricks. Take Cards. Control the Table.</h1>
+
+    <p>A three-player card game built on pressure, consequences, and table feel.</p>
+    <p>Miss your number and somebody gets stronger off your cards.</p>
+
+    <a href="demo2.html" class="play-btn">♠ PLAY NOW ♠</a>
+</div>
+
+<div class="section">
+    <div class="card-row">
+        <div class="card"><a href="learn-pluck.html">Learn the Game</a></div>
+        <div class="card"><a href="rules.html">View Rules</a></div>
+        <div class="card"><a href="about.html">About Pluck</a></div>
+    </div>
+</div>
+
+</body>
+</html>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -34,20 +266,19 @@ UNTOUCHED:
   <title>Practice Pluck</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
 
   <header class="nav">
     <div class="navLeft">
       <a class="brand" href="index.html" aria-label="Pluck Home">
-        <img src="images/logo.png" alt="Pluck The Card Game Logo" class="logo" />
+        <img src="/PluckTheCardGame_Original/images/PluckTheCardGame_Logo.jpg" alt="Pluck The Card Game Logo" class="logo" />
         <span>PLUCK</span>
       </a>
     </div>
 
     <nav class="navlinks" aria-label="Main navigation">
       <a href="index.html">Home</a>
-      <a href="game.html" class="activeLink">Practice</a>
+      <a href="game.html" class="activeLink">Practice Pluck</a>
       <a href="demo2.html">Pluck Arena</a>
       <a href="rules.html">Rules</a>
       <a href="learn-pluck.html">Learn Pluck</a>
@@ -63,15 +294,14 @@ UNTOUCHED:
         <div class="card">
           <h3 style="margin-top:0;">Initial Pick, Choose Dealer</h3>
           <p class="hint" style="margin-top:6px;">
-            Each player draws 1 card. Lowest card becomes Dealer.
-            If tied for lowest, repack and pick again.
+            Each player draws 1 card. Lowest card becomes Dealer. If tied for lowest, repack and pick again.
           </p>
 
           <div id="pickArea" style="margin-top:12px;">
             <div class="buttons" style="justify-content:flex-start;flex-wrap:wrap;">
-              <button class="btn" id="pickBtn" type="button">Pick</button>
-              <button class="btn btn-secondary" id="pickOkBtn" type="button" disabled>OK, Start Practice</button>
-              <button class="btn btn-secondary" id="pickReBtn" type="button" disabled>Re-Pick</button>
+              <button class="btn" id="pickBtn">Pick</button>
+              <button class="btn btn-secondary" id="pickOkBtn" disabled>OK, Start Practice</button>
+              <button class="btn btn-secondary" id="pickReBtn" disabled>Re-Pick</button>
             </div>
 
             <div style="margin-top:12px;">
@@ -83,12 +313,10 @@ UNTOUCHED:
                 <div class="pickName">AI2</div>
                 <div id="pickAI2" class="pickCardSlot">(none)</div>
               </div>
-
               <div class="pickSlot">
                 <div class="pickName">AI3</div>
                 <div id="pickAI3" class="pickCardSlot">(none)</div>
               </div>
-
               <div class="pickSlot">
                 <div class="pickName">YOU</div>
                 <div id="pickYOU" class="pickCardSlot">(none)</div>
@@ -105,7 +333,7 @@ UNTOUCHED:
           <div class="card cardTight">
             <h3 style="margin-top:0;">Trump</h3>
             <div class="pmeta">
-              <strong>Suit:</strong> <span id="trumpLabel">(not picked)</span><br />
+              <strong>Suit:</strong> <span id="trumpLabel">(not picked)</span><br/>
               <strong>Open:</strong> <span id="trumpOpenLabel">No</span>
             </div>
 
@@ -123,12 +351,10 @@ UNTOUCHED:
                 <span class="quotaName">AI2</span>
                 <span class="quotaVal" id="ai2Quota">7</span>
               </div>
-
               <div class="quotaPill">
                 <span class="quotaName">AI3</span>
                 <span class="quotaVal" id="ai3Quota">6</span>
               </div>
-
               <div class="quotaPill">
                 <span class="quotaName">YOU</span>
                 <span class="quotaVal" id="youQuota">4</span>
@@ -137,100 +363,4 @@ UNTOUCHED:
 
             <div class="quotaRow quotaRow2">
               <div class="quotaPill">
-                <span class="quotaName">AI2 Tricks</span>
-                <span class="quotaVal" id="ai2Tricks">0</span>
-              </div>
-
-              <div class="quotaPill">
-                <span class="quotaName">AI3 Tricks</span>
-                <span class="quotaVal" id="ai3Tricks">0</span>
-              </div>
-
-              <div class="quotaPill">
-                <span class="quotaName">YOU Tricks</span>
-                <span class="quotaVal" id="youTricks">0</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <section class="mainPlay">
-        <div class="card" style="padding:14px;">
-          <div class="phaseRow">
-            <div id="pDeal" class="phaseChip">Deal</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPluck" class="phaseChip">Pluck</div>
-            <div class="phaseArrow">→</div>
-            <div id="pTrump" class="phaseChip">Trump</div>
-            <div class="phaseArrow">→</div>
-            <div id="pPlay" class="phaseChip">Play</div>
-          </div>
-
-          <div style="margin-top:10px;color:#dce3ef;">
-            <strong>Phase:</strong> <span id="phaseLabel">PICK_DEALER</span>
-            &nbsp;•&nbsp; <strong>Trick:</strong> <span id="trickNum">0</span>/<span id="trickMax">17</span>
-            &nbsp;•&nbsp; <strong>Dealer:</strong> <span id="dealerBanner">(not set)</span>
-          </div>
-
-          <div id="turnBanner" class="turnBanner" style="margin-top:10px;"></div>
-
-          <div class="buttons" style="margin-top:12px; justify-content:flex-start;">
-            <button class="btn btn-secondary" id="resetBtn" type="button">Reset (New Deal)</button>
-          </div>
-        </div>
-
-        <div class="grid" style="margin-top:14px; grid-template-columns:repeat(2,minmax(0,1fr));">
-          <div class="card">
-            <h3>AI2 (hidden hand)</h3>
-            <div id="ai2Hand" class="handRow"></div>
-          </div>
-
-          <div class="card">
-            <h3>AI3 (hidden hand)</h3>
-            <div id="ai3Hand" class="handRow"></div>
-          </div>
-        </div>
-
-        <div class="card pluckPanel" id="pluckPanel" style="display:none; margin-top:14px;">
-          <h3>Pluck Phase</h3>
-          <p id="pluckStatus" class="msg"></p>
-          <div id="pluckChoices" class="buttons" style="justify-content:flex-start; flex-wrap:wrap;"></div>
-          <button class="btn" id="pluckNextBtn" type="button">Run Next Pluck</button>
-          <p class="hint">Failed suit attempt = pluck LOST. No re-pick.</p>
-        </div>
-
-        <div class="card" id="trumpPanel" style="display:none; margin-top:14px;">
-          <h3>Select Trump</h3>
-          <p id="trumpStatus" class="msg"></p>
-          <div class="buttons" style="justify-content:flex-start; flex-wrap:wrap;">
-            <button class="btn" type="button" data-trump="S">Spades</button>
-            <button class="btn" type="button" data-trump="H">Hearts</button>
-            <button class="btn" type="button" data-trump="D">Diamonds</button>
-            <button class="btn" type="button" data-trump="C">Clubs</button>
-          </div>
-        </div>
-
-        <div class="grid" style="margin-top:14px; grid-template-columns:repeat(2,minmax(0,1fr));">
-          <div class="card">
-            <h3>Your Hand</h3>
-            <div id="hand" class="hand"></div>
-            <p id="msg" class="msg"></p>
-            <p class="hint">Tap a card to play. Must follow suit if possible.</p>
-          </div>
-
-          <div class="card">
-            <h3>Trick</h3>
-            <div class="trickBox" id="trick">(empty)</div>
-            <p class="hint">Winner leads next trick.</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <footer class="footer">© 2026 Pluck The Card Game</footer>
-  </main>
-
-  <script src="js/game.js"></script>
-</body>
-</html>
+                <span class="quotaN
