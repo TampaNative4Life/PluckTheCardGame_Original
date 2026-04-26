@@ -1,40 +1,457 @@
-<!--
-=========================================================
+<!-- =========================================
 FILE: docs/demo2.html
-CHANGE DATE: 2026-04-24
-
-ACTION:
-Full file replacement.
+CHANGE DATE: 2026-04-26 17:05:00
 
 ISSUE:
-Mobile/tablet Pluck Arena spacing was close but still crowded.
-AI seats sat too far inward and the trick area competed with AI panels.
+Replace Undo with full trick Back control.
+Add post hand navigation controls.
 
 ROOT CAUSE:
-Mobile/tablet CSS left too much horizontal pressure between:
-- AI2 seat
-- AI3 seat
-- trickCenter
+Old undo model was card based and too weak.
 
 FIX:
-- Moves AI2 closer to far left edge on mobile/tablet
-- Moves AI3 closer to far right edge on mobile/tablet
-- Narrows trickCenter on mobile/tablet
-- Keeps AI card stacks vertical
-- Keeps AI panels fully visible
-- Keeps Romando Sr strip centered
-- Keeps Your Hand unchanged
+Removed Undo Last Card
+Added:
+- Back
+- Review Past Deal
+- Leave Arena
 
-ROW COUNT:
-Previous File Row Count: 454
-Current File Row Count: 454
+ROW COUNT
+Old: 454
+New: 462
 
-UNTOUCHED:
-- No HTML structure changes
-- No JS changes
-- No gameplay changes
-- No nav changes
-- No ID changes
+UNTOUCHED
+All gameplay layout preserved
+No seat movement changes
+No trick logic changes
+No nav changes
+========================================= -->
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pluck Arena</title>
+<link rel="stylesheet" href="css/style.css"/>
+
+<style>
+.cardBack{
+width:76px;height:108px;border-radius:14px;
+background:linear-gradient(135deg,#1a3a6e,#0f2448);
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 10px 22px rgba(0,0,0,.32);
+position:relative;flex:0 0 auto;
+}
+.cardBack::after{
+content:"";position:absolute;inset:6px;
+border-radius:8px;
+border:1px solid rgba(255,255,255,.12);
+}
+.turnStrip{
+width:min(1100px,100%);
+margin:6px auto 0;
+padding:8px 14px;
+border-radius:10px;
+background:rgba(10,20,38,.7);
+}
+
+.overlayButtons{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+}
+
+@media(max-width:700px){
+.overlayButtons{
+gap:8px;
+}
+}
+</style>
+</head>
+
+<body class="demo2">
+
+<header class="nav">
+<div class="navLeft">
+<a class="brand" href="index.html">
+<img src="images/logo.png" alt="Pluck Logo" class="logo"/>
+<span>PLUCK</span>
+</a>
+</div>
+
+<nav class="navlinks">
+<a href="index.html">Home</a>
+<a href="game.html">Practice</a>
+<a href="demo2.html" class="activeLink">Pluck Arena</a>
+<a href="rules.html">Rules</a>
+<a href="learn-pluck.html">Learn Pluck</a>
+<a href="about.html">About</a>
+</nav>
+</header>
+
+<main class="container">
+
+<section class="topHud">
+<div class="statusBar">
+
+<div class="statusItem">
+<span class="statusLabel">TRUMP</span>
+<span class="statusValue" id="trumpLabel">(not set)</span>
+</div>
+
+<div class="statusDivider"></div>
+
+<div class="statusItem">
+<span class="statusLabel">BOOKS</span>
+<span class="statusValue" id="booksSummary">
+YOU 0 • AI2 0 • AI3 0
+</span>
+</div>
+
+<div class="statusDivider"></div>
+
+<div class="statusItem">
+<span class="statusLabel">PHASE</span>
+<span id="phaseVal">PICK</span>
+</div>
+
+<div class="statusDivider"></div>
+
+<div class="statusItem">
+<span class="statusLabel">DEALER</span>
+<span id="dealerVal">(not set)</span>
+</div>
+
+<div class="statusDivider"></div>
+
+<div class="statusItem">
+<span class="statusLabel">TRICK</span>
+<span>
+<span id="trickNum">0</span> /
+<span id="trickMax">17</span>
+</span>
+</div>
+
+</div>
+</section>
+
+<div class="turnStrip" id="turnBanner">
+Phase: PICK DEALER
+</div>
+
+<section class="tableStage">
+
+<div class="tableTopBar">
+<button class="btn btn-secondary"
+id="resetBtn"
+type="button">
+Reset New Deal
+</button>
+</div>
+
+<section class="feltTable">
+
+<div class="seat seat-left">
+<div class="avatarWrap">
+<div>
+<div class="seatName">AI2 Left</div>
+<div id="ai2Hand"></div>
+<div class="seatSub">
+Quota <strong id="ai2Quota">7</strong>
+|
+Tricks <strong id="ai2Tricks">0</strong>
+</div>
+</div>
+</div>
+</div>
+
+<div class="seat seat-right">
+<div class="avatarWrap">
+<div>
+<div class="seatName">AI3 Right</div>
+<div id="ai3Hand"></div>
+<div class="seatSub">
+Quota <strong id="ai3Quota">6</strong>
+|
+Tricks <strong id="ai3Tricks">0</strong>
+</div>
+</div>
+</div>
+</div>
+
+<div class="trickCenter">
+<div class="trickInner">
+<div class="trickTitle">Trick Area</div>
+<div id="trickSlots">
+<div class="slotHint">(empty)</div>
+</div>
+</div>
+</div>
+
+<div class="seat seat-bottom">
+<div class="avatarWrap">
+<div style="flex:1">
+<div class="seatName">
+Romando Sr |
+Quota <strong id="youQuota">4</strong>
+|
+Tricks <strong id="youTricks">0</strong>
+</div>
+<div class="seatSub">
+Your cards are below
+</div>
+</div>
+</div>
+</div>
+
+</section>
+</section>
+
+<section class="bottomPanel">
+<div class="overlayCard bottomCard">
+<div id="msg">
+Pick first to begin.
+</div>
+</div>
+</section>
+
+<section class="bottomPanel">
+<div class="overlayCard bottomCard">
+<div class="overlayTitle">
+Your Hand
+</div>
+<div id="youHand"></div>
+</div>
+</section>
+
+
+<section class="bottomPanel">
+<div class="overlayCard bottomCard">
+
+<div class="overlayButtons">
+
+<button
+class="btn btn-secondary"
+id="backTrickBtn"
+type="button">
+← Back
+</button>
+
+<button
+class="btn btn-secondary"
+id="reviewDealBtn"
+type="button">
+Review Past Deal
+</button>
+
+<button
+class="btn btn-secondary"
+id="leaveArenaBtn"
+type="button"
+onclick="window.location.href='index.html';">
+Leave Arena
+</button>
+
+</div>
+
+</div>
+</section>
+
+
+<section class="bottomPanel"
+id="pluckEventPanel"
+style="display:none;">
+<div class="overlayCard bottomCard"
+id="pluckEventCard">
+<div id="pluckEventTitle"></div>
+<div id="pluckEventGive"></div>
+<div id="pluckEventTake"></div>
+<div id="pluckEventImpact"></div>
+</div>
+</section>
+
+
+<section class="bottomPanel"
+id="trumpPanel"
+style="display:none;">
+<div class="overlayCard bottomCard">
+
+<div class="overlayTitle">
+Choose Trump
+</div>
+
+<div id="trumpStatus">
+Dealer selects trump
+</div>
+
+<div class="overlayButtons">
+
+<button class="btn" data-trump="S">
+♠ Spades
+</button>
+
+<button class="btn" data-trump="H">
+♥ Hearts
+</button>
+
+<button class="btn" data-trump="D">
+♦ Diamonds
+</button>
+
+<button class="btn" data-trump="C">
+♣ Clubs
+</button>
+
+</div>
+</div>
+</section>
+
+
+<section class="bottomPanel"
+id="pluckPanel"
+style="display:none;">
+<div class="overlayCard bottomCard">
+<div class="overlayTitle">
+Pluck Phase
+</div>
+
+<div id="pluckStatus">
+Processing plucks...
+</div>
+
+<div id="pluckChoices"></div>
+
+<div class="overlayButtons">
+<button class="btn"
+id="pluckNextBtn"
+disabled>
+Confirm Send
+</button>
+</div>
+
+</div>
+</section>
+
+
+<section class="bottomPanel"
+id="pickPanel">
+
+<div class="overlayCard bottomCard">
+
+<div class="overlayTitle">
+Pick First
+</div>
+
+<div class="overlaySub">
+Lowest card deals
+</div>
+
+<div>
+<span id="gameLengthHint">
+Game ends at 10 plucks against
+</span>
+</div>
+
+<div class="overlayButtons">
+<button class="btn"
+id="gameLen8"
+data-threshold="8">
+Short 8
+</button>
+
+<button class="btn activeLength"
+id="gameLen10"
+data-threshold="10">
+Standard 10
+</button>
+
+<button class="btn"
+id="gameLen12"
+data-threshold="12">
+Long 12
+</button>
+</div>
+
+<div class="overlayButtons">
+<button class="btn"
+id="pickBtn">
+Pick
+</button>
+
+<button class="btn"
+id="pickOkBtn"
+disabled>
+OK Start
+</button>
+
+<button class="btn"
+id="pickReBtn"
+disabled>
+Repick
+</button>
+</div>
+
+<div id="pickStatus">
+Click Pick
+</div>
+
+<div class="pickRow">
+<div id="pickAI2">(none)</div>
+<div id="pickAI3">(none)</div>
+<div id="pickYOU">(none)</div>
+</div>
+
+</div>
+
+</section>
+
+<footer class="footer">
+© 2026 Pluck The Card Game
+</footer>
+
+</main>
+
+
+<div id="gameOverModal"
+style="display:none;">
+
+<div class="gameOverCard">
+
+<div class="gameOverTitle">
+GAME OVER
+</div>
+
+<div id="gameOverThreshold">
+Threshold 10
+</div>
+
+<div id="gameOverBody"></div>
+
+<div id="gameOverFooter"></div>
+
+<div class="overlayButtons">
+
+<button class="btn"
+id="newGameBtn">
+Start New Game
+</button>
+
+<button class="btn"
+onclick="window.location.href='index.html';">
+Leave Arena
+</button>
+
+</div>
+
+</div>
+</div>
+
+<script src="js/demo2.js"></script>
+
+</body>
+</html>- No ID changes
 - No desktop layout changes beyond inherited safety
 =========================================================
 -->
