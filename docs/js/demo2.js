@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-22 16:40
+// 2026-04-26
 //
 // FILE
 // docs/js/demo2.js
@@ -9,23 +9,31 @@
 // Full file replacement.
 //
 // ISSUE
-// Undo Last Card button appeared, but the move did not actually undo.
+// Undo Last Card was the wrong feature.
+// User needs a simple Back button that restores the current unresolved trick.
 //
 // ROOT CAUSE
-// 1. Undo validation incorrectly required turnIndex to be YOU after your play.
-//    After a valid human play, turnIndex advances to the next player.
-// 2. The AI move timer was still scheduled after your play.
-//    Even if undo ran, the pending AI action could still fire.
+// Original undo logic only restored the human player’s most recent card.
+// It did not restore full trick state after AI cards were played.
 //
 // FIX
-// • Undo now works after your play and before any AI card is added
-// • Pending AI timeout is cancelled on undo
-// • Undo success now clearly updates the message
-// • Navigation naming remains aligned with Pluck Arena page behavior
+// • Removed Undo Last Card system
+// • Added Back button support through #backTrickBtn
+// • Back restores the current unresolved trick to its starting state
+// • Back works after 1, 2, or 3 cards are down, as long as trick has not resolved
+// • Back restores all player hands
+// • Back restores turn order
+// • Back restores lead suit
+// • Back restores trump-open state
+// • Back restores trick number
+// • Back restores trick counts
+// • Back cancels pending AI action
+// • Back cancels pending trick resolution timer
+// • Back use is unlimited during testing
 //
 // LINE COUNT
-// Old: 1598
-// New: 1634
+// Old: 1634
+// New: 1668
 //
 // UNTOUCHED AREAS
 // • Dealer rotation logic
@@ -34,7 +42,7 @@
 // • Pluck cycle ordering logic
 // • Trump selection flow
 // • Existing AI decision logic
-// • Game over popup logic
+// • Game over logic
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -62,7 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const youHandEl          = $("youHand");
   const trickSlotsEl       = $("trickSlots");
   const resetBtn           = $("resetBtn");
-  const undoLastCardBtn    = $("undoLastCardBtn");
+  const backTrickBtn       = $("backTrickBtn");
+  const reviewDealBtn      = $("reviewDealBtn");
 
   const trumpLabelEl       = $("trumpLabel");
   const booksSummaryEl     = $("booksSummary");
@@ -149,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ["booksSummary", booksSummaryEl],
     ["phaseVal", phaseValEl],
     ["dealerVal", dealerValEl],
-    ["undoLastCardBtn", undoLastCardBtn]
+    ["backTrickBtn", backTrickBtn]
   ];
 
   const missing = required.filter(([, el]) => !el).map(([name]) => name);
@@ -345,67 +354,86 @@ document.addEventListener("DOMContentLoaded", () => {
   let isBound = false;
   let lastDealtDeck = null;
   let pendingAITimeout = null;
-  let undoState = null;
+  let pendingResolveTimeout = null;
+  let currentTrickSnapshot = null;
+  let completedTrickLog = [];
 
   function clearPendingAIAction() {
     if (pendingAITimeout) {
       clearTimeout(pendingAITimeout);
       pendingAITimeout = null;
     }
+
+    if (pendingResolveTimeout) {
+      clearTimeout(pendingResolveTimeout);
+      pendingResolveTimeout = null;
+    }
+
     engineBusy = false;
   }
 
-  function clearUndoState() {
-    undoState = null;
-    if (undoLastCardBtn) undoLastCardBtn.disabled = true;
+  function cloneHands() {
+    return players.map(p => p.hand.slice());
   }
 
-  function armUndoState(cardStr, trickBeforeLen, leadSuitBefore, trumpOpenBefore, turnIndexBefore) {
-    undoState = {
-      playerIndex: 2,
-      cardStr,
-      trickBeforeLen,
-      leadSuitBefore,
-      trumpOpenBefore,
-      turnIndexBefore
+  function cloneTrick() {
+    return trick.map(t => ({ playerIndex: t.playerIndex, cardStr: t.cardStr }));
+  }
+
+  function saveCurrentTrickSnapshot() {
+    currentTrickSnapshot = {
+      hands: cloneHands(),
+      tricksWon: players.map(p => p.tricks),
+      turnIndex,
+      leadSuit,
+      trumpOpen,
+      trick: cloneTrick(),
+      trickNumber
     };
-    if (undoLastCardBtn) undoLastCardBtn.disabled = false;
+    updateBackButton();
   }
 
-  function canUndoLastHumanPlay() {
-    return !!undoState &&
-      phase === "PLAY" &&
+  function clearCurrentTrickSnapshot() {
+    currentTrickSnapshot = null;
+    updateBackButton();
+  }
+
+  function canBackCurrentTrick() {
+    return phase === "PLAY" &&
       !gameOverTriggered &&
-      trick.length === undoState.trickBeforeLen + 1 &&
-      trick[trick.length - 1] &&
-      trick[trick.length - 1].playerIndex === 2 &&
-      trick[trick.length - 1].cardStr === undoState.cardStr;
+      currentTrickSnapshot &&
+      trick.length > 0;
   }
 
-  function undoLastHumanPlay() {
-    if (!canUndoLastHumanPlay()) {
-      clearUndoState();
+  function updateBackButton() {
+    if (!backTrickBtn) return;
+    backTrickBtn.disabled = !canBackCurrentTrick();
+  }
+
+  function restoreCurrentTrick() {
+    if (!canBackCurrentTrick()) {
+      msg("Nothing to go back to.");
       renderAll();
       return;
     }
 
     clearPendingAIAction();
 
-    const last = trick[trick.length - 1];
-    if (!last || last.playerIndex !== 2) {
-      clearUndoState();
-      renderAll();
-      return;
+    for (let i = 0; i < 3; i++) {
+      players[i].hand = currentTrickSnapshot.hands[i].slice();
+      players[i].tricks = currentTrickSnapshot.tricksWon[i];
     }
 
-    trick.pop();
-    players[2].hand.push(undoState.cardStr);
-    leadSuit = undoState.leadSuitBefore;
-    trumpOpen = undoState.trumpOpenBefore;
-    turnIndex = undoState.turnIndexBefore;
+    turnIndex = currentTrickSnapshot.turnIndex;
+    leadSuit = currentTrickSnapshot.leadSuit;
+    trumpOpen = currentTrickSnapshot.trumpOpen;
+    trick = currentTrickSnapshot.trick.map(t => ({
+      playerIndex: t.playerIndex,
+      cardStr: t.cardStr
+    }));
+    trickNumber = currentTrickSnapshot.trickNumber;
 
-    clearUndoState();
-    msg("Undo successful. Your last card was returned. Choose again.");
+    msg("Back successful. Current trick restored.");
     renderAll();
   }
 
@@ -475,7 +503,7 @@ document.addEventListener("DOMContentLoaded", () => {
     gameOverTriggered = true;
     clearPendingAIAction();
     phase = "GAME_OVER";
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     renderAll();
 
     show(pickPanelEl, false);
@@ -959,10 +987,7 @@ document.addEventListener("DOMContentLoaded", () => {
       turnBannerEl.textContent = `Phase: ${phaseDisplay(phase)} • ${who} • Trick ${trickNumber}/${TOTAL_TRICKS}`;
     }
 
-    if (undoLastCardBtn) {
-      undoLastCardBtn.disabled = !canUndoLastHumanPlay();
-    }
-
+    updateBackButton();
     updateDifficultyUI();
   }
 
@@ -1277,8 +1302,9 @@ document.addEventListener("DOMContentLoaded", () => {
     pluckQueue = [];
     activePluck = null;
     pluckSuitUsedByPair = new Map();
+    completedTrickLog = [];
     clearPendingAIAction();
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     hidePluckEvent();
   }
 
@@ -1659,7 +1685,7 @@ document.addEventListener("DOMContentLoaded", () => {
     trumpSuit = suit;
     trumpOpen = trumpSuit === "C";
     clearPendingAIAction();
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     renderAll();
   }
 
@@ -1677,25 +1703,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function playCard(pi, handIdx) {
-    const leadSuitBefore = leadSuit;
-    const trumpOpenBefore = trumpOpen;
-    const turnIndexBefore = turnIndex;
-    const trickBeforeLen = trick.length;
-
-    if (pi !== 2) {
-      clearUndoState();
+    if (trick.length === 0) {
+      saveCurrentTrickSnapshot();
     }
 
     const cardStr = players[pi].hand.splice(handIdx, 1)[0];
     if (!cardStr) return;
 
     if (trick.length === 0) setLeadSuitFromFirst(cardStr);
+
     trick.push({ playerIndex: pi, cardStr });
     updateTrumpOpen(cardStr);
-
-    if (pi === 2) {
-      armUndoState(cardStr, trickBeforeLen, leadSuitBefore, trumpOpenBefore, turnIndexBefore);
-    }
 
     turnIndex = (turnIndex + 1) % 3;
     renderAll();
@@ -1960,7 +1978,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return aiLowestPressureIndex(legal, hand);
   }
 
-  // ---------- AI trump-open helpers ----------
   function aiChooseTrumpOpenIndex(pi, legal, hand, need, remainingAfterThis) {
     const profile = aiProfile();
 
@@ -1999,7 +2016,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return aiLowestPressureIndex(legal, hand);
   }
 
-  // ---------- AI endgame winner steering ----------
   function aiResolveWinnerForTempTrick(tempTrick) {
     const anyTrump = tempTrick.some(t => isTrumpCard(t.cardStr));
 
@@ -2195,7 +2211,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearPendingAIAction();
     phase = "DEAL";
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     hidePluckEvent();
     setText(phaseValEl, phaseDisplay(phase));
     msg("Dealing...");
@@ -2226,7 +2242,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearPendingAIAction();
     phase = "PLUCK";
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
     show(pluckPanelEl, true);
@@ -2249,7 +2265,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearPendingAIAction();
     phase = "TRUMP_PICK";
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     hidePluckEvent();
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -2277,7 +2293,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearPendingAIAction();
     phase = "PLAY";
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     hidePluckEvent();
     setText(phaseValEl, phaseDisplay(phase));
     show(pickPanelEl, false);
@@ -2297,13 +2313,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     turnIndex = whoHas2C;
 
+    saveCurrentTrickSnapshot();
     msg("Play begins.");
     renderAll();
   }
 
   function endOfHand() {
     clearPendingAIAction();
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     computePlucksEarnedSuffered();
 
     for (let i = 0; i < 3; i++) {
@@ -2333,8 +2350,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resolveTrick() {
-    clearUndoState();
+    clearCurrentTrickSnapshot();
+
     const winner = evaluateTrickWinner();
+
+    completedTrickLog.push({
+      trickNumber,
+      winner: players[winner].id,
+      cards: cloneTrick()
+    });
+
     players[winner].tricks += 1;
 
     msg(`${players[winner].id} wins the trick.`);
@@ -2351,6 +2376,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       trickNumber += 1;
+      saveCurrentTrickSnapshot();
       renderAll();
       engineKick();
     }, BETWEEN_TRICKS);
@@ -2369,11 +2395,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (trick.length === 3) {
-        setTimeout(() => {
+        pendingResolveTimeout = setTimeout(() => {
+          pendingResolveTimeout = null;
+
           if (gameOverTriggered) {
             engineBusy = false;
             return;
           }
+
+          if (phase !== "PLAY") {
+            engineBusy = false;
+            return;
+          }
+
+          if (trick.length !== 3) {
+            engineBusy = false;
+            return;
+          }
+
           resolveTrick();
           engineBusy = false;
         }, RESOLVE_DELAY);
@@ -2437,8 +2476,9 @@ document.addEventListener("DOMContentLoaded", () => {
     phase = "PICK_DEALER";
     engineBusy = false;
     pluckSuitUsedByPair = new Map();
+    completedTrickLog = [];
 
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     resetMatchTotals();
 
     players.forEach(p => {
@@ -2460,6 +2500,20 @@ document.addEventListener("DOMContentLoaded", () => {
     setText(trickMaxEl, String(TOTAL_TRICKS));
     msg("Pick dealer to begin.");
     renderAll();
+  }
+
+  function reviewCurrentDeal() {
+    if (!completedTrickLog.length) {
+      msg("No completed tricks to review yet.");
+      return;
+    }
+
+    const last = completedTrickLog[completedTrickLog.length - 1];
+    const cards = last.cards
+      .map(t => `${players[t.playerIndex].id}: ${formatCardForDisplay(t.cardStr)}`)
+      .join(" • ");
+
+    msg(`Last completed trick ${last.trickNumber}. Winner: ${last.winner}. ${cards}`);
   }
 
   // ---------- events ----------
@@ -2545,9 +2599,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    if (undoLastCardBtn) {
-      undoLastCardBtn.addEventListener("click", () => {
-        undoLastHumanPlay();
+    if (backTrickBtn) {
+      backTrickBtn.addEventListener("click", () => {
+        restoreCurrentTrick();
+      });
+    }
+
+    if (reviewDealBtn) {
+      reviewDealBtn.addEventListener("click", () => {
+        reviewCurrentDeal();
       });
     }
 
@@ -2571,8 +2631,9 @@ document.addEventListener("DOMContentLoaded", () => {
     leadSuit = null;
     trickNumber = 0;
     turnIndex = 0;
+    completedTrickLog = [];
     clearPendingAIAction();
-    clearUndoState();
+    clearCurrentTrickSnapshot();
     resetMatchTotals();
 
     players.forEach(p => {
