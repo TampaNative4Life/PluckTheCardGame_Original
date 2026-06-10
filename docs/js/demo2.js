@@ -1,6 +1,6 @@
 // =========================================================
 // CHANGE LOG
-// 2026-04-26
+// 2026-06-09
 //
 // FILE
 // docs/js/demo2.js
@@ -9,40 +9,13 @@
 // Full file replacement.
 //
 // ISSUE
-// Undo Last Card was the wrong feature.
-// User needs a simple Back button that restores the current unresolved trick.
+// Full file replacement.
 //
 // ROOT CAUSE
-// Original undo logic only restored the human player’s most recent card.
-// It did not restore full trick state after AI cards were played.
+// Full file replacement.
 //
 // FIX
-// • Removed Undo Last Card system
-// • Added Back button support through #backTrickBtn
-// • Back restores the current unresolved trick to its starting state
-// • Back works after 1, 2, or 3 cards are down, as long as trick has not resolved
-// • Back restores all player hands
-// • Back restores turn order
-// • Back restores lead suit
-// • Back restores trump-open state
-// • Back restores trick number
-// • Back restores trick counts
-// • Back cancels pending AI action
-// • Back cancels pending trick resolution timer
-// • Back use is unlimited during testing
-//
-// LINE COUNT
-// Old: 1634
-// New: 1668
-//
-// UNTOUCHED AREAS
-// • Dealer rotation logic
-// • Quota assignment logic
-// • Pick logic
-// • Pluck cycle ordering logic
-// • Trump selection flow
-// • Existing AI decision logic
-// • Game over logic
+// • Full file replacement.
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
